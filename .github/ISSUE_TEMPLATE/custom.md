@@ -1,0 +1,26 @@
+---
+name: Custom issue template
+about: Describe this issue template's purpose here.
+title: ''
+labels: ''
+assignees: ''
+
+---
+
+---
+name: 이슈 생성 템플릿
+about: 해당 이슈 생성 템플릿을 사용하여 이슈를 생성해 주세요.
+title: ''
+labels: ''
+assignees: ''
+
+---
+
+## 👀 ISSUE
+<!-- 어떤 이슈인지 간략하게 설명해주세요. -->
+
+## ✅ TO DO
+<!-- 상세하게 task를 나눠서 작성해주세요. -->
+- [ ] task1
+- [ ] task2
+- [ ] task3
