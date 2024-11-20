@@ -1,4 +1,4 @@
-package com.example.mallangs;
+package com.mallangs;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
