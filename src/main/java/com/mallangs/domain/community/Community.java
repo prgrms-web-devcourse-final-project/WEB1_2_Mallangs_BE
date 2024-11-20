@@ -19,13 +19,13 @@ public class Community extends BaseTimeEntity {
     @Column(name = "board_id")
     private Long board_id;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "member_id")
-//    private Member member;
-//
-//    @Enumerated(EnumType.STRING)
-//    @JoinColumn(name = "category_id")
-//    private Category category;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
+    @Enumerated(EnumType.STRING)
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @Column(name = "title", nullable = false, length = 255)
     private String title;
@@ -42,16 +42,16 @@ public class Community extends BaseTimeEntity {
     @Column(name = "longitude")
     private Double longitude;
 
-//    public Community(Member member, Category category, String title, String content, String location,
-//                     Double latitude, Double longitude) {
-//        this.member = member;
-//        this.category = category;
-//        this.title = title;
-//        this.content = content;
-//        this.location = location;
-//        this.latitude = latitude;
-//        this.longitude = longitude;
-//    }
+    public Community(Member member, Category category, String title, String content, String location,
+                     Double latitude, Double longitude) {
+        this.member = member;
+        this.category = category;
+        this.title = title;
+        this.content = content;
+        this.location = location;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 
     public void update(String title, String content, String location, Double latitude, Double longitude) {
         this.title = title;
