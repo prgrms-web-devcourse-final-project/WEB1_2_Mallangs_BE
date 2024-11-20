@@ -11,18 +11,18 @@ import java.util.regex.Pattern;
 @Embeddable
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Nickname {
-    public static final String REGEX = "^[가-힣a-zA-Z0-9]{2,15}$\n";
-    public static final String ERR_MSG = "닉네임은 특수문자를 제외한 2~15자리여야 합니다.";
+public class MemberId {
+    public static final String REGEX = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,12}$\n";
+    public static final String ERR_MSG = "아이디는 영문 대소문자, 숫자를 포함한 6~12자리여야 합니다.";
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
-    @Column(name = "nickname", nullable = false, length = 15)
+    @Column(name = "member_id", nullable = false, length = 12)
     private String value;
 
-    public Nickname(final String nickname) {
-        if (!PATTERN.matcher(nickname).matches()) {
+    public MemberId(final String memberId) {
+        if (!PATTERN.matcher(memberId).matches()) {
             throw new IllegalArgumentException(ERR_MSG);
         }
-        this.value = nickname;
+        this.value = memberId;
     }
 }

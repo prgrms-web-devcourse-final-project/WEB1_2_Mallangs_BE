@@ -1,26 +1,25 @@
 package com.mallangs.domain.member;
 
-import com.mallangs.domain.member.embadded.Email;
-import com.mallangs.domain.member.embadded.Nickname;
-import com.mallangs.domain.member.embadded.Password;
+import com.mallangs.domain.member.embadded.*;
+import com.mallangs.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
-@Entity
-@Builder
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter
+@Builder
+@Entity
+@EqualsAndHashCode(of = "id", callSuper = false)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "member")
-public class Member {
+public class Member extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "member_id", nullable = false, unique = true)
-    private String memberId;
+    @Embedded
+    private MemberId memberId;
 
     @Embedded
     private Nickname nickname;
@@ -31,13 +30,30 @@ public class Member {
     @Embedded
     private Email email;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "address1_id",nullable = false)
     private Address address1;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "address2_id")
     private Address address2;
 
-//    @OneToMany(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "member_id")
-//    private List<MemberRole> roleList;
+    @Enumerated(EnumType.STRING)
+    private MemberRole memberRoles;
+
+    @Column(name = "profile_image")
+    private String profileImage;
+
+    @Column(name = "has_pet", nullable = false)
+    private Boolean hasPet;
+
+    @Column(name = "provider")
+    private String provider;
+
+    @Column(name = "provider_id")
+    private String providerId;
+
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive;
+
 }
