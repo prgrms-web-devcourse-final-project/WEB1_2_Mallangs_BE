@@ -29,9 +29,17 @@ public class Pet extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private PetType petType;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String image;
 
-    @Column(nullable = false)
     private LocalDate birthdate;
+
+    private Double weight;
+
+    @Column(nullable = false)
+    private Boolean isNeutering;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PetGender gender;
 }
