@@ -47,12 +47,6 @@ public class Member extends BaseTimeEntity {
     @Column(name = "has_pet", nullable = false)
     private Boolean hasPet;
 
-    @Column(name = "provider")
-    private String provider;
-
-    @Column(name = "provider_id")
-    private String providerId;
-
     @Column(name = "is_active", nullable = false)
     private Boolean isActive;
 
