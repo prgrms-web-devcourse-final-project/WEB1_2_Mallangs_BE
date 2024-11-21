@@ -15,28 +15,53 @@ public class Address {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "address_id")
     private Long id;
 
     @Column(name = "address_name", nullable = false)
-    private String addressName; // 주소 이름
+    private String addressName;
 
-    @Column(name = "city", nullable = false)
-    private String city; // 시/도
+    @Column(name = "address_type", nullable = false)
+    private String addressType;
 
-    @Column(name = "town", nullable = false)
-    private String town; // 시/군/구
+    @Column(name = "region_1depth_name")
+    private String region1depthName;
+
+    @Column(name = "region_2depth_name")
+    private String region2depthName;
 
     @Column(name = "region_3depth_name")
-    private String village; // 읍/면/동
+    private String region3depthName;
 
-    @Column(name = "longitude", nullable = false)
-    private String longitude; // 경도
+    @Column(name = "region_3depth_h_name")
+    private String region3depthHName;
 
-    @Column(name = "latitude", nullable = false)
-    private String latitude; // 위도
+    @Column(name = "main_address_no")
+    private String mainAddressNo;
 
-    @Column(name = "detail_info")
-    private String detailInfo; // 세부주소
+    @Column(name = "sub_address_no")
+    private String subAddressNo;
 
+    @Column(name = "road_name")
+    private String roadName;
+
+    @Column(name = "main_building_no")
+    private String mainBuildingNo;
+
+    @Column(name = "sub_building_no")
+    private String subBuildingNo;
+
+    @Column(name = "building_name")
+    private String buildingName;
+
+    @Column(name = "zone_no")
+    private String zoneNo;
+
+    @Column(name = "mountain_yn")
+    private String mountainYn;
+
+    @Column(name = "x", nullable = false)
+    private Double x;
+
+    @Column(name = "y", nullable = false)
+    private Double y;
 }
