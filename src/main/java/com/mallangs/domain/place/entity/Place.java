@@ -7,7 +7,6 @@ import lombok.*;
 @Entity
 @Getter
 @Builder
-@Setter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Place extends BaseTimeEntity {
