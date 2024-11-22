@@ -50,6 +50,7 @@ public class Pet extends BaseTimeEntity {
     private PetGender gender;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean isActive = true; // 기본값은 true
 
     public void deactivate() {
