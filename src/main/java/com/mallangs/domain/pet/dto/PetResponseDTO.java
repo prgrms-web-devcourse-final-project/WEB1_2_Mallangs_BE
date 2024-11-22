@@ -33,10 +33,12 @@ public class PetResponseDTO {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime updatedAt;
 
+    private Double distance; //거리정보
+
     // Constructor to create DTO from Entity
     public PetResponseDTO(Pet pet) {
         this.petId = pet.getPetId();
-        this.memberId=pet.getMember().getMemberId();
+        this.memberId = pet.getMember().getMemberId();
         this.name = pet.getName();
         this.petType = pet.getPetType();
         this.image = pet.getImage();
@@ -46,7 +48,12 @@ public class PetResponseDTO {
         this.isProfileOpen = pet.getIsOpenProfile();
         this.isNeutering = pet.getIsNeutering();
         this.gender = pet.getGender();
-        this.createdAt=pet.getCreatedAt();
-        this.updatedAt=pet.getUpdatedAt();
+        this.createdAt = pet.getCreatedAt();
+        this.updatedAt = pet.getUpdatedAt();
+    }
+
+    // 거리 정보를 설정하는 비즈니스 메서드
+    public void assignDistance(Double distance) {
+        this.distance = distance;
     }
 }

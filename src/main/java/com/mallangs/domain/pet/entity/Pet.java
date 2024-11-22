@@ -39,7 +39,7 @@ public class Pet extends BaseTimeEntity {
     @Column(length = 255)
     private String description;
 
-    @Column(nullable = false)
+    @Column(name = "is_open_profile", nullable = false)
     private Boolean isOpenProfile;
 
     @Column(nullable = false)
