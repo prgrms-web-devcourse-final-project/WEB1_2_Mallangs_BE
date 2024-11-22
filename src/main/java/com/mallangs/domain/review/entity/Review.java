@@ -9,7 +9,6 @@ import lombok.*;
 @Entity
 @Getter
 @Builder
-@Setter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Review {
@@ -26,8 +25,6 @@ public class Review {
 //    @JoinColumn(name = "member_id")
 //    private Member member;
 
-    @Min(1)
-    @Max(5)
     @Column(nullable = false)
     private Integer score;
 
