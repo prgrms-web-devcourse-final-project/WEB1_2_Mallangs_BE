@@ -1,22 +1,62 @@
 package com.mallangs.domain.community.entity;
 
-public enum Category {
+import com.mallangs.global.common.BaseTimeEntity;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-    // 커뮤니티 카테코리명 임시 지정, 이름 나오면 수정 예정
-    CATEGORY1("목격"),
-    CATEGORY2("카테고리2"),
-    CATEGORY3("카테고리3"),
-    CATEGORY4("카테고리4"),
-    CATEGORY5("카테고리5"),
-    CATEGORY6("카테고리6");
+import java.util.ArrayList;
+import java.util.List;
 
-    private String value;
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+public class Category extends BaseTimeEntity {
 
-    Category(String value) {
-        this.value = value;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long CategoryId;
+
+    @Column(nullable = false)
+    private String name;
+
+    private String description;
+
+    @Column(nullable = false)
+    private int categoryOrder;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private int categoryStatus;
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Community> communities = new ArrayList<>();
+
+    public Category(String name, String description, int categoryOrder, int categoryStatus) {
+        this.name = name;
+        this.description = description;
+        this.categoryOrder = categoryOrder;
+        this.categoryStatus = categoryStatus;
     }
 
-    public String getValue() {
-        return value;
+    // 카테고리 수정
+    public void changeCategory(String name, String description, int categoryOrder, int categoryStatus) {
+        this.name = name;
+        this.description = description;
+        this.categoryOrder = categoryOrder;
+        this.categoryStatus = categoryStatus;
+    }
+
+    // 카테고리 상태 변경
+    public void changeStatus(int categoryStatus) {
+        this.categoryStatus = categoryStatus;
+    }
+
+    // 카테고리 순서 변경
+    public void changeOrder(int categoryOrder) {
+        this.categoryOrder = categoryOrder;
     }
 }
