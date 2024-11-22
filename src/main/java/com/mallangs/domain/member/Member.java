@@ -4,13 +4,12 @@ import com.mallangs.domain.member.embadded.*;
 import com.mallangs.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Getter
 @Builder
 @Entity
-@EqualsAndHashCode(of = "id", callSuper = false)
+@EqualsAndHashCode(of = "memberId", callSuper = false)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "member")
@@ -18,10 +17,10 @@ public class Member extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long memberId;
 
     @Embedded
-    private MemberId memberId;
+    private UserId userId;
 
     @Embedded
     private Nickname nickname;
@@ -53,8 +52,8 @@ public class Member extends BaseTimeEntity {
     private Boolean isActive = true;
 
     // 회원가입
-    public Member(String memberId, String nickname, String password, String email, Address address, String profileImage, Boolean hasPet, PasswordEncoder passwordEncoder) {
-        this.memberId = new MemberId(memberId);
+    public Member(String userId, String nickname, String password, String email, Address address, String profileImage, Boolean hasPet, PasswordEncoder passwordEncoder) {
+        this.userId = new UserId(userId);
         this.nickname = new Nickname(nickname);
         this.password = new Password(password, passwordEncoder);
         this.email = new Email(email);
@@ -80,7 +79,7 @@ public class Member extends BaseTimeEntity {
     public void changeProfileImage(String profileImage) {
         this.profileImage = profileImage;
     }
-    public void changeHaspet(Boolean hasPet) {
+    public void changeHasPet(Boolean hasPet) {
         this.hasPet = hasPet;
     }
     public void changeIsActive(Boolean isActive) {
