@@ -32,7 +32,7 @@ public class Notification extends BaseTimeEntity {
     @Column(nullable = false)
     private String url;
 
-    public void updateIsRead(Boolean isRead) {
+    public void changeIsRead(Boolean isRead) {
         this.isRead = isRead;
     }
 }
