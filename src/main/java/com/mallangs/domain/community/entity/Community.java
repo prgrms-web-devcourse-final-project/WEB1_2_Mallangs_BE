@@ -16,48 +16,55 @@ public class Community extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "board_id")
-    private Long board_id;
+    private Long boardId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @Enumerated(EnumType.STRING)
-    @JoinColumn(name = "category_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @Column(name = "title", nullable = false, length = 255)
+    @Column(nullable = false)
     private String title;
 
-    @Column(name = "title", nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "location", nullable = false)
     private String location;
 
-    @Column(name = "latitude")
-    private Double latitude;
+    private String imgUrl;
 
-    @Column(name = "longitude")
-    private Double longitude;
+    private int viewCnt;
 
-    public Community(Member member, Category category, String title, String content, String location,
-                     Double latitude, Double longitude) {
+    private int commentCnt;
+
+    private int likeCnt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CommunityStatus communityStatus;
+
+    public Community(Member member, Category category, String title, String content,
+                     String location, String imgUrl) {
         this.member = member;
         this.category = category;
         this.title = title;
         this.content = content;
         this.location = location;
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this.imgUrl = imgUrl;
+        this.communityStatus = CommunityStatus.PUBLISHED;
+        this.viewCnt = 0;
+        this.commentCnt = 0;
+        this.likeCnt = 0;
     }
 
-    public void update(String title, String content, String location, Double latitude, Double longitude) {
+    // 게시글 정보 수정
+    public void change(String title, String content, String location, String imgUrl) {
         this.title = title;
         this.content = content;
         this.location = location;
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this.imgUrl = imgUrl;
     }
 }
