@@ -266,9 +266,8 @@ gradle-app.setting
 *.hprof
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij,java,gradle,macos,windows
-
 **/application.properties
 .env
 logs/
 **/generated/
->>>>>>> a99dd5721bbbd2156972821711ae252258474097
+
