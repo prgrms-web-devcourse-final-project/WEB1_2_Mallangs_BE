@@ -61,28 +61,17 @@ public class Member extends BaseTimeEntity {
         this.profileImage = profileImage;
         this.hasPet = hasPet;
     }
-    public void changeNickname(String nickname) {
+
+    @Builder
+    public void change(String nickname,String password, String email, Address address1, Address address2, String profileImage,Boolean hasPet,Boolean isActive, PasswordEncoder passwordEncoder){
         this.nickname = new Nickname(nickname);
-    }
-    public void changePassword(String password, PasswordEncoder passwordEncoder) {
         this.password = new Password(password, passwordEncoder);
-    }
-    public void changeEmail(String email) {
         this.email = new Email(email);
-    }
-    public void changeAddress1(Address address1) {
         this.address1 = address1;
-    }
-    public void changeAddress2(Address address2) {
-        this.address1 = address2;
-    }
-    public void changeProfileImage(String profileImage) {
+        this.address2 = address2;
         this.profileImage = profileImage;
-    }
-    public void changeHasPet(Boolean hasPet) {
         this.hasPet = hasPet;
-    }
-    public void changeIsActive(Boolean isActive) {
         this.isActive = isActive;
     }
+
 }
