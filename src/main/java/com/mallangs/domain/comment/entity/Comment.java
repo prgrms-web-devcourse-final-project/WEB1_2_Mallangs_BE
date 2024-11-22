@@ -1,6 +1,5 @@
 package com.mallangs.domain.comment.entity;
 
-import com.mallangs.domain.member.Member;
 import com.mallangs.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,7 +24,7 @@ public class Comment extends BaseTimeEntity {
 
     private String content;
 
-    public void updateContent(String content) {
+    public void changeContent(String content) {
         this.content = content;
     }
 }
