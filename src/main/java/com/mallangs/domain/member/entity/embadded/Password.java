@@ -13,11 +13,11 @@ import java.util.regex.Pattern;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Password {
-    public static final String REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[$@$!%*?&])[A-Za-z\\d$@$!%*?&]{8,20}";
+    public static final String REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[$@#!%*?&^])[A-Za-z\\d$@!%#*?&^]{8,}$";
     public static final String ERR_MSG = "비밀번호는 8~20, 최소 하나의 영어소문자, 영어 대문자, 특수 문자, 숫자 이상 포함되어야 합니다.";
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
-    @Column(name = "password", nullable = false, length = 20)
+    @Column(name = "password", nullable = false)
     private String value;
 
     public Password(final String password, final PasswordEncoder passwordEncoder) {

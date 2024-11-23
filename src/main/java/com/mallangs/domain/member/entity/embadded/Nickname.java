@@ -12,11 +12,11 @@ import java.util.regex.Pattern;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Nickname {
-    public static final String REGEX = "^[가-힣a-zA-Z0-9]{2,15}$\n";
-    public static final String ERR_MSG = "닉네임은 특수문자를 제외한 2~15자리여야 합니다.";
+    public static final String REGEX = "^[ㄱ-ㅎ가-힣a-zA-Z0-9-_\\\\s]{2,20}$";
+    public static final String ERR_MSG = "닉네임은 특수문자를 제외한 2~20자리여야 합니다.";
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
-    @Column(name = "nickname", nullable = false, length = 15)
+    @Column(name = "nickname", nullable = false, length = 50)
     private String value;
 
     public Nickname(final String nickname) {

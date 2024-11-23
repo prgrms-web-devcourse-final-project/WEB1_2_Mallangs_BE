@@ -3,8 +3,12 @@ package com.mallangs.domain.member.entity;
 import com.mallangs.domain.member.entity.embadded.*;
 import com.mallangs.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Builder
@@ -31,15 +35,12 @@ public class Member extends BaseTimeEntity {
     @Embedded
     private Email email;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address1_id", nullable = false)
-    private Address address1;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address2_id")
-    private Address address2;
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Address> addresses = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private MemberRole memberRole = MemberRole.ROLE_USER;
 
     @Column(name = "profile_image")
@@ -49,6 +50,7 @@ public class Member extends BaseTimeEntity {
     private Boolean hasPet;
 
     @Column(name = "is_active", nullable = false)
+    @Builder.Default
     private Boolean isActive = true;
 
     // 회원가입
@@ -57,24 +59,29 @@ public class Member extends BaseTimeEntity {
         this.nickname = new Nickname(nickname);
         this.password = new Password(password, passwordEncoder);
         this.email = new Email(email);
-        this.address1 = address;
         this.profileImage = profileImage;
         this.hasPet = hasPet;
+        addAddress(address);
     }
 
-    @Builder
-    public void change(String nickname,String password, String email, Address address1, Address address2, String profileImage,Boolean hasPet, PasswordEncoder passwordEncoder){
+    public void change(String nickname,String password, String email, String profileImage,Boolean hasPet, PasswordEncoder passwordEncoder){
         this.nickname = new Nickname(nickname);
         this.password = new Password(password, passwordEncoder);
         this.email = new Email(email);
-        this.address1 = address1;
-        this.address2 = address2;
         this.profileImage = profileImage;
         this.hasPet = hasPet;
+
     }
 
     public void changeIsActive(Boolean isActive){
         this.isActive = isActive;
+    }
+
+    public void addAddress(Address address){
+        this.addresses.add(address);
+    }
+    public void removeAddress(Address address){
+        this.addresses.remove(address);
     }
 
 }
