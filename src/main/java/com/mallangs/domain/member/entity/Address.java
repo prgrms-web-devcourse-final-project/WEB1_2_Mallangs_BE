@@ -1,4 +1,4 @@
-package com.mallangs.domain.member;
+package com.mallangs.domain.member.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -56,7 +56,7 @@ public class Address {
     private String zoneNo;
 
     @Column(name = "mountain_yn")
-    private String mountainYn;
+    private String mountainYn; // Y / N 으로 입력됨
 
     @Column(name = "x", nullable = false)
     private Double x;

@@ -1,4 +1,4 @@
-package com.mallangs.domain.member.embadded;
+package com.mallangs.domain.member.entity.embadded;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

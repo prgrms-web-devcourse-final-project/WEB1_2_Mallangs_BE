@@ -1,6 +1,6 @@
-package com.mallangs.domain.member;
+package com.mallangs.domain.member.entity;
 
-import com.mallangs.domain.member.embadded.*;
+import com.mallangs.domain.member.entity.embadded.*;
 import com.mallangs.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -40,7 +40,7 @@ public class Member extends BaseTimeEntity {
     private Address address2;
 
     @Enumerated(EnumType.STRING)
-    private MemberRole memberRoles = MemberRole.ROLE_USER;
+    private MemberRole memberRole = MemberRole.ROLE_USER;
 
     @Column(name = "profile_image")
     private String profileImage;
@@ -63,7 +63,7 @@ public class Member extends BaseTimeEntity {
     }
 
     @Builder
-    public void change(String nickname,String password, String email, Address address1, Address address2, String profileImage,Boolean hasPet,Boolean isActive, PasswordEncoder passwordEncoder){
+    public void change(String nickname,String password, String email, Address address1, Address address2, String profileImage,Boolean hasPet, PasswordEncoder passwordEncoder){
         this.nickname = new Nickname(nickname);
         this.password = new Password(password, passwordEncoder);
         this.email = new Email(email);
@@ -71,6 +71,9 @@ public class Member extends BaseTimeEntity {
         this.address2 = address2;
         this.profileImage = profileImage;
         this.hasPet = hasPet;
+    }
+
+    public void changeIsActive(Boolean isActive){
         this.isActive = isActive;
     }
 
