@@ -1,5 +1,6 @@
 package com.mallangs.domain.comment.entity;
 
+import com.mallangs.domain.member.Member;
 import com.mallangs.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,9 +14,9 @@ public class Comment extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commentId;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name="member_id")
-//    private Member member;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="member_id")
+    private Member member;
 
     @Enumerated(EnumType.STRING)
     private PostType postType;
