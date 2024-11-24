@@ -55,14 +55,13 @@ public class Member extends BaseTimeEntity {
     private Boolean isActive = true;
 
     // 회원가입
-    public Member(String userId, String nickname, String password, String email, Address address, String profileImage, Boolean hasPet, PasswordEncoder passwordEncoder) {
+    public Member(String userId, String nickname, String password, String email, String profileImage, Boolean hasPet, PasswordEncoder passwordEncoder) {
         this.userId = new UserId(userId);
         this.nickname = new Nickname(nickname);
         this.password = new Password(password, passwordEncoder);
         this.email = new Email(email);
         this.profileImage = profileImage;
         this.hasPet = hasPet;
-        addAddress(address);
     }
 
     public void change(String nickname,String password, String email, String profileImage,Boolean hasPet, PasswordEncoder passwordEncoder){

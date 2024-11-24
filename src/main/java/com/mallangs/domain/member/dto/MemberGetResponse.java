@@ -34,9 +34,13 @@ public class MemberGetResponse {
         this.profileImage = member.getProfileImage();
         this.createdAt = member.getCreatedAt();
         this.updatedAt = member.getUpdatedAt();
-        this.addresses = member.getAddresses().stream()
-                .map(MemberAddressResponse::new)
-                .collect(Collectors.toList());
-    }
+        if (!member.getAddresses().isEmpty()){
+            this.addresses = member.getAddresses().stream()
+                    .map(MemberAddressResponse::new)
+                    .collect(Collectors.toList());
+        }else {
+            this.addresses = new ArrayList<>();
+        }
 
+    }
 }
