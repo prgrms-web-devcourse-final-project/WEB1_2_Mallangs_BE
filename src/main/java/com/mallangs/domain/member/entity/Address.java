@@ -1,11 +1,13 @@
-package com.mallangs.domain.member;
+package com.mallangs.domain.member.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
 @Builder
 @Entity
+@ToString(exclude = "member")
 @EqualsAndHashCode
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -15,6 +17,11 @@ public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    @JsonIgnore
+    private Member member;
 
     @Column(name = "address_name", nullable = false)
     private String addressName;
@@ -56,7 +63,7 @@ public class Address {
     private String zoneNo;
 
     @Column(name = "mountain_yn")
-    private String mountainYn;
+    private String mountainYn; // Y / N 으로 입력됨
 
     @Column(name = "x", nullable = false)
     private Double x;

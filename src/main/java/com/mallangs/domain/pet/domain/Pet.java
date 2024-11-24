@@ -1,6 +1,5 @@
 package com.mallangs.domain.pet.domain;
 
-import com.mallangs.domain.member.Member;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
