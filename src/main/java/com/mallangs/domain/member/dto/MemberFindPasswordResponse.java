@@ -1,5 +1,8 @@
 package com.mallangs.domain.member.dto;
 
-public class MemberFindPasswordResponseDTO {
+import lombok.Data;
+
+@Data
+public class MemberFindPasswordResponse {
     private String email;
 }

@@ -13,6 +13,7 @@ import java.util.List;
 @Getter
 @Builder
 @Entity
+@ToString(exclude = "addresses")
 @EqualsAndHashCode(of = "memberId", callSuper = false)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

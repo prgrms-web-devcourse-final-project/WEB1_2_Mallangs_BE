@@ -1,5 +1,8 @@
 package com.mallangs.domain.member.dto;
 
-public class MemberUpdateResponseDTO {
+import lombok.Data;
+
+@Data
+public class MemberUpdateResponse {
     private String userId;
 }
