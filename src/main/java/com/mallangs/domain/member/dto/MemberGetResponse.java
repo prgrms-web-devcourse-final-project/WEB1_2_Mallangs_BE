@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 @Data
 public class MemberGetResponse {
 
+    private Long memberId;
     private String userId;
     private String nickname;
     private String email;
@@ -28,15 +29,20 @@ public class MemberGetResponse {
     private List<MemberAddressResponse> addresses;
 
     public MemberGetResponse(Member member) {
+        this.memberId = member.getMemberId();
         this.userId = member.getUserId().getValue();
         this.nickname = member.getNickname().getValue();
         this.email = member.getEmail().getValue();
         this.profileImage = member.getProfileImage();
         this.createdAt = member.getCreatedAt();
         this.updatedAt = member.getUpdatedAt();
-        this.addresses = member.getAddresses().stream()
-                .map(MemberAddressResponse::new)
-                .collect(Collectors.toList());
-    }
+        if (!member.getAddresses().isEmpty()){
+            this.addresses = member.getAddresses().stream()
+                    .map(MemberAddressResponse::new)
+                    .collect(Collectors.toList());
+        }else {
+            this.addresses = new ArrayList<>();
+        }
 
+    }
 }

@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
-public class MemberFindIdRequest {
+public class MemberFindUserIdRequest {
     @Pattern(regexp = Email.REGEX, message = Email.ERR_MSG)
     private String email;
     @Pattern(regexp = Nickname.REGEX, message = Nickname.ERR_MSG)

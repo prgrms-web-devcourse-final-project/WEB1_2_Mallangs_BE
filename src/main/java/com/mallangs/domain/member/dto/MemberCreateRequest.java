@@ -1,5 +1,7 @@
 package com.mallangs.domain.member.dto;
 
+import com.mallangs.domain.member.entity.Address;
+import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.embadded.Email;
 import com.mallangs.domain.member.entity.embadded.Nickname;
 import com.mallangs.domain.member.entity.embadded.Password;
@@ -7,9 +9,17 @@ import com.mallangs.domain.member.entity.embadded.UserId;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Data
+@NoArgsConstructor
 public class MemberCreateRequest {
+
+    private PasswordEncoder passwordEncoder;
+
     // 회원정보
     @Pattern(regexp = UserId.REGEX, message = UserId.ERR_MSG)
     private String userId;
@@ -19,6 +29,9 @@ public class MemberCreateRequest {
     private String nickname;
     @Pattern(regexp = Email.REGEX, message = Email.ERR_MSG)
     private String email;
+    @Pattern(regexp = "([^\\s]+(\\.(?i)(jpg|jpeg|png|gif|bmp|tiff|webp|svg|ico|heic|heif|avif))$)",
+            message = "유효한 이미지 파일을 업로드해주세요. (jpg, jpeg, png, gif, bmp, tiff, webp, svg, ico, heic, heif, avif)")
+    private String profileImage;
     @NotNull(message = "반려동물 유무는 필수 입력입니다.")
     private Boolean hasPet;
 
@@ -56,4 +69,27 @@ public class MemberCreateRequest {
     @NotNull(message = "경도는 필수입니다.")
     private Double y;
 
+    public Member toEntity() {
+        Member member = new Member(userId, nickname, password, email, profileImage, hasPet, passwordEncoder);
+        Address address = Address.builder()
+                .addressName(addressName)
+                .addressType(addressType)
+                .region1depthName(region1depthName)
+                .region2depthName(region2depthName)
+                .region3depthName(region3depthName)
+                .region3depthHName(region3depthHName)
+                .mainAddressNo(mainAddressNo)
+                .subAddressNo(subAddressNo)
+                .roadName(roadName)
+                .mainBuildingNo(mainBuildingNo)
+                .subBuildingNo(subBuildingNo)
+                .buildingName(buildingName)
+                .zoneNo(zoneNo)
+                .mountainYn(mountainYn)
+                .x(x)
+                .y(y)
+                .build();
+        member.addAddress(address);
+        return member;
+    }
 }
