@@ -11,12 +11,13 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "likes")
 @Builder
-public class Likes extends BaseTimeEntity {
+public class Like extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long likesId;
+    private Long likeId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -26,7 +27,7 @@ public class Likes extends BaseTimeEntity {
     @JoinColumn(name = "community_id")
     private Community community;
 
-    public Likes(Member member, Community community) {
+    public Like(Member member, Community community) {
         this.member = member;
         this.community = community;
     }
