@@ -2,6 +2,7 @@ package com.mallangs.domain.jwt.filter;
 
 import com.mallangs.domain.jwt.entity.CustomMemberDetails;
 import com.mallangs.domain.jwt.entity.TokenCategory;
+import com.mallangs.domain.jwt.service.RefreshTokenService;
 import com.mallangs.domain.jwt.util.JWTUtil;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.MemberRole;
@@ -82,6 +83,7 @@ public class JWTFilter extends OncePerRequestFilter {
                                     response.setStatus(HttpStatus.OK.value());
                                     Cookie refreshTokenCookie = new Cookie("RefreshToken", newRefreshToken);
                                     refreshTokenCookie.setPath("/");
+                                    refreshTokenCookie.setHttpOnly(true);
                                     refreshTokenCookie.setMaxAge(3 * 24 * 60 * 60);
                                     response.addCookie(refreshTokenCookie);
 

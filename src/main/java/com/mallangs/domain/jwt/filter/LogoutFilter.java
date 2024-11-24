@@ -72,6 +72,7 @@ public class LogoutFilter extends OncePerRequestFilter {
         Cookie cookie = new Cookie("refreshToken", null);
 //        cookie.setSecure(true); // HTTPS 환경에서만 전송
         cookie.setPath("/");
+        cookie.setHttpOnly(true);
         cookie.setMaxAge(0);
         response.addCookie(cookie);
 
