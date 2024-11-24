@@ -1,7 +1,6 @@
 package com.mallangs.domain.member.repository;
 
 import com.mallangs.domain.member.dto.MemberGetResponse;
-import com.mallangs.domain.member.dto.MemberListResponse;
 import com.mallangs.domain.member.entity.Address;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.embadded.Email;
@@ -9,23 +8,21 @@ import com.mallangs.domain.member.entity.embadded.Nickname;
 import com.mallangs.domain.member.entity.embadded.Password;
 import com.mallangs.domain.member.entity.embadded.UserId;
 import lombok.extern.log4j.Log4j2;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Log4j2
+@Transactional
 public class MemberRepositoryTests {
 
     @Autowired
@@ -36,7 +33,6 @@ public class MemberRepositoryTests {
     AddressRepository addressRepository;
 
     @Test
-    @Transactional
     @Rollback
     public void findByUserIdTest() {
         //given
@@ -73,15 +69,16 @@ public class MemberRepositoryTests {
         memberRepository.save(member);
         //when
         Member foundMember = memberRepository.findByUserId(member.getUserId());
+        Address foundAddress = addressRepository.findById(address.getId()).get();
         //then
         assertThat(foundMember.getUserId().getValue()).isEqualTo("testId1234");
         assertThat(foundMember.getNickname().getValue()).isEqualTo("testname2");
         assertThat(foundMember.getEmail().getValue()).isEqualTo("test123@test.com");
         assertThat(foundMember.getHasPet()).isEqualTo(true);
+        assertThat(foundMember.getAddresses().get(0).getAddressName()).isEqualTo(foundAddress.getAddressName());
     }
 
     @Test
-    @Transactional
     @Rollback
     public void existsByUserIdTest() {
         //given
@@ -128,7 +125,6 @@ public class MemberRepositoryTests {
     }
 
     @Test
-    @Transactional
     @Rollback
     public void existsByEmailTest() {
         //given
@@ -169,7 +165,6 @@ public class MemberRepositoryTests {
     }
 
     @Test
-    @Transactional
     public void memberListTest() {
         //given
         Member member = Member.builder()
@@ -236,6 +231,135 @@ public class MemberRepositoryTests {
         assertEquals(memberList.get(1).getAddresses().get(0).getAddressName(), "testAddress");
         for (MemberGetResponse list : memberList) {
             log.info("list = {}", list.toString());
+        }
+    }
+    @Test
+    public void searchMemberByUserIdTest(){
+//given
+        Member member = Member.builder()
+                .userId(new UserId("testId1234"))
+                .password(new Password("1234Aa1!!", passwordEncoder))
+                .email(new Email("test123@test.com"))
+                .nickname(new Nickname("testname2"))
+                .hasPet(true)
+                .build();
+        memberRepository.save(member);
+
+        Address address = Address.builder()
+                .member(member)
+                .addressName("testAddress")
+                .addressType("testAddressType")
+                .mainAddressNo("testmainAddressNo")
+                .x(1d)
+                .y(1d)
+                .mountainYn("testMountainYn")
+                .region1depthName("testRegion1depthName")
+                .region2depthName("testRegion2depthName")
+                .region3depthHName("testRegion3depthHName")
+                .region3depthName("testRegion3depthName")
+                .mainBuildingNo("testMainBuildingNo")
+                .subBuildingNo("testSubBuildingNo")
+                .roadName("testRoadName")
+                .buildingName("testBuildingName")
+                .subAddressNo("testSubAddressNo")
+                .zoneNo("testZoneNo")
+                .build();
+        addressRepository.save(address);
+        member.addAddress(address);
+        memberRepository.save(member);
+        //when
+        List<Member> members = memberRepository.searchMemberByUserId("testI");
+        //then
+        assertNotNull(members);
+
+        for (Member memberList : members){
+            log.info("memberListByUserId = {}", memberList.toString());
+        }
+    }
+    @Test
+    public void searchMemberByEmailTest(){
+        //given
+        Member member = Member.builder()
+                .userId(new UserId("testId1234"))
+                .password(new Password("1234Aa1!!", passwordEncoder))
+                .email(new Email("test123@test.com"))
+                .nickname(new Nickname("testname2"))
+                .hasPet(true)
+                .build();
+        memberRepository.save(member);
+
+        Address address = Address.builder()
+                .member(member)
+                .addressName("testAddress")
+                .addressType("testAddressType")
+                .mainAddressNo("testmainAddressNo")
+                .x(1d)
+                .y(1d)
+                .mountainYn("testMountainYn")
+                .region1depthName("testRegion1depthName")
+                .region2depthName("testRegion2depthName")
+                .region3depthHName("testRegion3depthHName")
+                .region3depthName("testRegion3depthName")
+                .mainBuildingNo("testMainBuildingNo")
+                .subBuildingNo("testSubBuildingNo")
+                .roadName("testRoadName")
+                .buildingName("testBuildingName")
+                .subAddressNo("testSubAddressNo")
+                .zoneNo("testZoneNo")
+                .build();
+        addressRepository.save(address);
+        member.addAddress(address);
+        memberRepository.save(member);
+        //when
+        List<Member> members = memberRepository.searchMemberByEmail("test");
+        //then
+        assertNotNull(members);
+
+        for (Member memberList : members){
+            log.info("memberListByEmail = {}", memberList.toString());
+        }
+    }
+    @Test
+    public void searchMemberByNicknameTest(){
+        //given
+        Member member = Member.builder()
+                .userId(new UserId("testId1234"))
+                .password(new Password("1234Aa1!!", passwordEncoder))
+                .email(new Email("test123@test.com"))
+                .nickname(new Nickname("testname2"))
+                .hasPet(true)
+                .build();
+        memberRepository.save(member);
+
+        Address address = Address.builder()
+                .member(member)
+                .addressName("testAddress")
+                .addressType("testAddressType")
+                .mainAddressNo("testmainAddressNo")
+                .x(1d)
+                .y(1d)
+                .mountainYn("testMountainYn")
+                .region1depthName("testRegion1depthName")
+                .region2depthName("testRegion2depthName")
+                .region3depthHName("testRegion3depthHName")
+                .region3depthName("testRegion3depthName")
+                .mainBuildingNo("testMainBuildingNo")
+                .subBuildingNo("testSubBuildingNo")
+                .roadName("testRoadName")
+                .buildingName("testBuildingName")
+                .subAddressNo("testSubAddressNo")
+                .zoneNo("testZoneNo")
+                .build();
+        addressRepository.save(address);
+        member.addAddress(address);
+        memberRepository.save(member);
+        //when
+        List<Member> members = memberRepository.searchMemberByNickname("test");
+        //then
+        assertNotNull(members);
+
+        for (Member memberList : members){
+            log.info("memberListByNickName = {}", memberList.toString());
         }
     }
 }
