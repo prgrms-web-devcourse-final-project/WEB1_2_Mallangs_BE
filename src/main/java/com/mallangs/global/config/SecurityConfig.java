@@ -1,5 +1,6 @@
 package com.mallangs.global.config;
 
+import com.mallangs.domain.jwt.util.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
