@@ -19,10 +19,12 @@ public class JWTUtil {
 
     private final SecretKey secretKey;
 
+    //키 암호화
     public JWTUtil(@Value("${spring.jwt.secretKey}")String secret) {
         secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
+    //Access Token 생성
     public String createAccessToken(Map<String, Object> valueMap, Long min) {
         Date now = new Date();
         return Jwts.builder().header().add("alg", "HS256").add("type", "JWT")
@@ -35,6 +37,7 @@ public class JWTUtil {
                 .signWith(secretKey)
                 .compact();
     }
+    //Refresh Token 생성
     public String createRefreshToken(Map<String, Object> valueMap, Long min) {
         try{
             Date now = new Date();
@@ -52,19 +55,34 @@ public class JWTUtil {
             throw e;
         }
     }
+    //Access 토큰 내용 꺼내기
     public Map<String, Object> validateToken(String token) {
         try{
             return Jwts.parser().verifyWith(secretKey).build()
                     .parseSignedClaims(token).getPayload();
         }catch (ExpiredJwtException e){
-            log.warn("토큰이 만료되었어요: {}, token {}", e.getMessage(), token);
+            log.warn("Access 토큰이 만료되었어요: {}, token {}", e.getMessage(), token);
             return e.getClaims();
         }catch (Exception e){
-            log.error("토큰 유효성검사 실패 : {}, token {}", e.getMessage(), token);
+            log.error("Access 토큰 유효성검사 실패 : {}, token {}", e.getMessage(), token);
+            throw e;
+        }
+    }
+    //Refresh 토큰 내용 꺼내기 (randomUUID)
+    public Map<String, Object> validateRefreshToken(String token) {
+        try{
+            return Jwts.parser().verifyWith(secretKey).build()
+                    .parseSignedClaims(token).getPayload();
+        }catch (ExpiredJwtException e){
+            log.warn("Refresh 토큰이 만료되었어요: {}, token {}", e.getMessage(), token);
+            return e.getClaims();
+        }catch (Exception e){
+            log.error("Refresh 토큰 유효성검사 실패 : {}, token {}", e.getMessage(), token);
             throw e;
         }
     }
 
+    //토큰 만료일 확인
     public Boolean isExpired(String token) {
         try {
             return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());

@@ -18,13 +18,14 @@ public class RefreshTokenService {
     private final RedisTemplate<String, Object> redisTemplate;
     protected static final String REFRESH_KEY = "RefreshToken";
 
+    //레디스 RefreshToken 저장
     public void insertInRedis(Map<String, Object> payloadMap, String refreshToken) {
 
         try {
             if (refreshToken != null) {
                 deleteRefreshTokenInRedis(payloadMap);
             }
-            if (refreshToken==null){
+            if (refreshToken == null) {
                 log.error("refreshToken is null");
                 throw new NoSuchElementException("refreshToken is null");
             }
@@ -35,12 +36,13 @@ public class RefreshTokenService {
         }
     }
 
+    //레디스 RefreshToken 조회
     public String readRefreshTokenInRedis(Map<String, Object> payloadMap) {
         try {
             String refreshToken = (String) redisTemplate.opsForHash().get(REFRESH_KEY, makeHashKey(payloadMap));
             if (refreshToken == null) {
-                log.warn("No refreshToken found for userId: {}", payloadMap);
-                throw new NoSuchElementException("No refresh token found for userId: " + payloadMap);
+                log.warn("No refreshToken found for");
+                throw new NoSuchElementException("No refresh token found");
             }
             return refreshToken;
         } catch (Exception e) {
@@ -49,6 +51,7 @@ public class RefreshTokenService {
         return null;
     }
 
+    //레디스 RefreshToken 삭제
     public void deleteRefreshTokenInRedis(Map<String, Object> payloadMap) {
         try {
             redisTemplate.opsForHash().delete(REFRESH_KEY, makeHashKey(payloadMap));
@@ -56,12 +59,11 @@ public class RefreshTokenService {
             log.error("redis failed to delete refreshToken :{}", e.getMessage());
         }
     }
+
     // 회원 데이터 마다 다른 키값 만들기
     public String makeHashKey(Map<String, Object> payloadMap) {
         Object userId = payloadMap.get("userId");
-        Object email = payloadMap.get("email");
-        Object role = payloadMap.get("role");
-        Object category = payloadMap.get("category");
-        return userId + ":" + email + ":" + role + ":" + category;
+        Object randomUUID = payloadMap.get("randomUUID");
+        return userId + ":" + randomUUID;
     }
 }

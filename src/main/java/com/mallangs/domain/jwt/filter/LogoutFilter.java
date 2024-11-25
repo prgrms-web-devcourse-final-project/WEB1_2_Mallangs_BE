@@ -15,7 +15,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Map;
-
+        /*
+            로그아웃에 필터 등록하기
+            <비밀번호찾기, 아이디찾기>
+        */
 @Log4j2
 @RequiredArgsConstructor
 public class LogoutFilter extends OncePerRequestFilter {
@@ -25,6 +28,7 @@ public class LogoutFilter extends OncePerRequestFilter {
     private final RefreshTokenService refreshTokenService;
 
     @Override
+    //등록된 필터만 필터링 허용
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         return !request.getRequestURI().equals("/api/member/logout");
     }
@@ -32,7 +36,7 @@ public class LogoutFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        // Refresh Token 없을 때
+        // Refresh Token 없다면 오류
         String refreshTokenFromCookies = getRefreshTokenFromCookies(request);
         log.info("refreshTokenFromCookies : {}",refreshTokenFromCookies);
         if (refreshTokenFromCookies == null || refreshTokenFromCookies.trim().isEmpty()) {
@@ -41,7 +45,7 @@ public class LogoutFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Access Token 없을 때
+        // Access Token 없다면 오류
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             log.warn("No access token found");
@@ -63,8 +67,9 @@ public class LogoutFilter extends OncePerRequestFilter {
                 log.info("AccessToken is expired");
 
             }
-            Map<String, Object> payloadRefresh = jwtUtil.validateToken(refreshTokenFromCookies);
-            refreshTokenService.deleteRefreshTokenInRedis(payloadRefresh);
+            // 리프레시 토큰 삭제
+            Map<String, Object> payloadMap = jwtUtil.validateRefreshToken(refreshTokenFromCookies);
+            refreshTokenService.deleteRefreshTokenInRedis(payloadMap);
 
         } catch (Exception e) {
             log.error("토큰 블랙리스트 처리에 실패하였습니다 : {}", e.getMessage());
@@ -91,7 +96,7 @@ public class LogoutFilter extends OncePerRequestFilter {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("refreshToken".equals(cookie.getName())) {
+                if ("RefreshToken".equals(cookie.getName())) {
                     return cookie.getValue();
                 }
             }

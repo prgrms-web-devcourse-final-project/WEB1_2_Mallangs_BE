@@ -24,6 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
@@ -38,12 +39,15 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final RefreshTokenService refreshTokenService;
 
     @Override
+    //로그인 정보 인증하기
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, String> requestMap = objectMapper.readValue(request.getInputStream(), Map.class);
+
             String userId = requestMap.get("userId");
             String password = requestMap.get("password");
+
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userId, password, null);
             return authenticationManager.authenticate(authToken);
         } catch (IOException e) {
@@ -52,9 +56,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
+    //로그인 인증 성공시
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException {
         CustomMemberDetails customUserDetails = (CustomMemberDetails) authentication.getPrincipal();
 
+        //customUserDetails에서 인증정보 꺼내기
         String userId = customUserDetails.getUserId();
         String email = customUserDetails.getEmail();
         String role = authentication.getAuthorities().stream()
@@ -62,17 +68,33 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                 .map(GrantedAuthority::getAuthority)
                 .orElse(null);
 
-        Map<String, Object> payloadMap = new HashMap<>();
-        payloadMap.put("userId", userId);
-        payloadMap.put("email", email);
-        payloadMap.put("role", role);
-        payloadMap.put("category", TokenCategory.ACCESS_TOKEN.name());
-        String accessToken = jwtUtil.createAccessToken(payloadMap, accessTokenValidity);
-        payloadMap.put("category", TokenCategory.REFRESH_TOKEN.name());
-        String refreshToken = jwtUtil.createRefreshToken(payloadMap, accessRefreshTokenValidity);
-        log.info("로그인, 토큰만듬: {}, refresh: {}", accessToken,refreshToken);
+        // Access 토큰 생성
+        Map<String, Object> AccessPayloadMap = new HashMap<>();
+        AccessPayloadMap.put("userId", userId);
+        AccessPayloadMap.put("email", email);
+        AccessPayloadMap.put("role", role);
+        AccessPayloadMap.put("category", TokenCategory.ACCESS_TOKEN.name());
+        String accessToken = jwtUtil.createAccessToken(AccessPayloadMap, accessTokenValidity);
+        AccessPayloadMap.put("category", TokenCategory.REFRESH_TOKEN.name());
 
-        refreshTokenService.insertInRedis(payloadMap, refreshToken);
+        //리프레시 토큰 생성 ( 난수를 입력, 의미없는 토큰 생성 )
+        Map<String, Object> refreshPayloadMap = new HashMap<>();
+        refreshPayloadMap.put("userId", userId);
+        //조작불가 방지 UUID
+        String randomUUID = UUID.randomUUID().toString();
+        refreshPayloadMap.put("randomUUID", randomUUID);
+        String refreshToken = jwtUtil.createRefreshToken(refreshPayloadMap, accessRefreshTokenValidity);
+        log.info("로그인, 토큰만듬: {}, refresh: {}", accessToken, refreshToken);
+
+        //리프레시 토큰 레디스에 저장하기
+        refreshTokenService.insertInRedis(refreshPayloadMap, refreshToken);
+
+        //토큰 전송
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(
+                "{\"AccessToken\": \"" + accessToken + "\"," +
+                " \"RefreshToken\": \"" + refreshToken + "\",");
 
         response.addHeader("Authorization", "Bearer " + accessToken);
         response.addCookie(createCookie(refreshToken));
@@ -82,6 +104,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
+        //로그인 인증 실패시
         response.setStatus(SC_UNAUTHORIZED);
         response.setContentType("application/json");
         try {
@@ -91,6 +114,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         }
     }
 
+    //쿠키 만들기
     private Cookie createCookie(String refreshCookie) {
         Cookie cookie = new Cookie("RefreshToken", refreshCookie);
         cookie.setMaxAge(3*24 * 60 * 60);

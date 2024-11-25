@@ -7,6 +7,7 @@ import com.mallangs.domain.jwt.service.AccessTokenBlackList;
 import com.mallangs.domain.jwt.service.RefreshTokenService;
 import com.mallangs.domain.jwt.util.JWTUtil;
 import com.mallangs.domain.member.entity.MemberRole;
+import com.mallangs.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,6 +40,7 @@ private final AuthenticationConfiguration authenticationConfiguration;
 private final JWTUtil jwtUtil;
 private final RefreshTokenService refreshTokenService;
 private final AccessTokenBlackList accessTokenBlackList;
+private final MemberRepository memberRepository;
 //private final CustomOAuth2UserService customOAuth2UserService;
 //private final CustomSuccessHandler customSuccessHandler;
 
@@ -98,7 +100,7 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
             .sessionManagement((session) -> session
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(new JWTFilter(jwtUtil, refreshTokenService, accessTokenValidity, accessRefreshTokenValidity, accessTokenBlackList), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new JWTFilter(jwtUtil, refreshTokenService, accessTokenValidity, accessRefreshTokenValidity, accessTokenBlackList, memberRepository), UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(logoutFilter, JWTFilter.class);
     return http.build();
 }
