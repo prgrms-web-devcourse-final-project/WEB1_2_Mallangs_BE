@@ -13,7 +13,7 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     @Query("""
             SELECT c FROM Community c WHERE c.category.categoryId = :categoryId AND c.communityStatus = 'PUBLISHED' ORDER BY c.createdAt DESC
             """)
-    Page<Community> findByCategoryId(@Param("categroyId") Long categoryId, Pageable pageable);
+    Page<Community> findByCategoryId(@Param("categoryId") Long categoryId, Pageable pageable);
 
     // 특정 회원이 작성한 게시글 목록 조회
     @Query("""
