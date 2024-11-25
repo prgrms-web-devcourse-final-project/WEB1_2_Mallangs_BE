@@ -44,10 +44,6 @@ public class MemberService {
         }
     }
 
-    //회원정보 수정
-    public void update
-
-
     //회원 리스트 조회
     public List<MemberGetResponse> getMemberList(){
         List<Member> members = memberRepository.memberList();

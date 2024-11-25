@@ -18,7 +18,7 @@ public class Category extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long CategoryId;
+    private Long categoryId;
 
     @Column(nullable = false)
     private String name;
