@@ -1,5 +1,6 @@
 package com.mallangs.domain.community.entity;
 
+import com.mallangs.domain.community.entity.Community;
 import com.mallangs.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -60,4 +61,5 @@ public class Category extends BaseTimeEntity {
     public void changeOrder(int categoryOrder) {
         this.categoryOrder = categoryOrder;
     }
+
 }

@@ -68,8 +68,8 @@ public class MemberRepositoryTests {
         member.addAddress(address);
         memberRepository.save(member);
         //when
-        Member foundMember = memberRepository.findByUserId(member.getUserId());
-        Address foundAddress = addressRepository.findById(address.getId()).get();
+        Member foundMember = memberRepository.findByUserId(member.getUserId()).orElseThrow();
+        Address foundAddress = addressRepository.findById(address.getId()).orElseThrow();
         //then
         assertThat(foundMember.getUserId().getValue()).isEqualTo("testId1234");
         assertThat(foundMember.getNickname().getValue()).isEqualTo("testname2");

@@ -8,17 +8,15 @@ import com.mallangs.domain.member.entity.embadded.Password;
 import com.mallangs.domain.member.entity.embadded.UserId;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import lombok.ToString;
+import org.springframework.data.geo.Point;
 
-@Data
+@Getter
+@ToString
 @NoArgsConstructor
 public class MemberCreateRequest {
-
-    private PasswordEncoder passwordEncoder;
 
     // 회원정보
     @Pattern(regexp = UserId.REGEX, message = UserId.ERR_MSG)
@@ -70,7 +68,12 @@ public class MemberCreateRequest {
     private Double y;
 
     public Member toEntity() {
-        Member member = new Member(userId, nickname, password, email, profileImage, hasPet, passwordEncoder);
+        Member member = Member.builder()
+                .userId(new UserId(userId))
+                .nickname(new Nickname(nickname))
+                .email(new Email(email))
+                .profileImage(profileImage)
+                .hasPet(hasPet).build();
         Address address = Address.builder()
                 .addressName(addressName)
                 .addressType(addressType)
@@ -86,8 +89,7 @@ public class MemberCreateRequest {
                 .buildingName(buildingName)
                 .zoneNo(zoneNo)
                 .mountainYn(mountainYn)
-                .x(x)
-                .y(y)
+                .point(new Point(x,y))
                 .build();
         member.addAddress(address);
         return member;
