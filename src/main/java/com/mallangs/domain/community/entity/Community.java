@@ -85,7 +85,9 @@ public class Community extends BaseTimeEntity {
 
     // 댓글수 감소
     public void decreaseCommentCount() {
-        this.commentCnt = Math.max(0, this.commentCnt - 1);
+        if (this.commentCnt > 0) {
+            this.commentCnt--;
+        }
     }
 
     // 좋아요수 증가
@@ -95,6 +97,8 @@ public class Community extends BaseTimeEntity {
 
     // 좋아요수 감소
     public void decreaseLikeCount() {
-        this.likeCnt = Math.max(0, this.likeCnt - 1);
+        if (this.likeCnt > 0) {
+            this.likeCnt--;
+        }
     }
 }
