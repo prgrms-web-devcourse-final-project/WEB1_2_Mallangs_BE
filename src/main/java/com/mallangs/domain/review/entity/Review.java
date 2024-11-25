@@ -33,5 +33,5 @@ public class Review {
 
     @Column(nullable = true, columnDefinition = "TEXT")
     private String image;
-    //123123123
+
 }
