@@ -25,5 +25,5 @@ public class Place extends BaseTimeEntity {
     private String closeDays;
 
     @Column(nullable = true, columnDefinition = "TEXT")
-    private String website;
+    private String website; //웹사이트링크
 }
