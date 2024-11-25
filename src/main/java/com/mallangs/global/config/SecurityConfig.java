@@ -1,6 +1,12 @@
 package com.mallangs.global.config;
 
+import com.mallangs.domain.jwt.filter.JWTFilter;
+import com.mallangs.domain.jwt.filter.LoginFilter;
+import com.mallangs.domain.jwt.filter.LogoutFilter;
+import com.mallangs.domain.jwt.service.AccessTokenBlackList;
+import com.mallangs.domain.jwt.service.RefreshTokenService;
 import com.mallangs.domain.jwt.util.JWTUtil;
+import com.mallangs.domain.member.entity.MemberRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +21,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.Collections;
@@ -34,14 +39,13 @@ private final AuthenticationConfiguration authenticationConfiguration;
 private final JWTUtil jwtUtil;
 private final RefreshTokenService refreshTokenService;
 private final AccessTokenBlackList accessTokenBlackList;
-private final CustomOAuth2UserService customOAuth2UserService;
-private final CustomSuccessHandler customSuccessHandler;
+//private final CustomOAuth2UserService customOAuth2UserService;
+//private final CustomSuccessHandler customSuccessHandler;
 
 @Bean
 public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
     return configuration.getAuthenticationManager();
 }
-
 
 @Bean
 public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -65,9 +69,11 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     // 서버 접근 설정
     AuthenticationManager authManager = authenticationManager(authenticationConfiguration);
 
+    // 로그인 필터 생성 및 설정
     LoginFilter loginFilter = new LoginFilter(accessTokenValidity, accessRefreshTokenValidity, authManager, jwtUtil, refreshTokenService);
-    loginFilter.setFilterProcessesUrl("/api/login");
+    loginFilter.setFilterProcessesUrl("/api/member/login");
 
+    //로그아웃 필터 생성
     LogoutFilter logoutFilter = new LogoutFilter(accessTokenBlackList, jwtUtil, refreshTokenService);
 
     // 다른 기능 정지
@@ -75,17 +81,17 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
             .csrf(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable);
-    // oauth2
-    http
-            .oauth2Login((oauth2) -> oauth2
-                    .userInfoEndpoint((userInfo) -> userInfo
-                            .userService(customOAuth2UserService))
-                    .successHandler(customSuccessHandler));
+//    // oauth2
+//    http
+//            .oauth2Login((oauth2) -> oauth2
+//                    .userInfoEndpoint((userInfo) -> userInfo
+//                            .userService(customOAuth2UserService))
+//                    .successHandler(customSuccessHandler));
     // 경로별 인가 작업
     http
             .authorizeHttpRequests((auth) -> auth
-                    .requestMatchers("/login", "/", "/join", "logout", "oauth2").permitAll()
-                    .requestMatchers("/admin").hasRole("ADMIN")
+                    .requestMatchers("/api/member/login", "/api/member/register", "/api/member/logout", "/api/member/oauth2").permitAll()
+                    .requestMatchers("/api/member/admin").hasRole("ADMIN")
                     .anyRequest().authenticated());
     // 필터
     http

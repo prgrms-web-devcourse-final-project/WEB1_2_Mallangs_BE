@@ -57,7 +57,7 @@ public class JWTUtil {
             return Jwts.parser().verifyWith(secretKey).build()
                     .parseSignedClaims(token).getPayload();
         }catch (ExpiredJwtException e){
-            log.error("토큰이 만료되었어요: {}, token {}", e.getMessage(), token);
+            log.warn("토큰이 만료되었어요: {}, token {}", e.getMessage(), token);
             return e.getClaims();
         }catch (Exception e){
             log.error("토큰 유효성검사 실패 : {}, token {}", e.getMessage(), token);
@@ -69,7 +69,7 @@ public class JWTUtil {
         try {
             return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
         }catch(ExpiredJwtException e){
-            log.error("토큰이 만료되었어요 : {}, token {}", e.getMessage(), token);
+            log.warn("토큰이 만료되었어요 : {}, token {}", e.getMessage(), token);
             return e.getClaims().getExpiration().before(new Date());
         }catch (Exception e){
             log.error("토큰 만료확인 실패 : {}, token {}", e.getMessage(), token);

@@ -2,6 +2,7 @@ package com.mallangs.domain.jwt.filter;
 
 import com.mallangs.domain.jwt.entity.CustomMemberDetails;
 import com.mallangs.domain.jwt.entity.TokenCategory;
+import com.mallangs.domain.jwt.service.AccessTokenBlackList;
 import com.mallangs.domain.jwt.service.RefreshTokenService;
 import com.mallangs.domain.jwt.util.JWTUtil;
 import com.mallangs.domain.member.entity.Member;

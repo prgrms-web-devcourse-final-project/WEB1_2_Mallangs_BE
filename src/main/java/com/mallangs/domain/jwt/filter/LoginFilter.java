@@ -4,6 +4,7 @@ package com.mallangs.domain.jwt.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mallangs.domain.jwt.entity.CustomMemberDetails;
 import com.mallangs.domain.jwt.entity.TokenCategory;
+import com.mallangs.domain.jwt.service.RefreshTokenService;
 import com.mallangs.domain.jwt.util.JWTUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;

@@ -26,7 +26,7 @@ public class LogoutFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return !request.getRequestURI().equals("/api/logout");
+        return !request.getRequestURI().equals("/api/member/logout");
     }
 
     @Override
@@ -34,6 +34,7 @@ public class LogoutFilter extends OncePerRequestFilter {
 
         // Refresh Token 없을 때
         String refreshTokenFromCookies = getRefreshTokenFromCookies(request);
+        log.info("refreshTokenFromCookies : {}",refreshTokenFromCookies);
         if (refreshTokenFromCookies == null || refreshTokenFromCookies.trim().isEmpty()) {
             log.warn("No refresh token found");
             handleErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Refresh Token is missing");
@@ -70,6 +71,7 @@ public class LogoutFilter extends OncePerRequestFilter {
             handleErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Token processing failed");
             return;
         }
+
         // 쿠키 비우기
         Cookie cookie = new Cookie("refreshToken", null);
 //        cookie.setSecure(true); // HTTPS 환경에서만 전송

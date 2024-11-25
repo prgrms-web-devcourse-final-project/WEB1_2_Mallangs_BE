@@ -24,6 +24,10 @@ public class RefreshTokenService {
             if (refreshToken != null) {
                 deleteRefreshTokenInRedis(payloadMap);
             }
+            if (refreshToken==null){
+                log.error("refreshToken is null");
+                throw new NoSuchElementException("refreshToken is null");
+            }
             deleteRefreshTokenInRedis(payloadMap);
             redisTemplate.opsForHash().put(REFRESH_KEY, makeHashKey(payloadMap), refreshToken);
         } catch (Exception e) {

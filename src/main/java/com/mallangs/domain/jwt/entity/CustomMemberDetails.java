@@ -33,9 +33,13 @@ public class CustomMemberDetails implements UserDetails {
         return member.getPassword().getValue();
     }
 
+    public String getNickname() {
+        return member.getNickname().getValue();
+    }
+
     @Override
     public String getUsername() {
-        return member.getNickname().getValue();
+        return null;
     }
 
     @Override
