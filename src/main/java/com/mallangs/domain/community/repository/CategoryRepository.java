@@ -27,9 +27,9 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     // 관리자용 기능
     // 카테고리 별 목록 조회
     @Query("""
-            SELECT c FROM Category c WHERE c.categoryStatus = :status ORDER BY c.categoryOrder ASC
+            SELECT c FROM Category c WHERE c.categoryStatus = :categoryStatus ORDER BY c.categoryOrder ASC
             """)
-    List<Category> findAllByStatusOrderByCategoryOrder(@Param("status") int status);
+    List<Category> findAllByStatusOrderByCategoryOrder(@Param("status") CategoryStatus categoryStatus);
 
     // 카테고리 이름으로 검색
     List<Category> findByNameContaining(String name);
