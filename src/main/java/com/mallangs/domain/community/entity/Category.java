@@ -2,7 +2,10 @@ package com.mallangs.domain.community.entity;
 
 import com.mallangs.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,8 +13,6 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
 public class Category extends BaseTimeEntity {
 
     @Id
@@ -33,11 +34,13 @@ public class Category extends BaseTimeEntity {
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Community> communities = new ArrayList<>();
 
+    @Builder
     public Category(String name, String description, int categoryOrder, CategoryStatus categoryStatus) {
         this.name = name;
         this.description = description;
         this.categoryOrder = categoryOrder;
         this.categoryStatus = categoryStatus;
+        this.communities = new ArrayList<>();
     }
 
     // 카테고리 수정
