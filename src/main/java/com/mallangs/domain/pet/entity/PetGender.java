@@ -12,4 +12,5 @@ public enum PetGender {
     PetGender(String koreanName) {
         this.koreanName = koreanName;
     }
+    //123
 }
