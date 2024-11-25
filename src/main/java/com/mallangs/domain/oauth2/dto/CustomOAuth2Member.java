@@ -10,7 +10,10 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 public class CustomOAuth2Member implements OAuth2User {
-
+        /**
+         * 일반 로그인의 UserDetails 와 같은 역할
+         * OAuth2 에서는 OAuth2User 사용
+         */
     private final MemberOAuth2DTO memberOAuth2DTO;
 
     @Override

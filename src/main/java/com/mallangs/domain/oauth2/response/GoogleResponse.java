@@ -5,9 +5,10 @@ import lombok.RequiredArgsConstructor;
 import java.util.Map;
 
 @RequiredArgsConstructor
-//리소스로 부터 전달받는 최초 데이터 받기 위한 객체
 public class GoogleResponse implements OAuth2Response {
-
+        /**
+         * 리소스로 부터 전달받는 최초 데이터 받기 위한 객체
+         */
     private final Map<String, Object> attribute;
 
     @Override

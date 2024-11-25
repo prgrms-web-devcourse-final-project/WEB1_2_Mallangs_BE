@@ -4,19 +4,19 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
         /**
-        json 데이터가 다른 리소스 서버와 다르게
-         중첩되어 있어서 구현이 좀 더 복잡하다.
-        {
-          "resultcode": "00",
-          "message": "success",
-          "response": {
-            "id": "1234567890",
-            "email": "user@example.com",
-            "name": "홍길동",
-            "profile_image": "https://example.com/profile.jpg"
-          }
-        }
-         **/
+            *json 데이터가 다른 리소스 서버와 다르게
+             중첩되어 있어서 구현이 좀 더 복잡하다.
+            {
+              "resultcode": "00",
+              "message": "success",
+              "response": {
+                "id": "1234567890",
+                "email": "user@example.com",
+                "name": "홍길동",
+                "profile_image": "https://example.com/profile.jpg"
+              }
+            }
+         */
 @RequiredArgsConstructor
 public class NaverResponse implements OAuth2Response {
 

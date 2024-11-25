@@ -28,9 +28,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Log4j2
 public class CustomOAuth2MemberService extends DefaultOAuth2UserService {
-    /*
-       리소스 서버로 부터 값을 받아와서
-       어플리케이션에서 정제하는 로직
+    /**
+      * 리소스 서버로 부터 값을 받아와서
+      * 어플리케이션에서 정제하는 로직
    */
     private final PasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
@@ -90,6 +90,7 @@ public class CustomOAuth2MemberService extends DefaultOAuth2UserService {
 
             memberRepository.save(member);
 
+            //OAuth2 인증 위한 데이터 입력
             MemberOAuth2DTO memberDTO = new MemberOAuth2DTO();
             memberDTO.changeUserId(member.getUserId().getValue());
             memberDTO.changePassword(member.getPassword().getValue());
