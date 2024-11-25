@@ -1,9 +1,11 @@
 package com.mallangs.domain.member.dto;
 
 import com.mallangs.domain.member.entity.Address;
-import lombok.Data;
+import lombok.Getter;
+import lombok.ToString;
 
-@Data
+@Getter
+@ToString
 public class MemberAddressResponse {
 
     private Long addressId;

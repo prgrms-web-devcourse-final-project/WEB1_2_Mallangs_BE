@@ -46,6 +46,7 @@ public class MemberUserService {
     public String create(MemberCreateRequest memberCreateRequest) {
         try {
             Member member = memberCreateRequest.toEntity();
+            member.changePassword(new Password(memberCreateRequest.getPassword(),passwordEncoder));
             memberRepository.save(member);
             return member.getUserId().getValue();
         } catch (Exception e) {
