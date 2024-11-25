@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
-public class PetResponseDTO {
+public class PetResponse {
 
     private Long petId;
     private Long memberId;
@@ -21,10 +21,6 @@ public class PetResponseDTO {
     private PetType petType;
     private String image;
     private LocalDate birthdate;
-    private Double weight;
-    private String description;
-    private Boolean isProfileOpen;
-    private Boolean isNeutering;
     private PetGender gender;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -36,17 +32,13 @@ public class PetResponseDTO {
     private Double distance; //거리정보
 
     // Constructor to create DTO from Entity
-    public PetResponseDTO(Pet pet) {
+    public PetResponse(Pet pet) {
         this.petId = pet.getPetId();
         this.memberId = pet.getMember().getMemberId();
+        this.birthdate = pet.getBirthdate();
         this.name = pet.getName();
         this.petType = pet.getPetType();
         this.image = pet.getImage();
-        this.birthdate = pet.getBirthdate();
-        this.weight = pet.getWeight();
-        this.description = pet.getDescription();
-        this.isProfileOpen = pet.getIsOpenProfile();
-        this.isNeutering = pet.getIsNeutering();
         this.gender = pet.getGender();
         this.createdAt = pet.getCreatedAt();
         this.updatedAt = pet.getUpdatedAt();

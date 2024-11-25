@@ -1,12 +1,9 @@
 package com.mallangs.domain.pet.dto;
 
-import com.mallangs.domain.member.entity.Member;
+import com.mallangs.domain.member.Member;
 import com.mallangs.domain.pet.entity.Pet;
 import com.mallangs.domain.pet.entity.PetGender;
 import com.mallangs.domain.pet.entity.PetType;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -16,7 +13,7 @@ import java.time.LocalDate;
 
 @Getter
 @NoArgsConstructor
-public class PetRequestDTO {
+public class PetCreateRequest {
     //시큐리티 설정 완료시 삭제?
     private Long memberId;
 
@@ -33,6 +30,8 @@ public class PetRequestDTO {
     private Double weight;
 
     private String description;
+
+    //private Boolean isRepresentative;
 
     @NotNull(message = "프로필 공개 유무를 입력하세요")
     private Boolean isOpenProfile;
@@ -55,6 +54,7 @@ public class PetRequestDTO {
                 .isOpenProfile(this.isOpenProfile)
                 .isNeutering(this.isNeutering)
                 .gender(this.gender)
+                //.isRepresentative(this.isRepresentative != null ? this.isRepresentative : false)
                 .build();
     }
 }

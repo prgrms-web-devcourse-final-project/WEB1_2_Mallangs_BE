@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface PetRepository extends JpaRepository<Pet, Long> {
 
@@ -17,6 +19,12 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
     //모든 반려동물 조회, 공개프로필과 활성상태
     @Query("SELECT p FROM Pet p WHERE p.isOpenProfile = TRUE AND p.isActive = true")
     Page<Pet> findAllOpenProfilePets(Pageable pageable);
+
+    @Query( "SELECT COUNT(p) > 0 FROM Pet p WHERE p.member.memberId = :memberId")
+    boolean existsByMemberId(Long memberId);
+
+    @Query("SELECT p FROM Pet p LEFT JOIN FETCH p.member m WHERE m.memberId = :memberId AND p.isRepresentative = true")
+    Optional<Pet> findRepresentativePetByMemberId(Long memberId);
 
     //반경 내 반려동물 조회
     @Query(value = """
@@ -43,6 +51,8 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
             String region3depthName,   // 동/읍/면 필터
             Pageable pageable         // 페이징 정보
     );
+
+
 }
 
 

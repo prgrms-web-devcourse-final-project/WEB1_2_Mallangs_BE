@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 @Getter
 @NoArgsConstructor
-public class PetUpdateDTO {
+public class PetUpdateRequest {
     private String name;
     private PetType petType;
     private String image;

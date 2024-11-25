@@ -3,7 +3,7 @@ package com.mallangs.domain.pet.dto;
 import lombok.Getter;
 
 @Getter
-public class PetLocationDTO {
+public class PetLocationRequest {
     private Double y;    // 위도 (y 좌표) latitude
     private Double x;   // 경도 (x 좌표) longitude
     private Double radius;      // 검색 반경 (km 단위)

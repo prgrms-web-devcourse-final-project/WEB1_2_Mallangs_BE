@@ -1,6 +1,6 @@
 package com.mallangs.domain.pet.entity;
 
-import com.mallangs.domain.member.entity.Member;
+import com.mallangs.domain.member.Member;
 import com.mallangs.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -49,6 +49,8 @@ public class Pet extends BaseTimeEntity {
     @Column(nullable = false)
     private PetGender gender;
 
+    private boolean isRepresentative;
+
     @Column(nullable = false)
     @Builder.Default
     private Boolean isActive = true; // 기본값은 true
@@ -61,39 +63,27 @@ public class Pet extends BaseTimeEntity {
         this.isActive = true;
     }
 
-    public void changeName(String name){
-        this.name = name;
+    public void changeRepresentative(boolean isRepresentative){
+        this.isRepresentative = isRepresentative;
     }
 
-    public void changePetType(PetType petType){
+    public void change(String name,
+                       PetType petType,
+                       String image,
+                       LocalDate birthdate,
+                       Double weight,
+                       String description,
+                       Boolean isOpenProfile,
+                       Boolean isNeutering,
+                       PetGender gender) {
         this.name = name;
-    }
-
-    public void changeImage(String image) {
+        this.petType = petType;
         this.image = image;
-    }
-
-    public void changeBirthdate(LocalDate birthdate) {
         this.birthdate = birthdate;
-    }
-
-    public void changeWeight(Double weight) {
         this.weight = weight;
-    }
-
-    public void changeDescription(String description) {
         this.description = description;
-    }
-
-    public void changeIsOpenProfile(Boolean isOpenProfile) {
         this.isOpenProfile = isOpenProfile;
-    }
-
-    public void changeIsNeutering(Boolean isNeutering) {
         this.isNeutering = isNeutering;
-    }
-
-    public void changeGender(PetGender gender) {
         this.gender = gender;
     }
 }
