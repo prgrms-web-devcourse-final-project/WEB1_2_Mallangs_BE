@@ -46,6 +46,7 @@ public class Community extends BaseTimeEntity {
     private CommunityStatus communityStatus;
 
     @Builder
+
     public Community(Member member, Category category, String title, String content,
                      String location, String imgUrl) {
         this.member = member;
