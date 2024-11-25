@@ -13,6 +13,9 @@ public enum ErrorCode {
   // Member
   MEMBER_NOT_FOUND(NOT_FOUND, "회원 정보를 찾을 수 없습니다."),
 
+  // Address
+  ADDRESS_NOT_FOUND(NOT_FOUND, "주소 정보를 찾을 수 없습니다."),
+
   //PET
   PET_NOT_FOUND(NOT_FOUND, "반려동물 정보를 찾을 수 없습니다"),
   PET_NOT_ACTIVATE(HttpStatus.GONE, "반려동물이 비활성화(삭제) 상태입니다."),
