@@ -75,13 +75,11 @@ dependencies {
     testImplementation 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
 
-<<<<<<< HEAD
     //SMTP의존성
     implementation 'org.springframework.boot:spring-boot-starter-mail'
-=======
+
     //스웨거 설정
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
->>>>>>> 1b4adbb768b73da95a52cd84c4708ff119828ff2
 
 }
 

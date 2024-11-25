@@ -11,10 +11,6 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-<<<<<<< HEAD
-@Builder
-=======
->>>>>>> 1b4adbb768b73da95a52cd84c4708ff119828ff2
 public class Community extends BaseTimeEntity {
 
     @Id
@@ -49,10 +45,7 @@ public class Community extends BaseTimeEntity {
     @Column(nullable = false)
     private CommunityStatus communityStatus;
 
-<<<<<<< HEAD
-=======
     @Builder
->>>>>>> 1b4adbb768b73da95a52cd84c4708ff119828ff2
     public Community(Member member, Category category, String title, String content,
                      String location, String imgUrl) {
         this.member = member;

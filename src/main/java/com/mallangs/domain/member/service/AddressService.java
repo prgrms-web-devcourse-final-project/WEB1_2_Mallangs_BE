@@ -1,6 +1,5 @@
 package com.mallangs.domain.member.service;
 
-<<<<<<< HEAD
 import com.mallangs.domain.member.dto.MemberAddressRequest;
 import com.mallangs.domain.member.dto.MemberAddressResponse;
 import com.mallangs.domain.member.entity.Address;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Log4j2
 @Service
@@ -69,7 +67,4 @@ public class AddressService {
         }
     }
 
-=======
-public class AddressService {
->>>>>>> 1b4adbb768b73da95a52cd84c4708ff119828ff2
 }

@@ -61,8 +61,5 @@ public class Category extends BaseTimeEntity {
     public void changeOrder(int categoryOrder) {
         this.categoryOrder = categoryOrder;
     }
-<<<<<<< HEAD
+
 }
-=======
-}
->>>>>>> 1b4adbb768b73da95a52cd84c4708ff119828ff2
