@@ -3,13 +3,14 @@ package com.mallangs.domain.community.entity;
 import com.mallangs.domain.member.Member;
 import com.mallangs.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
 public class Community extends BaseTimeEntity {
 
     @Id
@@ -44,6 +45,7 @@ public class Community extends BaseTimeEntity {
     @Column(nullable = false)
     private CommunityStatus communityStatus;
 
+    @Builder
     public Community(Member member, Category category, String title, String content,
                      String location, String imgUrl) {
         this.member = member;
