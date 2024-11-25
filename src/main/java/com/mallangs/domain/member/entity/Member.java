@@ -63,6 +63,7 @@ public class Member extends BaseTimeEntity {
         this.hasPet = hasPet;
     }
 
+    //수정
     public void change(String nickname,String password, String email, String profileImage, PasswordEncoder passwordEncoder){
         this.nickname = new Nickname(nickname);
         this.password = new Password(password, passwordEncoder);
