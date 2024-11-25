@@ -57,8 +57,8 @@ public class CustomOAuth2MemberService extends DefaultOAuth2UserService {
 
         //중복많을 시 UUID 설정 + 닉네임 길이 늘이기
         String userId = oAuth2Response.getProvider() + " " + oAuth2Response.getProviderId();
-        String shortenUserId = userId.substring(12);
-        String nickname = oAuth2Response.getNickname().trim().substring(15);
+        String shortenUserId = userId.substring(6,12);
+        String nickname = oAuth2Response.getNickname().trim().substring(2,15);
         String email = oAuth2Response.getEmail();
         Optional<Member> existMember = memberRepository.findByUserId(new UserId(shortenUserId));
 
