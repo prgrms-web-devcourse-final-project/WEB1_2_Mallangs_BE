@@ -33,8 +33,8 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class SecurityConfig {
 // 토큰 만료 시간
-@Value("${spring.jwt.access-token-validity-in-milliseconds}") private Long accessTokenValidity;
-@Value("${spring.jwt.refresh-token-validity-in-milliseconds}") private Long accessRefreshTokenValidity;
+@Value("${spring.jwt.access-token-validity-in-minutes}") private Long accessTokenValidity;
+@Value("${spring.jwt.refresh-token-validity-in-minutes}") private Long accessRefreshTokenValidity;
 
 private final AuthenticationConfiguration authenticationConfiguration;
 private final JWTUtil jwtUtil;
