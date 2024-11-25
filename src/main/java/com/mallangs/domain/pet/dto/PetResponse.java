@@ -31,7 +31,7 @@ public class PetResponse {
 
     private Double distance; //거리정보
 
-    // Constructor to create DTO from Entity
+    // Entity -> DTO
     public PetResponse(Pet pet) {
         this.petId = pet.getPetId();
         this.memberId = pet.getMember().getMemberId();
@@ -44,7 +44,7 @@ public class PetResponse {
         this.updatedAt = pet.getUpdatedAt();
     }
 
-    // 거리 정보를 설정하는 비즈니스 메서드
+//     거리 정보를 설정하는 비즈니스 메서드
     public void assignDistance(Double distance) {
         this.distance = distance;
     }
