@@ -26,5 +26,5 @@ public class Place extends BaseTimeEntity {
 
     @Column(nullable = true, columnDefinition = "TEXT")
     private String website; //웹사이트링크
-    //123
+
 }

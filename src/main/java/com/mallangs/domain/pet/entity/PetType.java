@@ -14,6 +14,6 @@ public enum PetType {
     PetType(String koreanName) {
         this.koreanName = koreanName;
 
-        //12312313
+
     }
 }
