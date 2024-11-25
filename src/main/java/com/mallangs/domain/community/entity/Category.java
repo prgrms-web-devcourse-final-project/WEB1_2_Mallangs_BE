@@ -60,4 +60,3 @@ public class Category extends BaseTimeEntity {
         this.categoryOrder = categoryOrder;
     }
 }
->>>>>>> 39b9640dc7bf03c3212f65d70f7375c534725c58
