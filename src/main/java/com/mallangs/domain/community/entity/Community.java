@@ -67,4 +67,34 @@ public class Community extends BaseTimeEntity {
         this.location = location;
         this.imgUrl = imgUrl;
     }
+
+    // 게시글 상태 변경
+    public void changeStatus(CommunityStatus status) {
+        this.communityStatus = status;
+    }
+
+    // 조회수 증가
+    public void increaseViewCount() {
+        this.viewCnt++;
+    }
+
+    // 댓글수 증가
+    public void increaseCommentCount() {
+        this.commentCnt++;
+    }
+
+    // 댓글수 감소
+    public void decreaseCommentCount() {
+        this.commentCnt = Math.max(0, this.commentCnt - 1);
+    }
+
+    // 좋아요수 증가
+    public void increaseLikeCount() {
+        this.likeCnt++;
+    }
+
+    // 좋아요수 감소
+    public void decreaseLikeCount() {
+        this.likeCnt = Math.max(0, this.likeCnt - 1);
+    }
 }
