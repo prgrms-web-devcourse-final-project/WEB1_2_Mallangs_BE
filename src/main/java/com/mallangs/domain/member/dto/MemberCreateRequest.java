@@ -8,6 +8,7 @@ import com.mallangs.domain.member.entity.embadded.Password;
 import com.mallangs.domain.member.entity.embadded.UserId;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+<<<<<<< HEAD
 import lombok.*;
 import org.springframework.data.geo.Point;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,6 +19,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @NoArgsConstructor
 public class MemberCreateRequest {
 
+=======
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+@Data
+@NoArgsConstructor
+public class MemberCreateRequest {
+
+    private PasswordEncoder passwordEncoder;
+
+>>>>>>> 1b4adbb768b73da95a52cd84c4708ff119828ff2
     // 회원정보
     @Pattern(regexp = UserId.REGEX, message = UserId.ERR_MSG)
     private String userId;
@@ -68,12 +83,16 @@ public class MemberCreateRequest {
     private Double y;
 
     public Member toEntity() {
+<<<<<<< HEAD
         Member member = Member.builder()
                 .userId(new UserId(userId))
                 .nickname(new Nickname(nickname))
                 .email(new Email(email))
                 .profileImage(profileImage)
                 .hasPet(hasPet).build();
+=======
+        Member member = new Member(userId, nickname, password, email, profileImage, hasPet, passwordEncoder);
+>>>>>>> 1b4adbb768b73da95a52cd84c4708ff119828ff2
         Address address = Address.builder()
                 .addressName(addressName)
                 .addressType(addressType)
@@ -89,7 +108,12 @@ public class MemberCreateRequest {
                 .buildingName(buildingName)
                 .zoneNo(zoneNo)
                 .mountainYn(mountainYn)
+<<<<<<< HEAD
                 .point(new Point(x,y))
+=======
+                .x(x)
+                .y(y)
+>>>>>>> 1b4adbb768b73da95a52cd84c4708ff119828ff2
                 .build();
         member.addAddress(address);
         return member;

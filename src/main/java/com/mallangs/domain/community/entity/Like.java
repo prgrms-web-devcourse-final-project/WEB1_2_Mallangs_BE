@@ -1,17 +1,15 @@
 package com.mallangs.domain.community.entity;
 
-import com.mallangs.domain.member.Member;
+import com.mallangs.domain.member.entity.Member;
 import com.mallangs.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "likes")
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Table(name = "like")
 @Builder
 public class Like extends BaseTimeEntity {
 

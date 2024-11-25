@@ -1,5 +1,6 @@
 package com.mallangs.domain.member.service;
 
+<<<<<<< HEAD
 import com.mallangs.domain.member.dto.MemberAddressRequest;
 import com.mallangs.domain.member.dto.MemberAddressResponse;
 import com.mallangs.domain.member.entity.Address;
@@ -68,4 +69,7 @@ public class AddressService {
         }
     }
 
+=======
+public class AddressService {
+>>>>>>> 1b4adbb768b73da95a52cd84c4708ff119828ff2
 }

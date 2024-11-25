@@ -1,6 +1,5 @@
 package com.mallangs.domain.notification.entity;
 
-import com.mallangs.domain.member.Member;
 import com.mallangs.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;

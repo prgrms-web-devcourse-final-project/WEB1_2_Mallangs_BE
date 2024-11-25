@@ -14,7 +14,6 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
 public class Category extends BaseTimeEntity {
 
     @Id
@@ -31,20 +30,22 @@ public class Category extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private int categoryStatus;
+    private CategoryStatus categoryStatus;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Community> communities = new ArrayList<>();
 
-    public Category(String name, String description, int categoryOrder, int categoryStatus) {
+    @Builder
+    public Category(String name, String description, int categoryOrder, CategoryStatus categoryStatus) {
         this.name = name;
         this.description = description;
         this.categoryOrder = categoryOrder;
         this.categoryStatus = categoryStatus;
+        this.communities = new ArrayList<>();
     }
 
     // 카테고리 수정
-    public void changeCategory(String name, String description, int categoryOrder, int categoryStatus) {
+    public void changeCategory(String name, String description, int categoryOrder, CategoryStatus categoryStatus) {
         this.name = name;
         this.description = description;
         this.categoryOrder = categoryOrder;
@@ -52,7 +53,7 @@ public class Category extends BaseTimeEntity {
     }
 
     // 카테고리 상태 변경
-    public void changeStatus(int categoryStatus) {
+    public void changeStatus(CategoryStatus categoryStatus) {
         this.categoryStatus = categoryStatus;
     }
 
@@ -60,4 +61,8 @@ public class Category extends BaseTimeEntity {
     public void changeOrder(int categoryOrder) {
         this.categoryOrder = categoryOrder;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 1b4adbb768b73da95a52cd84c4708ff119828ff2
