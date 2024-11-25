@@ -4,12 +4,13 @@ import lombok.Getter;
 
 @Getter
 public enum PetGender {
-    MALE("수컷"),
-    FEMALE("암컷");
+    MALE("남아"),
+    FEMALE("여아");
 
     private final String koreanName;
 
     PetGender(String koreanName) {
         this.koreanName = koreanName;
     }
+
 }
