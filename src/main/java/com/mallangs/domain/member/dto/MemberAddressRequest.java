@@ -2,9 +2,12 @@ package com.mallangs.domain.member.dto;
 
 import com.mallangs.domain.member.entity.Address;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import lombok.Getter;
+import lombok.ToString;
+import org.springframework.data.geo.Point;
 
-@Data
+@Getter
+@ToString
 public class MemberAddressRequest {
     // 주소
     @NotNull(message = "주소 이름은 필수입니다.")
@@ -56,8 +59,7 @@ public class MemberAddressRequest {
                 .buildingName(buildingName)
                 .zoneNo(zoneNo)
                 .mountainYn(mountainYn)
-                .x(x)
-                .y(y)
+                .point(new Point(x,y))
                 .build();
     }
 }

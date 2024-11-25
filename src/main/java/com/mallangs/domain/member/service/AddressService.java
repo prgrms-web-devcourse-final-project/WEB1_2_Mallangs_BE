@@ -54,13 +54,14 @@ public class AddressService {
     }
 
     //주소 삭제
-    public void delete(Long addressId) {
+    public void delete(String email, Long addressId) {
         try {
-            if (!addressRepository.existsById(addressId)) {
-                log.error("주소가 존재하지 않습니다. ID: {}", addressId);
-                throw new IllegalArgumentException("삭제할 주소가 존재하지 않습니다.");
-            }
-            addressRepository.deleteById(addressId);
+            Address address = addressRepository.findById(addressId)
+                    .orElseThrow(() -> new MallangsCustomException(ErrorCode.ADDRESS_NOT_FOUND));
+            Member foundMember = memberRepository.findByEmail(new Email(email))
+                    .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+            foundMember.removeAddress(address);
         } catch (Exception e) {
             log.error("주소 삭제에 실패하였습니다. {}", e.getMessage());
             throw e;
