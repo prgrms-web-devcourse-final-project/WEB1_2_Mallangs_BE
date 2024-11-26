@@ -42,15 +42,15 @@ public class MemberAddressRequest {
     private String zoneNo;
     @NotNull(message = "산악지역은 필수입력 값 입니다.")
     private String mountainYn;
-    @NotNull(message = "위도는 필수입니다.")
-    private Double longitude;
     @NotNull(message = "경도는 필수입니다.")
-    private Double latitude;
+    private Double longitude;
+    @NotNull(message = "위도는 필수입니다.")
+    private Double latitude; //y
 
     private static final GeometryFactory geometryFactory = new GeometryFactory();
 
     public Address toEntity() {
-        Point point = geometryFactory.createPoint(new Coordinate(x, y));
+        Point point = geometryFactory.createPoint(new Coordinate(longitude, latitude));
         //Point point = GeometryUtil.createPoint(latitude, longitude);
         return Address.builder()
                 .addressName(addressName)

@@ -160,8 +160,6 @@ public class PetService {
 
             // 지역명 필터 추가
             Page<Pet> pets = petRepository.findNearbyPets(
-//                    petLocationRequest.getPoint().getY(),    // latitude는 y좌표로 매핑
-//                    petLocationRequest.getPoint().getX(),    // longitude는 x좌표로 매핑
                     petLocationRequest.getY(),    // latitude는 y좌표로 매핑
                     petLocationRequest.getX(),    // longitude는 x좌표로 매핑
                     petLocationRequest.getRadius(),
@@ -175,8 +173,6 @@ public class PetService {
                 PetResponse dto = new PetResponse(pet);
                 // 거리 계산 추가
                 double distance = calculateDistance(
-//                        petLocationRequest.getPoint().getY(),  // latitude -> y
-//                        petLocationRequest.getPoint().getX(),  // longitude -> x
                         petLocationRequest.getY(),  // latitude -> y
                         petLocationRequest.getX(),  // longitude -> x
                         pet.getMember().getAddresses().isEmpty() ? 0.0 : pet.getMember().getAddresses().get(0).getPoint().getY(),
@@ -194,13 +190,10 @@ public class PetService {
 
     // 위치 검색 파라미터 검증
     private void validateLocationSearch(PetLocationRequest searchDTO) {
-//        if (searchDTO.getPoint() == null || searchDTO.getRadius() == null) {
         if (searchDTO.getX() == null || searchDTO.getY() == null || searchDTO.getRadius() == null) {
             throw new MallangsCustomException(ErrorCode.LOCATION_INVALIDE_PARAMS);
         }
 
-//        double x = searchDTO.getPoint().getX();
-//        double y = searchDTO.getPoint().getY();
           double x = searchDTO.getX();
           double y = searchDTO.getY();
 

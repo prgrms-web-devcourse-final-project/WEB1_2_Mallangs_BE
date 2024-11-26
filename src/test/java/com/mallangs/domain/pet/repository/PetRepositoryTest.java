@@ -28,9 +28,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+
 
 @SpringBootTest
 @Transactional
@@ -111,6 +112,7 @@ class PetRepositoryTest {
                     .weight(157D+i)
                     .gender(PetGender.MALE)
                     .petType(PetType.DOG)
+                    .isRepresentative(i==9)
                     .isNeutering(true)
                     .build();
 
@@ -122,6 +124,7 @@ class PetRepositoryTest {
                     .weight(131D+i)
                     .gender(PetGender.MALE)
                     .petType(PetType.CAT)
+                    .isRepresentative(i==0)
                     .isNeutering(true)
                     .build();
             petRepository.save(testPet1);
@@ -193,6 +196,7 @@ class PetRepositoryTest {
 
         List<Address> addresses = firstPet.getMember().getAddresses();
         assertThat(addresses).isNotEmpty(); // 주소가 있는지 확인
+        Address address = addresses.get(0);
 
 
         // 첫 번째 Pet 객체의 지역명 검증
@@ -200,8 +204,42 @@ class PetRepositoryTest {
 //        assertThat(address.getRegion2depthName()).isEqualTo("강남구");
 //        assertThat(address.getRegion3depthName()).isEqualTo("역삼동");
 
-//        assertThat(address.getRegion1depthName()).isEqualTo("울산");
-//        assertThat(address.getRegion2depthName()).isEqualTo("남구");
-//        assertThat(address.getRegion3depthName()).isEqualTo("신정동");
+        assertThat(address.getRegion1depthName()).isEqualTo("울산");
+        assertThat(address.getRegion2depthName()).isEqualTo("남구");
+        assertThat(address.getRegion3depthName()).isEqualTo("신정동");
+    }
+
+    @Test
+    @DisplayName("memberId로 펫 반려동물 여부 확인")
+    void testExistsByMemberId_WhenPetExists() {
+        //given
+        Long memberId = testMember1.getMemberId();
+
+        //when
+        boolean exists = petRepository.existsByMemberId(memberId);
+
+        //then
+        assertThat(exists).isTrue();
+    }
+
+    @Test
+    @DisplayName("대표 말랑이 조회")
+    void testFindRepresentativePetByMemberId() {
+        //given
+        // 기존 더미 데이터 중 강아지는 마지막, 고양이는 첫번째
+
+        //when
+        Optional<Pet> foundPet = petRepository.findRepresentativePetByMemberId(testMember1.getMemberId());
+        Optional<Pet> foundPet2 = petRepository.findRepresentativePetByMemberId(testMember2.getMemberId());
+
+        //then
+        assertThat(foundPet).isPresent();
+        assertThat(foundPet2).isPresent();
+
+        assertThat(foundPet.get().getIsRepresentative()).isTrue();
+        assertThat(foundPet2.get().getIsRepresentative()).isTrue();
+
+        assertThat(foundPet.get().getMember()).isEqualTo(testMember1);
+        assertThat(foundPet2.get().getMember()).isEqualTo(testMember2);
     }
 }

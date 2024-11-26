@@ -49,7 +49,7 @@ public class Pet extends BaseTimeEntity {
     @Column(nullable = false)
     private PetGender gender;
 
-    private boolean isRepresentative;
+    private Boolean isRepresentative;
 
     @Column(nullable = false)
     @Builder.Default
