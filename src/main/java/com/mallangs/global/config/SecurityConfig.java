@@ -7,6 +7,8 @@ import com.mallangs.domain.jwt.service.AccessTokenBlackList;
 import com.mallangs.domain.jwt.service.RefreshTokenService;
 import com.mallangs.domain.jwt.util.JWTUtil;
 import com.mallangs.domain.member.repository.MemberRepository;
+import com.mallangs.domain.oauth2.handler.CustomSuccessHandler;
+import com.mallangs.domain.oauth2.service.CustomOAuth2MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,8 +44,8 @@ public class SecurityConfig {
     private final RefreshTokenService refreshTokenService;
     private final AccessTokenBlackList accessTokenBlackList;
     private final MemberRepository memberRepository;
-//private final CustomOAuth2UserService customOAuth2UserService;
-//private final CustomSuccessHandler customSuccessHandler;
+    private final CustomOAuth2MemberService customOAuth2MemberService;
+    private final CustomSuccessHandler customSuccessHandler;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -84,17 +86,19 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable);
-//    // oauth2
-//    http
-//            .oauth2Login((oauth2) -> oauth2
-//                    .userInfoEndpoint((userInfo) -> userInfo
-//                            .userService(customOAuth2UserService))
-//                    .successHandler(customSuccessHandler));
-        // 경로별 인가 작업
+        // oauth2
+        http
+                .oauth2Login((oauth2) -> oauth2
+                        .userInfoEndpoint((userInfo) -> userInfo
+                                .userService(customOAuth2MemberService))
+                        .successHandler(customSuccessHandler));
+//         경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/api/member/login", "/api/member/register", "/api/member/logout", "/api/member/oauth2").permitAll()
                         .requestMatchers("/api/member/admin").hasRole("ADMIN")
+                        .requestMatchers("/api/member/**").permitAll()
+                        .requestMatchers("/api/address/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
                         .requestMatchers("/swagger-resources/**").permitAll()

@@ -69,4 +69,7 @@ public class Address {
     @Column(name = "point", nullable = false)
     private Point point;
 
+    public void addMember(Member member) {
+        this.member = member;
+    }
 }
