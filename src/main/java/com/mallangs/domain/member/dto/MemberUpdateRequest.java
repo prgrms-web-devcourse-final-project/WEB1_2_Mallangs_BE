@@ -8,8 +8,6 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.List;
-
 @Getter
 @ToString
 public class MemberUpdateRequest {
@@ -25,6 +23,5 @@ public class MemberUpdateRequest {
     private String profileImage;
     @Pattern(regexp = Password.REGEX, message = Password.ERR_MSG)
     private String password;
-    private List<MemberAddressRequest> addresses;
 }
 

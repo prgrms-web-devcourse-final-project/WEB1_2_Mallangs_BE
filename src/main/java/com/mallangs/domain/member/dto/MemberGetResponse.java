@@ -1,13 +1,8 @@
 package com.mallangs.domain.member.dto;
 
-import com.mallangs.domain.member.entity.Address;
 import com.mallangs.domain.member.entity.Member;
-import com.mallangs.domain.member.entity.embadded.Email;
-import com.mallangs.domain.member.entity.embadded.Nickname;
-import com.mallangs.domain.member.entity.embadded.UserId;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
