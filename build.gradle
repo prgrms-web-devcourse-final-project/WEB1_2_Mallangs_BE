@@ -47,6 +47,9 @@ dependencies {
     implementation 'it.ozimov:embedded-redis:0.7.2'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    //Oauth2Client 의존성
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
     //jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
@@ -74,6 +77,17 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
+
+    //SMTP의존성
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    //스웨거 설정
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+
+    //포인터 의존성
+    implementation 'org.hibernate.orm:hibernate-spatial:6.5.3.Final'
+    implementation 'org.locationtech.jts:jts-core:1.19.0'
+    implementation 'com.querydsl:querydsl-spatial'
 
 }
 
