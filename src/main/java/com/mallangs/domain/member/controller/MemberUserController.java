@@ -66,4 +66,10 @@ public class MemberUserController {
         MemberSendMailResponse mail = memberUserService.findPassword(memberFindPasswordRequest);
         return ResponseEntity.ok(memberUserService.mailSend(mail));
     }
+    @PostMapping("/check-password")
+    public void checkPassword(@Validated @RequestBody PasswordDTO passwordDTO
+                                ,Authentication authentication ){
+        String userId = authentication.getName();
+        memberUserService.checkPassword(passwordDTO, userId);
+    }
 }
