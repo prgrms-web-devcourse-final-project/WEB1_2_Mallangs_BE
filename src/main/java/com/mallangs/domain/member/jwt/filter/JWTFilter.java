@@ -1,10 +1,10 @@
-package com.mallangs.domain.jwt.filter;
+package com.mallangs.domain.member.jwt.filter;
 
-import com.mallangs.domain.jwt.entity.CustomMemberDetails;
-import com.mallangs.domain.jwt.entity.TokenCategory;
-import com.mallangs.domain.jwt.service.AccessTokenBlackList;
-import com.mallangs.domain.jwt.service.RefreshTokenService;
-import com.mallangs.domain.jwt.util.JWTUtil;
+import com.mallangs.domain.member.jwt.entity.CustomMemberDetails;
+import com.mallangs.domain.member.jwt.entity.TokenCategory;
+import com.mallangs.domain.member.jwt.service.AccessTokenBlackList;
+import com.mallangs.domain.member.jwt.service.RefreshTokenService;
+import com.mallangs.domain.member.jwt.util.JWTUtil;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.MemberRole;
 import com.mallangs.domain.member.entity.embadded.Email;
@@ -28,7 +28,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -47,7 +46,9 @@ public class JWTFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         try {
             //등록된 URI 필터 제외
-            if (request.getRequestURI().startsWith("/api/member/register")) {
+            if (request.getRequestURI().startsWith("/api/member/register")||
+                    request.getRequestURI().startsWith("/api/member/find-user-id")||
+                    request.getRequestURI().startsWith("/api/member/find-password")) {
                 filterChain.doFilter(request, response);
                 return;
             }

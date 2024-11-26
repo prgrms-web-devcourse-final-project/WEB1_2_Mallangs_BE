@@ -1,4 +1,4 @@
-package com.mallangs.domain.jwt.util;
+package com.mallangs.domain.member.jwt.util;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;

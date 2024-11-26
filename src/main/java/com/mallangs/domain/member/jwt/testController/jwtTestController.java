@@ -1,4 +1,4 @@
-package com.mallangs.domain.jwt.testController;
+package com.mallangs.domain.member.jwt.testController;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
