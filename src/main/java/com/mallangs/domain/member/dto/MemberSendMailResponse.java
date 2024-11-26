@@ -8,7 +8,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class MemberSendMailResponse {
-    private String address;
+    private String email;
     private String title;
     private String message;
 }

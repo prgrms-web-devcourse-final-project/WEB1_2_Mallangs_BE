@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Nickname {
-    public static final String REGEX = "^[a-zA-Z0-9가-힣]{2,15}$\n";
+    public static final String REGEX = "^[ㄱ-ㅎ가-힣a-zA-Z0-9-_\\\\s]{2,15}$";
     public static final String ERR_MSG = "닉네임은 특수문자를 제외한 2~15자리여야 합니다.";
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 

@@ -4,6 +4,7 @@ import com.mallangs.domain.member.dto.*;
 import com.mallangs.domain.member.service.MemberUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -32,12 +33,11 @@ public class MemberUserController {
         return ResponseEntity.ok(memberUserService.get(userId));
     }
 
-    @PutMapping
+    @PutMapping("/{memberId}")
     @Operation(summary = "회원수정", description = "회원수정 요청 API")
     public void update(@Validated @RequestBody MemberUpdateRequest memberUpdateRequest,
-                                                Authentication authentication){
-        String userId = authentication.getName();
-        memberUserService.update(memberUpdateRequest,userId);
+                       @PathVariable ("memberId") Long memberId){
+        memberUserService.update(memberUpdateRequest,memberId);
     }
 
     @DeleteMapping("/{memberId}")
@@ -60,10 +60,10 @@ public class MemberUserController {
         return ResponseEntity.ok(memberUserService.findUserId(memberFindUserIdRequest));
     }
 
-    @PostMapping("/findPassword")
+    @PostMapping("/find-password")
     @Operation(summary = "비밀번호찾기", description = "비밀번호찾기 요청 API")
-    public ResponseEntity<String> findPassword(@Validated @RequestBody MemberFindPasswordRequest memberFindPasswordRequest){
-        MemberSendMailResponse message = memberUserService.findPassword(memberFindPasswordRequest);
-        return ResponseEntity.ok(memberUserService.mailSend(message));
+    public ResponseEntity<String> findPassword(@Validated @RequestBody MemberFindPasswordRequest memberFindPasswordRequest) throws MessagingException {
+        MemberSendMailResponse mail = memberUserService.findPassword(memberFindPasswordRequest);
+        return ResponseEntity.ok(memberUserService.mailSend(mail));
     }
 }

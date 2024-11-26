@@ -101,7 +101,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/member/**").permitAll()
                         .requestMatchers("/api/address/**").permitAll()
 
-
                         // Swagger UI 관련 경로 허용
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()

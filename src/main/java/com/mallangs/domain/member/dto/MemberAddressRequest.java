@@ -1,10 +1,11 @@
 package com.mallangs.domain.member.dto;
 
 import com.mallangs.domain.member.entity.Address;
+import com.mallangs.domain.member.util.GeometryUtil;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.ToString;
-import org.springframework.data.geo.Point;
+import org.locationtech.jts.geom.Point;
 
 @Getter
 @ToString
@@ -39,11 +40,12 @@ public class MemberAddressRequest {
     @NotNull(message = "산악지역은 필수입력 값 입니다.")
     private String mountainYn;
     @NotNull(message = "위도는 필수입니다.")
-    private Double x;
+    private Double longitude;
     @NotNull(message = "경도는 필수입니다.")
-    private Double y;
+    private Double latitude;
 
     public Address toEntity() {
+        Point point = GeometryUtil.createPoint(latitude, longitude);
         return Address.builder()
                 .addressName(addressName)
                 .addressType(addressType)
@@ -59,7 +61,7 @@ public class MemberAddressRequest {
                 .buildingName(buildingName)
                 .zoneNo(zoneNo)
                 .mountainYn(mountainYn)
-                .point(new Point(x,y))
+                .point(point)
                 .build();
     }
 }
