@@ -80,6 +80,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         //리프레시 토큰 생성 ( 난수를 입력, 의미없는 토큰 생성 )
         Map<String, Object> refreshPayloadMap = new HashMap<>();
         refreshPayloadMap.put("userId", userId);
+
         //식별 위한 UserID 입력
         String randomUUID = UUID.randomUUID().toString();
         refreshPayloadMap.put("randomUUID", randomUUID);

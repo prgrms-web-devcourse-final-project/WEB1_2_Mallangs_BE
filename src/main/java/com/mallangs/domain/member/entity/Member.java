@@ -54,9 +54,9 @@ public class Member extends BaseTimeEntity {
     private Boolean isActive = true;
 
     // 회원가입
-    public Member(String userId, String nickname, Password password, String email, String profileImage, Boolean hasPet) {
+    public Member(String userId, String nickname, Password password, String email, String profileImage, Boolean hasPet){
         this.userId = new UserId(userId);
-        this.nickname =  new Nickname(nickname);
+        this.nickname = new Nickname(nickname);
         this.password = password;
         this.email = new Email(email);
         this.profileImage = profileImage;

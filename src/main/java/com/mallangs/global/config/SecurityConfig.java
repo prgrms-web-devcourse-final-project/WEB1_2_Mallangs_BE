@@ -32,6 +32,7 @@ import java.util.Collections;
 @Log4j2
 @EnableMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @RequiredArgsConstructor
+
 public class SecurityConfig {
     // 토큰 만료 시간
     @Value("${spring.jwt.access-token-validity-in-minutes}")
@@ -92,13 +93,16 @@ public class SecurityConfig {
                         .userInfoEndpoint((userInfo) -> userInfo
                                 .userService(customOAuth2MemberService))
                         .successHandler(customSuccessHandler));
-//         경로별 인가 작업
+        // 경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/api/member/login", "/api/member/register", "/api/member/logout", "/api/member/oauth2").permitAll()
                         .requestMatchers("/api/member/admin").hasRole("ADMIN")
                         .requestMatchers("/api/member/**").permitAll()
                         .requestMatchers("/api/address/**").permitAll()
+
+
+                        // Swagger UI 관련 경로 허용
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
                         .requestMatchers("/swagger-resources/**").permitAll()
