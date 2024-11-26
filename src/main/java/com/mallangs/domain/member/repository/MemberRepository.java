@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-       Boolean existsByUserId(UserId userId);
+    Boolean existsByUserId(UserId userId);
     Boolean existsByEmail(Email email);
 
     //단일 회원조회 - 아이디

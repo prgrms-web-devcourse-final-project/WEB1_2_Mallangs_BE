@@ -67,14 +67,16 @@ public class MemberCreateRequest {
     @NotNull(message = "경도는 필수입니다.")
     private Double y;
 
-    public Member toEntity() {
-        Member member = Member.builder()
+    public Member toEntityMember() {
+        return Member.builder()
                 .userId(new UserId(userId))
                 .nickname(new Nickname(nickname))
                 .email(new Email(email))
                 .profileImage(profileImage)
                 .hasPet(hasPet).build();
-        Address address = Address.builder()
+    }
+    public Address toEntityAddress() {
+        return Address.builder()
                 .addressName(addressName)
                 .addressType(addressType)
                 .region1depthName(region1depthName)
@@ -91,7 +93,5 @@ public class MemberCreateRequest {
                 .mountainYn(mountainYn)
                 .point(new Point(x,y))
                 .build();
-        member.addAddress(address);
-        return member;
     }
 }
