@@ -14,10 +14,13 @@ import com.mallangs.domain.member.entity.embadded.UserId;
 import com.mallangs.domain.member.repository.AddressRepository;
 import com.mallangs.domain.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.geo.Point;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Commit;
@@ -87,8 +90,7 @@ class CommunityRepositoryTest {
         return categoryRepository.save(category);
     }
 
-    private Community saveCommunity(Member member, Category category, String title, String content, String location,
-                                    String imgUrl) {
+    private Community saveCommunity(Member member, Category category, String title, String content) {
         Community community = Community.builder()
                 .member(member)
                 .category(category)
@@ -98,51 +100,71 @@ class CommunityRepositoryTest {
         return communityRepository.save(community);
     }
 
-    @Test
-    @DisplayName("게시글 생성 검증")
-    void createCommunity() {
-        // given
-        Member member = saveMember();
-        Category category = saveCategory("일반게시판");
+    private Member testMember;
+    private Category testCategory;
+    private Community testCommunity;
 
-        // when
-        Community community = Community.builder()
-                .member(member)
-                .category(category)
-                .title("테스트 제목")
-                .content("테스트 내용")
-                .build();
-
-        // then
-        assertThat(community.getTitle()).isEqualTo("테스트 제목");
-        assertThat(community.getContent()).isEqualTo("테스트 내용");
-        assertThat(community.getCommunityStatus()).isEqualTo(CommunityStatus.PUBLISHED);
-        assertThat(community.getViewCnt()).isZero();
-        assertThat(community.getCommentCnt()).isZero();
-        assertThat(community.getLikeCnt()).isZero();
+    @BeforeEach
+    void setUp() {
+        testMember = saveMember();
+        testCategory = saveCategory("일반게시판");
+        testCommunity = saveCommunity(testMember, testCategory, "테스트 제목", "테스트 내용");
     }
 
     @Test
-    @DisplayName("게시글 수정")
-    void change() {
-        //given
-        Member member = saveMember();
-        Category category = saveCategory("실종게시판");
-
-        Community community = Community.builder()
-                .member(member)
-                .category(category)
-                .title("테스트 제목")
-                .content("테스트 컨텐츠")
-                .build();
-
+    @DisplayName("카테고리별 게시글 조회")
+    void findByCategoryId() {
         // when
-        community.change("수정된 제목", "수정된 내용", "서울", "image.jpg");
+        Page<Community> result = communityRepository.findByCategoryId(testCategory.getCategoryId(), PageRequest.of(0, 10));
 
         // then
-        assertThat(community.getTitle()).isEqualTo("수정된 제목");
-        assertThat(community.getContent()).isEqualTo("수정된 내용");
-        assertThat(community.getLocation()).isEqualTo("서울");
-        assertThat(community.getImgUrl()).isEqualTo("image.jpg");
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getTitle()).isEqualTo("테스트 제목");
+    }
+
+    @Test
+    @DisplayName("키워드로 게시글 검색")
+    void searchByTitleOrContent() {
+        // when
+        Page<Community> result = communityRepository.searchByTitleOrContent("제목", PageRequest.of(0, 10));
+
+        // then
+        Community foundCommunity = result.getContent().get(0);
+        assertThat(foundCommunity.getTitle()).contains("제목");
+        assertThat(foundCommunity.getContent()).contains("내용");
+    }
+
+    @Test
+    @DisplayName("회원별 게시글 조회")
+    void findByMemberId() {
+        // when
+        Page<Community> result = communityRepository.findByMemberId(testMember.getMemberId(), PageRequest.of(0, 10));
+
+        // then
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getMember().getMemberId()).isEqualTo(testMember.getMemberId());
+    }
+
+    @Test
+    @DisplayName("상태별 게시글 조회")
+    void findByStatus() {
+        // when
+        Page<Community> result = communityRepository.findByStatus(CommunityStatus.PUBLISHED, PageRequest.of(0, 10));
+
+        // then
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getCommunityStatus()).isEqualTo(CommunityStatus.PUBLISHED);
+    }
+
+    @Test
+    @DisplayName("카테고리와 제목으로 게시글 검색")
+    void searchForAdmin() {
+        // when
+        Page<Community> result = communityRepository.searchForAdmin(testCategory.getCategoryId(), "테스트", PageRequest.of(0, 10));
+
+        // then
+        Community foundCommunity = result.getContent().get(0);
+        assertThat(foundCommunity.getCategory().getCategoryId()).isEqualTo(testCategory.getCategoryId());
+        assertThat(foundCommunity.getTitle()).contains("테스트");
     }
 }
