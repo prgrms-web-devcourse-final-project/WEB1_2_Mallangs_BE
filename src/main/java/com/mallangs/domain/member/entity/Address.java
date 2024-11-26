@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.locationtech.jts.geom.Point;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+import org.locationtech.jts.geom.Point;
 
 @Getter
 @Builder
@@ -67,7 +70,11 @@ public class Address {
     @Column(name = "mountain_yn")
     private String mountainYn; // Y / N 으로 입력됨
 
+    @JdbcTypeCode(SqlTypes.GEOMETRY)
     @Column(name = "point", nullable = false, columnDefinition = "POINT SRID 4326")
     private Point point;
 
+    public void addMember(Member member) {
+        this.member = member;
+    }
 }

@@ -3,19 +3,14 @@ package com.mallangs.domain.member.dto;
 import com.mallangs.domain.member.entity.embadded.Email;
 import com.mallangs.domain.member.entity.embadded.Nickname;
 import com.mallangs.domain.member.entity.embadded.Password;
-import com.mallangs.domain.member.entity.embadded.UserId;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.ToString;
-
-import java.util.List;
 
 @Getter
 @ToString
 public class MemberUpdateRequest {
     // 기본 정보
-    @Pattern(regexp = UserId.REGEX, message = UserId.ERR_MSG)
-    private String userId;
     @Pattern(regexp = Nickname.REGEX, message = Nickname.ERR_MSG)
     private String nickname;
     @Pattern(regexp = Email.REGEX, message = Email.ERR_MSG)
@@ -25,6 +20,5 @@ public class MemberUpdateRequest {
     private String profileImage;
     @Pattern(regexp = Password.REGEX, message = Password.ERR_MSG)
     private String password;
-    private List<MemberAddressRequest> addresses;
 }
 

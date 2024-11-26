@@ -26,7 +26,7 @@ public class MemberAdminService {
     private final MemberRepository memberRepository;
 
     //회원삭제
-    public void unActive(Long memberId) {
+    public void delete(Long memberId) {
         try {
             Member foundMember = memberRepository.findById(memberId).orElseThrow(()
                     -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));

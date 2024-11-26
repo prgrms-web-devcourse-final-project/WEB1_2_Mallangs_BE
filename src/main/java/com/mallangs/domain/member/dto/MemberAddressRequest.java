@@ -1,6 +1,7 @@
 package com.mallangs.domain.member.dto;
 
 import com.mallangs.domain.member.entity.Address;
+import com.mallangs.domain.member.util.GeometryUtil;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.ToString;
@@ -42,14 +43,15 @@ public class MemberAddressRequest {
     @NotNull(message = "산악지역은 필수입력 값 입니다.")
     private String mountainYn;
     @NotNull(message = "위도는 필수입니다.")
-    private Double x;
+    private Double longitude;
     @NotNull(message = "경도는 필수입니다.")
-    private Double y;
+    private Double latitude;
 
     private static final GeometryFactory geometryFactory = new GeometryFactory();
 
     public Address toEntity() {
         Point point = geometryFactory.createPoint(new Coordinate(x, y));
+        //Point point = GeometryUtil.createPoint(latitude, longitude);
         return Address.builder()
                 .addressName(addressName)
                 .addressType(addressType)
