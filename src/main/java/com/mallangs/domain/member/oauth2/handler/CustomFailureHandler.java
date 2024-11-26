@@ -1,4 +1,4 @@
-package com.mallangs.domain.oauth2.handler;
+package com.mallangs.domain.member.oauth2.handler;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +27,7 @@ public class CustomFailureHandler extends SimpleUrlAuthenticationFailureHandler 
         try {
             response.getWriter().write("{\"error\": \"" + exception.getMessage() + "\"}");
         } catch (IOException e) {
-            log.error("로그인 인증 실패 :{}", e.getMessage());
+            log.error("Oauth2 로그인 인증 실패 :{}", e.getMessage());
         }
     }
 }

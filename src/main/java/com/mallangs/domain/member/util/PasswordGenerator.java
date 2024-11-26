@@ -18,32 +18,29 @@ public class PasswordGenerator {
         SecureRandom random = new SecureRandom();
 
         // 최소 조건을 만족하기 위해 각 집합에서 하나씩 추가
-        StringBuilder password = new StringBuilder();
-        password.append(lowerCase.charAt(random.nextInt(lowerCase.length())));
-        password.append(upperCase.charAt(random.nextInt(upperCase.length())));
-        password.append(digits.charAt(random.nextInt(digits.length())));
-        password.append(specialChars.charAt(random.nextInt(specialChars.length())));
+        List<Character> passwordChars = new ArrayList<>();
+        passwordChars.add(lowerCase.charAt(random.nextInt(lowerCase.length())));
+        passwordChars.add(upperCase.charAt(random.nextInt(upperCase.length())));
+        passwordChars.add(digits.charAt(random.nextInt(digits.length())));
+        passwordChars.add(specialChars.charAt(random.nextInt(specialChars.length())));
 
-        // 나머지 길이를 랜덤으로 채움
+        // 나머지 길이를 랜덤으로 채움 (최소 8자, 최대 20자)
         String allChars = lowerCase + upperCase + digits + specialChars;
+        int remainingLength = 12; // 최소 8자 + 추가 12자 = 최대 20자
 
-        for (int i = 0; i < 20; i++) {
-            password.append(allChars.charAt(random.nextInt(allChars.length())));
+        for (int i = 0; i < remainingLength; i++) {
+            passwordChars.add(allChars.charAt(random.nextInt(allChars.length())));
         }
 
         // 비밀번호를 랜덤하게 섞음
-        List<Character> passwordChars = new ArrayList<>();
-        for (char c : password.toString().toCharArray()) {
-            passwordChars.add(c);
-        }
         Collections.shuffle(passwordChars);
 
+        // 최종 비밀번호 생성
         StringBuilder finalPassword = new StringBuilder();
         for (char c : passwordChars) {
             finalPassword.append(c);
         }
-        String lastPassword = "12345678" + finalPassword;
 
-        return lastPassword.substring(9,20);
+        return finalPassword.toString();
     }
 }

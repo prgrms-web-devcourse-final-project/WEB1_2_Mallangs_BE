@@ -1,6 +1,6 @@
-package com.mallangs.domain.jwt.service;
+package com.mallangs.domain.member.jwt.service;
 
-import com.mallangs.domain.jwt.entity.CustomMemberDetails;
+import com.mallangs.domain.member.jwt.entity.CustomMemberDetails;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.embadded.UserId;
 import com.mallangs.domain.member.repository.MemberRepository;

@@ -1,11 +1,16 @@
-package com.mallangs.domain.jwt.filter;
+package com.mallangs.domain.member.jwt.filter;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mallangs.domain.jwt.entity.CustomMemberDetails;
-import com.mallangs.domain.jwt.entity.TokenCategory;
-import com.mallangs.domain.jwt.service.RefreshTokenService;
-import com.mallangs.domain.jwt.util.JWTUtil;
+import com.mallangs.domain.member.entity.Member;
+import com.mallangs.domain.member.entity.embadded.UserId;
+import com.mallangs.domain.member.jwt.entity.CustomMemberDetails;
+import com.mallangs.domain.member.jwt.entity.TokenCategory;
+import com.mallangs.domain.member.jwt.service.RefreshTokenService;
+import com.mallangs.domain.member.jwt.util.JWTUtil;
+import com.mallangs.domain.member.repository.MemberRepository;
+import com.mallangs.global.exception.ErrorCode;
+import com.mallangs.global.exception.MallangsCustomException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +29,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
@@ -37,6 +43,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
+    private final MemberRepository memberRepository;
 
     @Override
     //로그인 정보 인증하기
@@ -101,6 +108,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         response.addCookie(createCookie(refreshToken));
         response.setStatus(HttpStatus.OK.value());
 
+        //로그인 시간 저장
+        Member foundMember = memberRepository.findByUserId(new UserId(userId))
+                .orElseThrow(()->new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+        foundMember.recordLoginTime();
+        memberRepository.save(foundMember);
     }
 
     @Override

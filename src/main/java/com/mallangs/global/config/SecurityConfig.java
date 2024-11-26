@@ -1,14 +1,15 @@
 package com.mallangs.global.config;
 
-import com.mallangs.domain.jwt.filter.JWTFilter;
-import com.mallangs.domain.jwt.filter.LoginFilter;
-import com.mallangs.domain.jwt.filter.LogoutFilter;
-import com.mallangs.domain.jwt.service.AccessTokenBlackList;
-import com.mallangs.domain.jwt.service.RefreshTokenService;
-import com.mallangs.domain.jwt.util.JWTUtil;
+import com.mallangs.domain.member.jwt.filter.JWTFilter;
+import com.mallangs.domain.member.jwt.filter.LoginFilter;
+import com.mallangs.domain.member.jwt.filter.LogoutFilter;
+import com.mallangs.domain.member.jwt.service.AccessTokenBlackList;
+import com.mallangs.domain.member.jwt.service.RefreshTokenService;
+import com.mallangs.domain.member.jwt.util.JWTUtil;
+import com.mallangs.domain.member.oauth2.handler.CustomFailureHandler;
 import com.mallangs.domain.member.repository.MemberRepository;
-import com.mallangs.domain.oauth2.handler.CustomSuccessHandler;
-import com.mallangs.domain.oauth2.service.CustomOAuth2MemberService;
+import com.mallangs.domain.member.oauth2.handler.CustomSuccessHandler;
+import com.mallangs.domain.member.oauth2.service.CustomOAuth2MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,6 +48,7 @@ public class SecurityConfig {
     private final MemberRepository memberRepository;
     private final CustomOAuth2MemberService customOAuth2MemberService;
     private final CustomSuccessHandler customSuccessHandler;
+    private final CustomFailureHandler customFailureHandler;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -54,7 +56,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         // cors 필터
         http
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(request -> {
@@ -76,7 +78,8 @@ public class SecurityConfig {
         AuthenticationManager authManager = authenticationManager(authenticationConfiguration);
 
         // 로그인 필터 생성 및 설정
-        LoginFilter loginFilter = new LoginFilter(accessTokenValidity, accessRefreshTokenValidity, authManager, jwtUtil, refreshTokenService);
+        LoginFilter loginFilter = new LoginFilter(accessTokenValidity, accessRefreshTokenValidity,
+                                        authManager, jwtUtil, refreshTokenService,memberRepository);
         loginFilter.setFilterProcessesUrl("/api/member/login");
 
         //로그아웃 필터 생성
@@ -87,19 +90,17 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable);
-        // oauth2
-        http
-                .oauth2Login((oauth2) -> oauth2
-                        .userInfoEndpoint((userInfo) -> userInfo
-                                .userService(customOAuth2MemberService))
-                        .successHandler(customSuccessHandler));
+
         // 경로별 인가 작업
         http
-                .authorizeHttpRequests((auth) -> auth
+                .authorizeHttpRequests((auth) ->
+                        auth
+                        .requestMatchers("/api/member/register", "/api/member/login",
+                                "/api/member/logout","/api/member/find-user-id",
+                                "/api/member/find-password").permitAll()
                         .requestMatchers("/api/member/admin").hasRole("ADMIN")
-                        .requestMatchers("/api/member/**").permitAll()
+                        .requestMatchers("/api/member/**").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/api/address/**").permitAll()
-
                         // Swagger UI 관련 경로 허용
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
@@ -113,6 +114,25 @@ public class SecurityConfig {
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JWTFilter(jwtUtil, refreshTokenService, accessTokenValidity, accessRefreshTokenValidity, accessTokenBlackList, memberRepository), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(logoutFilter, JWTFilter.class);
+        return http.build();
+    }
+    @Bean
+    public SecurityFilterChain oauth2SecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests((auth) -> auth
+                        .requestMatchers("/oauth2/**").permitAll()
+                        .anyRequest().denyAll() // OAuth2 경로 외에는 이 체인에서 거부
+                )
+                .oauth2Login((oauth2) -> oauth2
+                        .userInfoEndpoint((userInfo) -> userInfo
+                                .userService(customOAuth2MemberService))
+                        .successHandler(customSuccessHandler)
+                        .failureHandler(customFailureHandler)
+                );
+
         return http.build();
     }
 }

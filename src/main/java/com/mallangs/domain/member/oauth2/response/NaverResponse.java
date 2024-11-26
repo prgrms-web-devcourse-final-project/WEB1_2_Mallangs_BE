@@ -1,4 +1,4 @@
-package com.mallangs.domain.oauth2.response;
+package com.mallangs.domain.member.oauth2.response;
 
 import lombok.RequiredArgsConstructor;
 

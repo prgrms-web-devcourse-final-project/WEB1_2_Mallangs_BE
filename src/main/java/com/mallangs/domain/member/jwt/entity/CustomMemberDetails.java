@@ -1,4 +1,4 @@
-package com.mallangs.domain.jwt.entity;
+package com.mallangs.domain.member.jwt.entity;
 
 import com.mallangs.domain.member.entity.Member;
 import lombok.RequiredArgsConstructor;
