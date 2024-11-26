@@ -139,7 +139,7 @@ public class PetService {
     //반려동물 복원 (활성화)
     private PetResponse restorePet(Long petId) {
         try {
-            Pet pet = petRepository.findById(petId).orElseThrow(() -> new EntityNotFoundException("Pet not found"));//머지시 커스텀 예외로 대체될 부분
+            Pet pet = petRepository.findById(petId).orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
             pet.activate();
             petRepository.save(pet);
             return new PetResponse(pet);
