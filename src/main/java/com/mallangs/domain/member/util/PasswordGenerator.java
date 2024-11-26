@@ -44,6 +44,6 @@ public class PasswordGenerator {
         }
         String lastPassword = "12345678" + finalPassword;
 
-        return lastPassword.substring(9,19);
+        return lastPassword.substring(9,20);
     }
 }
