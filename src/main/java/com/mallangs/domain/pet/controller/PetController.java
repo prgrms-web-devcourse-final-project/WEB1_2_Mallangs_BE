@@ -62,7 +62,7 @@ public class PetController {
     public ResponseEntity<Void> updateRepresentativePet(
             @AuthenticationPrincipal Long memberId,
             @PathVariable Long petId) {
-        petService.setRepresentativePet(memberId, petId);
+        petService.createRepresentativePet(memberId, petId);
         return ResponseEntity.ok().build();
     }
 
@@ -83,6 +83,24 @@ public class PetController {
             @ModelAttribute PageRequest pageRequestDTO) {
         Page<PetResponse> pets = petService.getNearbyPets(petLocationDTO, pageRequestDTO);
         return ResponseEntity.ok(pets);
+    }
+
+    @PatchMapping("/{petId}/delete")
+    @Operation(summary = "반려동물 삭제 (비활성화)", description = "특정 반려동물을 삭제(비활성화)하는 API")
+    public ResponseEntity<PetResponse> deletePet(
+            @PathVariable Long petId,
+            @AuthenticationPrincipal Long memberId) {
+        PetResponse pet = petService.deletePet(petId, memberId);
+        return ResponseEntity.ok(pet);
+    }
+
+    @PatchMapping("/{petId}/restore")
+    @Operation(summary = "반려동물 복원 (활성화)", description = "삭제된 반려동물을 복원(활성화)하는 API")
+    public ResponseEntity<PetResponse> restorePet(
+            @PathVariable Long petId,
+            @AuthenticationPrincipal Long memberId) {
+        PetResponse pet = petService.restorePet(petId, memberId);
+        return ResponseEntity.ok(pet);
     }
 
 }

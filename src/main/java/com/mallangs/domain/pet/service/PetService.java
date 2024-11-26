@@ -80,7 +80,7 @@ public class PetService {
     }
 
     //대표 말랑이(반려동물) 등록
-    public void setRepresentativePet(Long memberId, Long petId) {
+    public void createRepresentativePet(Long memberId, Long petId) {
         try {
             // 기존 대표 반려동물이 있다면 조회하여 대표상태 해제
             petRepository.findRepresentativePetByMemberId(memberId)
@@ -122,9 +122,12 @@ public class PetService {
     }
 
     //반려동물 삭제 (비활성화)
-    private PetResponse deletePet(Long petId) {
+    public PetResponse deletePet(Long petId, Long memberId) {
         try {
             Pet pet = petRepository.findById(petId).orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
+            if (!pet.getMember().getMemberId().equals(memberId)) {
+                throw new MallangsCustomException(ErrorCode.PET_NOT_OWNED);
+            }
             pet.deactivate();
             petRepository.save(pet);
             return new PetResponse(pet);
@@ -135,9 +138,12 @@ public class PetService {
     }
 
     //반려동물 복원 (활성화)
-    private PetResponse restorePet(Long petId) {
+    public PetResponse restorePet(Long petId, Long memberId) {
         try {
             Pet pet = petRepository.findById(petId).orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
+            if (!pet.getMember().getMemberId().equals(memberId)) {
+                throw new MallangsCustomException(ErrorCode.PET_NOT_OWNED);
+            }
             pet.activate();
             petRepository.save(pet);
             return new PetResponse(pet);

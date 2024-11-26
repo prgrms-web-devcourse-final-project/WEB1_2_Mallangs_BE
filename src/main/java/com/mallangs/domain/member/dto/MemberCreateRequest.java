@@ -72,7 +72,6 @@ public class MemberCreateRequest {
     @NotNull(message = "경도는 필수입니다.")
     private Double longitude;
 
-    private static final GeometryFactory geometryFactory = new GeometryFactory();
 
     public Member toEntityMember() {
         return Member.builder()
@@ -83,8 +82,7 @@ public class MemberCreateRequest {
                 .hasPet(hasPet).build();
     }
     public Address toEntityAddress() {
-        //Point point = GeometryUtil.createPoint(latitude, longitude);
-        Point point = geometryFactory.createPoint(new Coordinate(longitude, latitude));
+        Point point = GeometryUtil.createPoint(latitude, longitude);
         return Address.builder()
                 .addressName(addressName)
                 .addressType(addressType)

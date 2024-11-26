@@ -47,11 +47,9 @@ public class MemberAddressRequest {
     @NotNull(message = "위도는 필수입니다.")
     private Double latitude; //y
 
-    private static final GeometryFactory geometryFactory = new GeometryFactory();
 
     public Address toEntity() {
-        Point point = geometryFactory.createPoint(new Coordinate(longitude, latitude));
-        //Point point = GeometryUtil.createPoint(latitude, longitude);
+        Point point = GeometryUtil.createPoint(latitude, longitude);
         return Address.builder()
                 .addressName(addressName)
                 .addressType(addressType)

@@ -25,6 +25,7 @@ public enum ErrorCode {
   PET_NOT_DELETE(HttpStatus.INTERNAL_SERVER_ERROR, "반려동물 삭제(비활성화)에 실패하였습니다."),
   PET_NOT_RESTORE(HttpStatus.INTERNAL_SERVER_ERROR, "반려동물 복원(활성화)에 실패하였습니다."),
   PET_NOT_SEARCH_LOCATION(HttpStatus.INTERNAL_SERVER_ERROR, "주변 반려동물 검색에 실패하였습니다."),
+  PET_NOT_OWNED(HttpStatus.FORBIDDEN, "반려동물에 대한 권한이 없습니다."),
   PET_NOT_REPRESENTATIVE(HttpStatus.INTERNAL_SERVER_ERROR, "대표 말랑이(반려동물) 등록에 실패하였습니다."),
 
   //Location
