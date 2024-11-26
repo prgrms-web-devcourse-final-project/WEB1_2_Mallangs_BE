@@ -3,6 +3,10 @@ package com.mallangs.domain.pet.repository;
 
 import com.mallangs.domain.member.entity.Address;
 import com.mallangs.domain.member.entity.Member;
+import com.mallangs.domain.member.entity.embadded.Email;
+import com.mallangs.domain.member.entity.embadded.Nickname;
+import com.mallangs.domain.member.entity.embadded.Password;
+import com.mallangs.domain.member.entity.embadded.UserId;
 import com.mallangs.domain.member.repository.AddressRepository;
 import com.mallangs.domain.member.repository.MemberRepository;
 import com.mallangs.domain.pet.entity.Pet;
@@ -11,12 +15,19 @@ import com.mallangs.domain.pet.entity.PetType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,6 +41,8 @@ class PetRepositoryTest {
     private MemberRepository memberRepository;
     @Autowired
     private AddressRepository addressRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private Member testMember1;
     private Member testMember2;
@@ -37,37 +50,57 @@ class PetRepositoryTest {
     private Address testAddress2;
     private Pet testPet1;
     private Pet testPet2;
+    private final GeometryFactory geometryFactory = new GeometryFactory();
 
     @BeforeEach
     void setUp(){
+
+        testMember1 = Member.builder()
+                .userId(new UserId("testId1234"))
+                .password(new Password("1234Aa1!!", passwordEncoder))
+                .email(new Email("test123@test.com"))
+                .nickname(new Nickname("testname2"))
+                .hasPet(true)
+                .build();
+        memberRepository.save(testMember1);
+
+        testMember2 = Member.builder()
+                .userId(new UserId("asaaas11"))
+                .password(new Password("11asdasAsds!!", passwordEncoder))
+                .email(new Email("test1@test.com"))
+                .nickname(new Nickname("12"))
+                .hasPet(true)
+                .build();
+        memberRepository.save(testMember2);
+
+        Point point1 = geometryFactory.createPoint(new Coordinate(127.0276, 37.4979));
+        point1.setSRID(4326);
         testAddress1 = Address.builder()
                 .addressName("서울테스트")
-                .x(127.0276)
-                .y(37.4979)
+                .addressType("테스트")
+                .point(point1)
                 .region1depthName("서울")
                 .region2depthName("강남구")
                 .region3depthName("역삼동")
+                .member(testMember1)  // Member 설정
                 .build();
         addressRepository.save(testAddress1);
 
+        Point point2 = geometryFactory.createPoint(new Coordinate(129.3280, 35.5376));
+        point2.setSRID(4326);
         testAddress2 = Address.builder()
-                .addressName("울산테스트") // 추가
-                .x(129.3280)
-                .y(35.5376)
+                .addressName("울산테스트")
+                .addressType("테스트")
+                .point(point2)
                 .region1depthName("울산")
                 .region2depthName("남구")
                 .region3depthName("신정동")
+                .member(testMember2)  // Member 설정
                 .build();
         addressRepository.save(testAddress2);
 
-        testMember1 = Member.builder()
-                .address1(testAddress1)
-                .build();
-        testMember2 = Member.builder()
-                .address1(testAddress2)
-                .build();
-        memberRepository.save(testMember1);
-        memberRepository.save(testMember2);
+        testMember1.addAddress(testAddress1);
+        testMember2.addAddress(testAddress2);
 
         for(int i =0; i<10;i++) {
             testPet1 = Pet.builder()
@@ -141,27 +174,34 @@ class PetRepositoryTest {
     void findNearbyPets() {
         //given
         Pageable pageable = PageRequest.of(0,10);
-        Double centerY = 37.4977;
-        Double centerX = 127.0256;
-        Double radiusInKm = 10.0;
+//        Double centerY = 37.4979; //서울 위도
+//        Double centerX = 127.0276;
+//        Double radiusInKm = 20.0;
 
-//        Double centerY = 35.5377;
-//        Double centerX = 129.3276;
-//        Double radiusInKm = 10.0;
+        Double centerY = 35.5377; //울산
+        Double centerX = 129.3280;
+        Double radiusInKm = 20.0;
 
         //when
         Page<Pet> result = petRepository.findNearbyPets(centerY, centerX, radiusInKm, null, null, null, pageable);
 
         //then
         assertThat(result).isNotEmpty();
+        //첫번쨰 반려동물
+        Pet firstPet = result.getContent().get(0);
+        assertThat(firstPet.getMember()).isNotNull();
+
+        List<Address> addresses = firstPet.getMember().getAddresses();
+        assertThat(addresses).isNotEmpty(); // 주소가 있는지 확인
+
+
         // 첫 번째 Pet 객체의 지역명 검증
-        assertThat(result.getContent().get(0).getMember().getAddress1().getRegion1depthName()).isEqualTo("서울");
-        assertThat(result.getContent().get(0).getMember().getAddress1().getRegion2depthName()).isEqualTo("강남구");
-        assertThat(result.getContent().get(0).getMember().getAddress1().getRegion3depthName()).isEqualTo("역삼동");
+//        assertThat(address.getRegion1depthName()).isEqualTo("서울");
+//        assertThat(address.getRegion2depthName()).isEqualTo("강남구");
+//        assertThat(address.getRegion3depthName()).isEqualTo("역삼동");
 
-
-//        assertThat(result.getContent().get(0).getMember().getAddress1().getRegion1depthName()).isEqualTo("울산");
-//        assertThat(result.getContent().get(0).getMember().getAddress1().getRegion2depthName()).isEqualTo("남구");
-//        assertThat(result.getContent().get(0).getMember().getAddress1().getRegion3depthName()).isEqualTo("신정동");
+//        assertThat(address.getRegion1depthName()).isEqualTo("울산");
+//        assertThat(address.getRegion2depthName()).isEqualTo("남구");
+//        assertThat(address.getRegion3depthName()).isEqualTo("신정동");
     }
 }

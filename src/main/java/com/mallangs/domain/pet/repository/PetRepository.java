@@ -35,7 +35,7 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
         AND p.is_active = true \
         AND ST_Distance_Sphere(\
             point(?2, ?1), \
-            point(ST_X(a.point), ST_Y(a.point))\
+            point(ST_Y(a.point), ST_X(a.point))\
         ) <= ?3 * 1000 \
         AND (?4 IS NULL OR a.region_1depth_name = ?4) \
         AND (?5 IS NULL OR a.region_2depth_name = ?5) \

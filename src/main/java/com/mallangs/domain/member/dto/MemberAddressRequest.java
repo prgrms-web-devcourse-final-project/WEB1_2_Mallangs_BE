@@ -4,7 +4,10 @@ import com.mallangs.domain.member.entity.Address;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.ToString;
-import org.springframework.data.geo.Point;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+
 
 @Getter
 @ToString
@@ -43,7 +46,10 @@ public class MemberAddressRequest {
     @NotNull(message = "경도는 필수입니다.")
     private Double y;
 
+    private static final GeometryFactory geometryFactory = new GeometryFactory();
+
     public Address toEntity() {
+        Point point = geometryFactory.createPoint(new Coordinate(x, y));
         return Address.builder()
                 .addressName(addressName)
                 .addressType(addressType)
@@ -59,7 +65,7 @@ public class MemberAddressRequest {
                 .buildingName(buildingName)
                 .zoneNo(zoneNo)
                 .mountainYn(mountainYn)
-                .point(new Point(x,y))
+                .point(point)
                 .build();
     }
 }

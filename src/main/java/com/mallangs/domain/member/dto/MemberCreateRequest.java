@@ -11,7 +11,11 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.springframework.data.geo.Point;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+
+
 
 @Getter
 @ToString
@@ -67,7 +71,11 @@ public class MemberCreateRequest {
     @NotNull(message = "경도는 필수입니다.")
     private Double y;
 
+    private static final GeometryFactory geometryFactory = new GeometryFactory();
+
+
     public Member toEntity() {
+        Point point = geometryFactory.createPoint(new Coordinate(x, y));
         Member member = Member.builder()
                 .userId(new UserId(userId))
                 .nickname(new Nickname(nickname))
@@ -89,7 +97,7 @@ public class MemberCreateRequest {
                 .buildingName(buildingName)
                 .zoneNo(zoneNo)
                 .mountainYn(mountainYn)
-                .point(new Point(x,y))
+                .point(point)
                 .build();
         member.addAddress(address);
         return member;
