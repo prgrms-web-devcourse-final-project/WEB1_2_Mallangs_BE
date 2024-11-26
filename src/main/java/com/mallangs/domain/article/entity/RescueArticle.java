@@ -1,12 +1,13 @@
 package com.mallangs.domain.article.entity;
 
+import com.mallangs.domain.article.dto.request.RescueCreateRequest;
+import com.mallangs.domain.member.Member;
 import com.mallangs.domain.pet.entity.PetType;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -14,7 +15,6 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 @DiscriminatorValue("rescue")
 @SuperBuilder
 public class RescueArticle extends Article {
@@ -33,5 +33,19 @@ public class RescueArticle extends Article {
         this.petType = updatedRescueArticle.getPetType();
       }
     }
+  }
+
+  public static RescueArticle createRescueArticle(Member member,
+      RescueCreateRequest createRequest) {
+    return RescueArticle.builder()
+        .petType(createRequest.getPetType())
+        .member(member)
+        .mapVisibility(createRequest.getMapVisibility())
+        .title(createRequest.getTitle())
+        .geography(createRequest.getGeography())
+        .description(createRequest.getDescription())
+        .contact(createRequest.getContact())
+        .image(createRequest.getImage())
+        .build();
   }
 }
