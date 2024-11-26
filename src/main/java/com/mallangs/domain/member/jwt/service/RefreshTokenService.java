@@ -1,4 +1,4 @@
-package com.mallangs.domain.jwt.service;
+package com.mallangs.domain.member.jwt.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

@@ -40,7 +40,7 @@ public class AddressService {
             memberRepository.save(foundMember);
         } catch (Exception e) {
             log.error("주소 추가에 실패하였습니다. {}", e.getMessage());
-            throw e;
+            throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);
         }
     }
 
@@ -51,7 +51,7 @@ public class AddressService {
             return addresses.stream().map(MemberAddressResponse::new).toList();
         } catch (Exception e) {
             log.error("주소 조회에 실패하였습니다. {}", e.getMessage());
-            throw e;
+            throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);
         }
     }
 
@@ -61,7 +61,7 @@ public class AddressService {
             addressRepository.deleteById(addressId);
         } catch (Exception e) {
             log.error("주소 삭제에 실패하였습니다. {}", e.getMessage());
-            throw e;
+            throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);
         }
     }
 
