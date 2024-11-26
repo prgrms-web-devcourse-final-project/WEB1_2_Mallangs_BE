@@ -7,6 +7,7 @@ import com.mallangs.domain.member.entity.embadded.Email;
 import com.mallangs.domain.member.entity.embadded.Nickname;
 import com.mallangs.domain.member.entity.embadded.Password;
 import com.mallangs.domain.member.entity.embadded.UserId;
+import com.mallangs.domain.member.repository.AddressRepository;
 import com.mallangs.domain.member.repository.MemberRepository;
 import com.mallangs.domain.member.util.PasswordGenerator;
 import com.mallangs.global.exception.ErrorCode;
@@ -38,6 +39,7 @@ public class MemberUserService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender javaMailSender;
+    private final AddressRepository addressRepository;
 
     @Value("${spring.mail.username}")
     private String from;
@@ -45,8 +47,13 @@ public class MemberUserService {
     //회원가입
     public String create(MemberCreateRequest memberCreateRequest) {
         try {
-            Member member = memberCreateRequest.toEntity();
+            Member member = memberCreateRequest.toEntityMember();
             member.changePassword(new Password(memberCreateRequest.getPassword(),passwordEncoder));
+            memberRepository.save(member);
+            Address address = memberCreateRequest.toEntityAddress();
+            address.addMember(member);
+            addressRepository.save(address);
+            member.addAddress(address);
             memberRepository.save(member);
             return member.getUserId().getValue();
         } catch (Exception e) {
@@ -56,9 +63,9 @@ public class MemberUserService {
     }
 
     //회원조회
-    public MemberGetResponse get(Long memberId) {
+    public MemberGetResponse get(String userId) {
         try {
-            Member foundMember = memberRepository.findById(memberId).orElseThrow(() ->
+            Member foundMember = memberRepository.findByUserId(new UserId(userId)).orElseThrow(() ->
                     new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
             return new MemberGetResponse(foundMember);
         } catch (Exception e) {
@@ -68,9 +75,9 @@ public class MemberUserService {
     }
 
     //회원정보 수정
-    public void update(MemberUpdateRequest memberUpdateRequest) {
+    public void update(MemberUpdateRequest memberUpdateRequest,String userId) {
         try {
-            Member foundMember = memberRepository.findByUserId(new UserId(memberUpdateRequest.getUserId()))
+            Member foundMember = memberRepository.findByUserId(new UserId(userId))
                     .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
 
             //회원 정보 수정
@@ -176,7 +183,7 @@ public class MemberUserService {
     }
 
     //메일 전송하기
-    public void mailSend(MemberSendMailResponse memberSendMailResponse) {
+    public String mailSend(MemberSendMailResponse memberSendMailResponse) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(memberSendMailResponse.getAddress());
@@ -185,6 +192,7 @@ public class MemberUserService {
             message.setFrom(from);
             message.setReplyTo(from);
             javaMailSender.send(message);
+            return memberSendMailResponse.getAddress();
         } catch (Exception e) {
             log.error("메세지 전송에 실패하였습니다. {}", e.getMessage());
             throw e;
