@@ -7,7 +7,6 @@ import com.mallangs.domain.pet.entity.Pet;
 import com.mallangs.domain.pet.repository.PetRepository;
 import com.mallangs.global.exception.ErrorCode;
 import com.mallangs.global.exception.MallangsCustomException;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -32,7 +31,6 @@ public class PetService {
             Page<Pet> pets = petRepository.findAllPetsByMemberId(memberId, pageable);
             return pets.map(PetResponse::new);
         } catch (Exception e) {
-            //예외처리 merge 되면 커스텀 예외 생성
             log.error("getAllMyPets error: {}", e.getMessage());
             throw new MallangsCustomException(ErrorCode.PET_NOT_FOUND);
         }
@@ -42,12 +40,12 @@ public class PetService {
     public PetResponse getPet(Long petId, Long memberId) {
         Pet pet = petRepository.findById(petId).orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
 
-        //타인의 비활성화 반려동물
+        //타인의 비활성화 반려동물 조회시 예외 던짐
         if (!pet.getIsActive() && !pet.getMember().getMemberId().equals(memberId)) {
             throw new MallangsCustomException(ErrorCode.PET_NOT_ACTIVATE);
         }
 
-        //타인의 비공개 반려동물
+        //타인의 비공개 반려동물 조회시 예외 던짐
         if (!pet.getIsOpenProfile() && !pet.getMember().getMemberId().equals(memberId)) {
             throw new MallangsCustomException(ErrorCode.PET_NOT_PROFILE_OPEN);
         }
@@ -189,17 +187,17 @@ public class PetService {
     }
 
     // 위치 검색 파라미터 검증
-    private void validateLocationSearch(PetLocationRequest searchDTO) {
-        if (searchDTO.getX() == null || searchDTO.getY() == null || searchDTO.getRadius() == null) {
+    private void validateLocationSearch(PetLocationRequest petLocationRequest) {
+        if (petLocationRequest.getX() == null || petLocationRequest.getY() == null || petLocationRequest.getRadius() == null) {
             throw new MallangsCustomException(ErrorCode.LOCATION_INVALIDE_PARAMS);
         }
 
-          double x = searchDTO.getX();
-          double y = searchDTO.getY();
+          double x = petLocationRequest.getX();
+          double y = petLocationRequest.getY();
 
         if (y < -90 || y > 90 || //북위는 양수로 남위는 음수로 표현
                 x < -180 || x > 180 || //동경은 양수로 서경은 음수로 표현
-                searchDTO.getRadius() <= 0 || searchDTO.getRadius() > 20) { // 최대 반경 20km
+                petLocationRequest.getRadius() <= 0 || petLocationRequest.getRadius() > 20) { // 최대 반경 20km
             throw new MallangsCustomException(ErrorCode.LOCATION_INVALIDE_RANGE);
         }
     }
