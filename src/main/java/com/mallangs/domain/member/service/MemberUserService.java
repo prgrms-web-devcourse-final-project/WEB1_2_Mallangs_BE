@@ -7,24 +7,32 @@ import com.mallangs.domain.member.entity.embadded.Email;
 import com.mallangs.domain.member.entity.embadded.Nickname;
 import com.mallangs.domain.member.entity.embadded.Password;
 import com.mallangs.domain.member.entity.embadded.UserId;
+import com.mallangs.domain.member.repository.AddressRepository;
 import com.mallangs.domain.member.repository.MemberRepository;
 import com.mallangs.domain.member.util.PasswordGenerator;
 import com.mallangs.global.exception.ErrorCode;
 import com.mallangs.global.exception.MallangsCustomException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.eclipse.angus.mail.util.logging.MailHandler;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
 
 /*
     예외처리 수정 필요
@@ -37,7 +45,8 @@ public class MemberUserService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JavaMailSender javaMailSender;
+    private final JavaMailSender emailSender;
+    private final AddressRepository addressRepository;
 
     @Value("${spring.mail.username}")
     private String from;
@@ -45,8 +54,13 @@ public class MemberUserService {
     //회원가입
     public String create(MemberCreateRequest memberCreateRequest) {
         try {
-            Member member = memberCreateRequest.toEntity();
+            Member member = memberCreateRequest.toEntityMember();
             member.changePassword(new Password(memberCreateRequest.getPassword(),passwordEncoder));
+            memberRepository.save(member);
+            Address address = memberCreateRequest.toEntityAddress();
+            address.addMember(member);
+            addressRepository.save(address);
+            member.addAddress(address);
             memberRepository.save(member);
             return member.getUserId().getValue();
         } catch (Exception e) {
@@ -56,9 +70,9 @@ public class MemberUserService {
     }
 
     //회원조회
-    public MemberGetResponse get(Long memberId) {
+    public MemberGetResponse get(String userId) {
         try {
-            Member foundMember = memberRepository.findById(memberId).orElseThrow(() ->
+            Member foundMember = memberRepository.findByUserId(new UserId(userId)).orElseThrow(() ->
                     new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
             return new MemberGetResponse(foundMember);
         } catch (Exception e) {
@@ -68,9 +82,9 @@ public class MemberUserService {
     }
 
     //회원정보 수정
-    public void update(MemberUpdateRequest memberUpdateRequest) {
+    public void update(MemberUpdateRequest memberUpdateRequest,Long memberId) {
         try {
-            Member foundMember = memberRepository.findByUserId(new UserId(memberUpdateRequest.getUserId()))
+            Member foundMember = memberRepository.findById(memberId)
                     .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
 
             //회원 정보 수정
@@ -167,7 +181,7 @@ public class MemberUserService {
 
     public MemberSendMailResponse writeMessage(String email, String tempPassword) {
         MemberSendMailResponse dto = new MemberSendMailResponse();
-        dto.setAddress(email);
+        dto.setEmail(email);
         dto.setTitle("Mallang 임시비밀번호 안내 이메일 입니다.");
         dto.setMessage("안녕하세요. Mallang 임시비밀번호 안내 관련 이메일 입니다.\n" + " 회원님의 임시 비밀번호는 "
                 + tempPassword + " 입니다.\n" + "로그인 후에는 비밀번호 변경 바랍니다.\n"
@@ -176,15 +190,23 @@ public class MemberUserService {
     }
 
     //메일 전송하기
-    public void mailSend(MemberSendMailResponse memberSendMailResponse) {
+    public String mailSend(MemberSendMailResponse memberSendMailResponse) throws MessagingException {
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(memberSendMailResponse.getAddress());
-            message.setSubject(memberSendMailResponse.getTitle());
-            message.setText(memberSendMailResponse.getMessage());
-            message.setFrom(from);
-            message.setReplyTo(from);
-            javaMailSender.send(message);
+            //MimeMessageHelper 로 message + multi file 전송
+            MimeMessage message = emailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            //송수신자, 메세지 내용 등록
+            helper.setFrom(from);
+            helper.setTo(memberSendMailResponse.getEmail());
+            helper.setSubject(memberSendMailResponse.getTitle());
+            helper.setText(memberSendMailResponse.getMessage());
+            helper.setReplyTo(from);
+
+            //파일등록
+//            helper.addAttachment(Objects.requireNonNull(file.getOriginalFilename()), file);
+            emailSender.send(message);
+            return memberSendMailResponse.getEmail();
         } catch (Exception e) {
             log.error("메세지 전송에 실패하였습니다. {}", e.getMessage());
             throw e;

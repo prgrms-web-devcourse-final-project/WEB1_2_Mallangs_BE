@@ -61,7 +61,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         CustomMemberDetails customUserDetails = (CustomMemberDetails) authentication.getPrincipal();
 
         //customUserDetails에서 인증정보 꺼내기
-        String userId = customUserDetails.getUserId();
+        String userId = customUserDetails.getUsername();
         String email = customUserDetails.getEmail();
         String role = authentication.getAuthorities().stream()
                 .findFirst()

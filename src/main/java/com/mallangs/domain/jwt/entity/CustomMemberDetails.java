@@ -19,12 +19,12 @@ public class CustomMemberDetails implements UserDetails {
         collection.add((GrantedAuthority) () -> member.getMemberRole().name());
         return collection;
     }
+    public String getUserId(){
+        return member.getUserId().getValue();
+    }
 
     public String getEmail(){
         return member.getEmail().getValue();
-    }
-    public String getUserId(){
-        return member.getUserId().getValue();
     }
     public String getRole(){return member.getMemberRole().name();}
 
@@ -39,7 +39,7 @@ public class CustomMemberDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return null;
+        return member.getUserId().getValue();
     }
 
     @Override

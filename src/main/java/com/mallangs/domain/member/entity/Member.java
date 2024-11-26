@@ -83,8 +83,4 @@ public class Member extends BaseTimeEntity {
         this.addresses.add(address);
     }
 
-    public void removeAddress(Address address){
-        this.addresses.remove(address);
-    }
-
 }

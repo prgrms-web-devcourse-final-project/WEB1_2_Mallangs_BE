@@ -6,6 +6,7 @@ import com.mallangs.domain.member.entity.embadded.Email;
 import com.mallangs.domain.member.entity.embadded.Nickname;
 import com.mallangs.domain.member.entity.embadded.Password;
 import com.mallangs.domain.member.entity.embadded.UserId;
+import com.mallangs.domain.member.util.GeometryUtil;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
@@ -63,18 +64,21 @@ public class MemberCreateRequest {
     @NotNull(message = "산악지역은 필수입력 값 입니다.")
     private String mountainYn;
     @NotNull(message = "위도는 필수입니다.")
-    private Double x;
+    private Double latitude;
     @NotNull(message = "경도는 필수입니다.")
-    private Double y;
+    private Double longitude;
 
-    public Member toEntity() {
-        Member member = Member.builder()
+    public Member toEntityMember() {
+        return Member.builder()
                 .userId(new UserId(userId))
                 .nickname(new Nickname(nickname))
                 .email(new Email(email))
                 .profileImage(profileImage)
                 .hasPet(hasPet).build();
-        Address address = Address.builder()
+    }
+    public Address toEntityAddress() {
+        org.locationtech.jts.geom.Point point = GeometryUtil.createPoint(latitude, longitude);
+        return Address.builder()
                 .addressName(addressName)
                 .addressType(addressType)
                 .region1depthName(region1depthName)
@@ -89,9 +93,7 @@ public class MemberCreateRequest {
                 .buildingName(buildingName)
                 .zoneNo(zoneNo)
                 .mountainYn(mountainYn)
-                .point(new Point(x,y))
+                .point(point)
                 .build();
-        member.addAddress(address);
-        return member;
     }
 }

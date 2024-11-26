@@ -13,8 +13,8 @@ public class MemberAddressResponse {
     private String region3depthName;
     private String mainAddressNo;
     private String roadName;
-    private Double x;
-    private Double y;
+    private Double latitude;
+    private Double longitude;
 
     public MemberAddressResponse(Address address){
         this.addressId = address.getId();
@@ -22,7 +22,7 @@ public class MemberAddressResponse {
         this.region3depthName = address.getRegion3depthName();
         this.mainAddressNo = address.getMainAddressNo();
         this.roadName = address.getRoadName();
-        this.x = address.getPoint().getX();
-        this.y = address.getPoint().getY();
+        this.latitude = address.getPoint().getY();
+        this.longitude = address.getPoint().getX();
     }
 }

@@ -5,6 +5,7 @@ import com.mallangs.domain.member.dto.MemberAddressResponse;
 import com.mallangs.domain.member.entity.Address;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.embadded.Email;
+import com.mallangs.domain.member.entity.embadded.UserId;
 import com.mallangs.domain.member.repository.AddressRepository;
 import com.mallangs.domain.member.repository.MemberRepository;
 import com.mallangs.global.exception.ErrorCode;
@@ -26,14 +27,16 @@ public class AddressService {
     private final MemberRepository memberRepository;
 
     //주소 추가
-    public void create(String email, MemberAddressRequest memberAddressRequest) {
+    public void create(String userId, MemberAddressRequest memberAddressRequest) {
         try {
-            Address address = memberAddressRequest.toEntity();
-
-            Member foundMember = memberRepository.findByEmail(new Email(email))
+            Member foundMember = memberRepository.findByUserId(new UserId(userId))
                     .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
-            foundMember.getAddresses().add(address);
 
+            Address address = memberAddressRequest.toEntity();
+            address.addMember(foundMember);
+            Address save = addressRepository.save(address);
+
+            foundMember.getAddresses().add(address);
             memberRepository.save(foundMember);
         } catch (Exception e) {
             log.error("주소 추가에 실패하였습니다. {}", e.getMessage());
@@ -53,14 +56,9 @@ public class AddressService {
     }
 
     //주소 삭제
-    public void delete(String email, Long addressId) {
+    public void delete(Long addressId) {
         try {
-            Address address = addressRepository.findById(addressId)
-                    .orElseThrow(() -> new MallangsCustomException(ErrorCode.ADDRESS_NOT_FOUND));
-            Member foundMember = memberRepository.findByEmail(new Email(email))
-                    .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
-
-            foundMember.removeAddress(address);
+            addressRepository.deleteById(addressId);
         } catch (Exception e) {
             log.error("주소 삭제에 실패하였습니다. {}", e.getMessage());
             throw e;
