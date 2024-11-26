@@ -54,15 +54,16 @@ public class Member extends BaseTimeEntity {
     private Boolean isActive = true;
 
     // 회원가입
-    public Member(String userId, String nickname, Password password, String email, String profileImage, Boolean hasPet) {
+    public Member(String userId, String nickname, Password password, String email, String profileImage, Boolean hasPet){
         this.userId = new UserId(userId);
-        this.nickname =  new Nickname(nickname);
+        this.nickname = new Nickname(nickname);
         this.password = password;
         this.email = new Email(email);
         this.profileImage = profileImage;
         this.hasPet = hasPet;
     }
 
+    //수정
     public void change(String nickname,String password, String email, String profileImage, PasswordEncoder passwordEncoder){
         this.nickname = new Nickname(nickname);
         this.password = new Password(password, passwordEncoder);
@@ -80,10 +81,6 @@ public class Member extends BaseTimeEntity {
 
     public void addAddress(Address address){
         this.addresses.add(address);
-    }
-
-    public void removeAddress(Address address){
-        this.addresses.remove(address);
     }
 
 }

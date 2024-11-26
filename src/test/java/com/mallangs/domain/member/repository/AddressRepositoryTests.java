@@ -6,9 +6,11 @@ import com.mallangs.domain.member.entity.embadded.Email;
 import com.mallangs.domain.member.entity.embadded.Nickname;
 import com.mallangs.domain.member.entity.embadded.Password;
 import com.mallangs.domain.member.entity.embadded.UserId;
+import com.mallangs.domain.member.util.GeometryUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.geo.Point;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -37,14 +39,12 @@ public class AddressRepositoryTests {
                 .hasPet(true)
                 .build();
         memberRepository.save(member);
-
         Address address = Address.builder()
                 .member(member)
                 .addressName("testAddress")
                 .addressType("testAddressType")
                 .mainAddressNo("testmainAddressNo")
-                .x(1d)
-                .y(1d)
+                .point(GeometryUtil.createPoint(1, 2))
                 .mountainYn("testMountainYn")
                 .region1depthName("testRegion1depthName")
                 .region2depthName("testRegion2depthName")

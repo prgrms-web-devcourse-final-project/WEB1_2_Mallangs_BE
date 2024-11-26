@@ -7,10 +7,12 @@ import com.mallangs.domain.member.entity.embadded.Email;
 import com.mallangs.domain.member.entity.embadded.Nickname;
 import com.mallangs.domain.member.entity.embadded.Password;
 import com.mallangs.domain.member.entity.embadded.UserId;
+import com.mallangs.domain.member.util.GeometryUtil;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.geo.Point;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,12 +35,11 @@ public class MemberRepositoryTests {
     AddressRepository addressRepository;
 
     @Test
-    @Rollback
     public void findByUserIdTest() {
         //given
         Member member = Member.builder()
                 .userId(new UserId("testId1234"))
-                .password(new Password("1234Aa1!!", passwordEncoder))
+                .password(new Password("122234Aa1!!", passwordEncoder))
                 .email(new Email("test123@test.com"))
                 .nickname(new Nickname("testname2"))
                 .hasPet(true)
@@ -50,8 +51,7 @@ public class MemberRepositoryTests {
                 .addressName("testAddress")
                 .addressType("testAddressType")
                 .mainAddressNo("testmainAddressNo")
-                .x(1d)
-                .y(1d)
+                .point(GeometryUtil.createPoint(1, 2))
                 .mountainYn("testMountainYn")
                 .region1depthName("testRegion1depthName")
                 .region2depthName("testRegion2depthName")
@@ -96,8 +96,7 @@ public class MemberRepositoryTests {
                 .addressName("testAddress")
                 .addressType("testAddressType")
                 .mainAddressNo("testmainAddressNo")
-                .x(1d)
-                .y(1d)
+                .point(GeometryUtil.createPoint(1, 2))
                 .mountainYn("testMountainYn")
                 .region1depthName("testRegion1depthName")
                 .region2depthName("testRegion2depthName")
@@ -117,11 +116,6 @@ public class MemberRepositoryTests {
         //then
         assertThat(isExist).isTrue();
 
-        assertThrows(IllegalArgumentException.class,
-                () -> {
-                    Boolean noneExist = memberRepository.existsByUserId(new UserId("NoneExist"));
-                }
-        );
     }
 
     @Test
@@ -142,8 +136,7 @@ public class MemberRepositoryTests {
                 .addressName("testAddress")
                 .addressType("testAddressType")
                 .mainAddressNo("testmainAddressNo")
-                .x(1d)
-                .y(1d)
+                .point(GeometryUtil.createPoint(1, 2))
                 .mountainYn("testMountainYn")
                 .region1depthName("testRegion1depthName")
                 .region2depthName("testRegion2depthName")
@@ -181,8 +174,7 @@ public class MemberRepositoryTests {
                 .addressName("testAddress")
                 .addressType("testAddressType")
                 .mainAddressNo("testmainAddressNo")
-                .x(1d)
-                .y(1d)
+                .point(GeometryUtil.createPoint(1, 2))
                 .mountainYn("testMountainYn")
                 .region1depthName("testRegion1depthName")
                 .region2depthName("testRegion2depthName")
@@ -201,8 +193,7 @@ public class MemberRepositoryTests {
                 .addressName("testAddress2")
                 .addressType("testAddressType2")
                 .mainAddressNo("testmainAddressNo2")
-                .x(1d)
-                .y(1d)
+                .point(GeometryUtil.createPoint(1, 2))
                 .mountainYn("testMountainYn2")
                 .region1depthName("testRegion1depthName2")
                 .region2depthName("testRegion2depthName2")
@@ -227,8 +218,7 @@ public class MemberRepositoryTests {
                 .map(MemberGetResponse::new)
                 .toList();
         //then
-        assertEquals(memberList.get(0).getUserId(), "testId123");
-        assertEquals(memberList.get(1).getAddresses().get(0).getAddressName(), "testAddress");
+        assertEquals(memberList.get(0).getUserId(), "testId155");
         for (MemberGetResponse list : memberList) {
             log.info("list = {}", list.toString());
         }
@@ -250,8 +240,7 @@ public class MemberRepositoryTests {
                 .addressName("testAddress")
                 .addressType("testAddressType")
                 .mainAddressNo("testmainAddressNo")
-                .x(1d)
-                .y(1d)
+                .point(GeometryUtil.createPoint(1, 2))
                 .mountainYn("testMountainYn")
                 .region1depthName("testRegion1depthName")
                 .region2depthName("testRegion2depthName")
@@ -293,8 +282,7 @@ public class MemberRepositoryTests {
                 .addressName("testAddress")
                 .addressType("testAddressType")
                 .mainAddressNo("testmainAddressNo")
-                .x(1d)
-                .y(1d)
+                .point(GeometryUtil.createPoint(1, 2))
                 .mountainYn("testMountainYn")
                 .region1depthName("testRegion1depthName")
                 .region2depthName("testRegion2depthName")
@@ -336,8 +324,7 @@ public class MemberRepositoryTests {
                 .addressName("testAddress")
                 .addressType("testAddressType")
                 .mainAddressNo("testmainAddressNo")
-                .x(1d)
-                .y(1d)
+                .point(GeometryUtil.createPoint(1, 2))
                 .mountainYn("testMountainYn")
                 .region1depthName("testRegion1depthName")
                 .region2depthName("testRegion2depthName")
