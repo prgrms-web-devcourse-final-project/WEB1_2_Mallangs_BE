@@ -211,7 +211,7 @@ class PetRepositoryTest {
 
     @Test
     @DisplayName("memberId로 펫 반려동물 여부 확인")
-    void testExistsByMemberId_WhenPetExists() {
+    void testExistsByMemberId() {
         //given
         Long memberId = testMember1.getMemberId();
 
