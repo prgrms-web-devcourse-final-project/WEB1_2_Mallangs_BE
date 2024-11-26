@@ -1,6 +1,6 @@
 package com.mallangs.domain.pet.service;
 
-import com.mallangs.domain.member.Member;
+import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.repository.MemberRepository;
 import com.mallangs.domain.pet.dto.*;
 import com.mallangs.domain.pet.entity.Pet;
@@ -117,7 +117,7 @@ public class PetService {
             petRepository.save(pet);
             return new PetResponse(pet);
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("updatePet error: {}", e.getMessage());
             throw new MallangsCustomException(ErrorCode.PET_NOT_UPDATE);
         }
@@ -130,7 +130,7 @@ public class PetService {
             pet.deactivate();
             petRepository.save(pet);
             return new PetResponse(pet);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("deletePet error: {}", e.getMessage());
             throw new MallangsCustomException(ErrorCode.PET_NOT_DELETE);
         }
@@ -143,7 +143,7 @@ public class PetService {
             pet.activate();
             petRepository.save(pet);
             return new PetResponse(pet);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("restorePet error: {}", e.getMessage());
             throw new MallangsCustomException(ErrorCode.PET_NOT_RESTORE);
         }
@@ -155,11 +155,13 @@ public class PetService {
         try {
             validateLocationSearch(petLocationRequest);
 
-            Sort sort = Sort.by("petId").descending();
+            Sort sort = Sort.by("pet_Id").descending();
             Pageable pageable = pageRequest.getPageable(sort);
 
             // 지역명 필터 추가
             Page<Pet> pets = petRepository.findNearbyPets(
+//                    petLocationRequest.getPoint().getY(),    // latitude는 y좌표로 매핑
+//                    petLocationRequest.getPoint().getX(),    // longitude는 x좌표로 매핑
                     petLocationRequest.getY(),    // latitude는 y좌표로 매핑
                     petLocationRequest.getX(),    // longitude는 x좌표로 매핑
                     petLocationRequest.getRadius(),
@@ -173,33 +175,37 @@ public class PetService {
                 PetResponse dto = new PetResponse(pet);
                 // 거리 계산 추가
                 double distance = calculateDistance(
+//                        petLocationRequest.getPoint().getY(),  // latitude -> y
+//                        petLocationRequest.getPoint().getX(),  // longitude -> x
                         petLocationRequest.getY(),  // latitude -> y
                         petLocationRequest.getX(),  // longitude -> x
-                        pet.getMember().getAddress1().getY(),
-                        pet.getMember().getAddress1().getX()
+                        pet.getMember().getAddresses().isEmpty() ? 0.0 : pet.getMember().getAddresses().get(0).getPoint().getY(),
+                        pet.getMember().getAddresses().isEmpty() ? 0.0 : pet.getMember().getAddresses().get(0).getPoint().getX()
                 );
                 dto.assignDistance(Math.round(distance * 100.0) / 100.0); // 소수점 2자리까지
                 return dto;
             });
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("getNearbyPets error: {}", e.getMessage());
             throw new MallangsCustomException(ErrorCode.PET_NOT_SEARCH_LOCATION);
         }
     }
 
-
-
     // 위치 검색 파라미터 검증
     private void validateLocationSearch(PetLocationRequest searchDTO) {
-        if (searchDTO.getX() == null ||
-                searchDTO.getY() == null ||
-                searchDTO.getRadius() == null) {
+//        if (searchDTO.getPoint() == null || searchDTO.getRadius() == null) {
+        if (searchDTO.getX() == null || searchDTO.getY() == null || searchDTO.getRadius() == null) {
             throw new MallangsCustomException(ErrorCode.LOCATION_INVALIDE_PARAMS);
         }
 
-        if (searchDTO.getY() < -90 || searchDTO.getY() > 90 ||
-                searchDTO.getX() < -180 || searchDTO.getX() > 180 ||
+//        double x = searchDTO.getPoint().getX();
+//        double y = searchDTO.getPoint().getY();
+          double x = searchDTO.getX();
+          double y = searchDTO.getY();
+
+        if (y < -90 || y > 90 || //북위는 양수로 남위는 음수로 표현
+                x < -180 || x > 180 || //동경은 양수로 서경은 음수로 표현
                 searchDTO.getRadius() <= 0 || searchDTO.getRadius() > 20) { // 최대 반경 20km
             throw new MallangsCustomException(ErrorCode.LOCATION_INVALIDE_RANGE);
         }

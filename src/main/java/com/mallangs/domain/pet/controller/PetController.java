@@ -23,7 +23,8 @@ public class PetController {
     @GetMapping
     public ResponseEntity<Page<PetResponse>> getAllMyPets(
             @ModelAttribute PageRequest pageRequestDTO,
-            @AuthenticationPrincipal Long memberId) {
+            //@AuthenticationPrincipal Long memberId) {
+            Long memberId) {
         Page<PetResponse> pets = petService.getAllMyPets(pageRequestDTO, memberId);
         return ResponseEntity.ok(pets);
     }
@@ -42,7 +43,8 @@ public class PetController {
     @GetMapping("/representative")
     @Operation(summary = "대표 반려동물(말랑이) 정보조회", description = "대표 반려동물(말랑이) 정보를 조회하는 API")
     public ResponseEntity<PetResponse> getRepresentativePet(
-            @AuthenticationPrincipal Long memberId) {
+            //@AuthenticationPrincipal Long memberId) {
+             Long memberId) {
         PetResponse pet = petService.getRepresentativePet(memberId);
         return ResponseEntity.ok(pet);
     }
@@ -59,7 +61,7 @@ public class PetController {
     //대표 말랑이 변경
     @PutMapping("/representative/{petId}")
     @Operation(summary = "대표 반려동물(말랑이) 변경", description = "대표 반려동물(말랑이)을 변경하는 API")
-    public ResponseEntity<Void> setRepresentativePet(
+    public ResponseEntity<Void> updateRepresentativePet(
             @AuthenticationPrincipal Long memberId,
             @PathVariable Long petId) {
         petService.setRepresentativePet(memberId, petId);

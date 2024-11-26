@@ -1,6 +1,6 @@
 package com.mallangs.domain.pet.dto;
 
-import com.mallangs.domain.member.Member;
+import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.pet.entity.Pet;
 import com.mallangs.domain.pet.entity.PetGender;
 import com.mallangs.domain.pet.entity.PetType;

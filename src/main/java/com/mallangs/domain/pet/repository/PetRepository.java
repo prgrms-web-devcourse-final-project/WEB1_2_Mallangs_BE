@@ -30,12 +30,12 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
     @Query(value = """
         SELECT p.* FROM Pet p \
         JOIN Member m ON p.member_id = m.member_id \
-        JOIN address a ON m.address1_id = a.id \
+        JOIN address a ON a.member_id = m.member_id \
         WHERE p.is_open_profile = true \
         AND p.is_active = true \
         AND ST_Distance_Sphere(\
             point(?2, ?1), \
-            point(a.x, a.y)\
+            point(ST_X(a.point), ST_Y(a.point))\
         ) <= ?3 * 1000 \
         AND (?4 IS NULL OR a.region_1depth_name = ?4) \
         AND (?5 IS NULL OR a.region_2depth_name = ?5) \
