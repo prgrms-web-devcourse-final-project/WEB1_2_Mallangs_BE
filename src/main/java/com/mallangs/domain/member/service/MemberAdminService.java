@@ -1,21 +1,18 @@
 package com.mallangs.domain.member.service;
 
-import com.mallangs.domain.member.dto.MemberGetResponse;
-import com.mallangs.domain.member.dto.PageRequestDTO;
-import com.mallangs.domain.member.entity.Member;
+import com.mallangs.domain.member.dto.*;
 import com.mallangs.domain.member.repository.MemberRepository;
 import com.mallangs.global.exception.ErrorCode;
 import com.mallangs.global.exception.MallangsCustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Log4j2
 @Service
@@ -25,70 +22,82 @@ public class MemberAdminService {
 
     private final MemberRepository memberRepository;
 
-    //회원삭제
-    public void delete(Long memberId) {
+    //회원 차단
+    public int banMember(MemberBanRequest memberBanRequest) {
         try {
-            Member foundMember = memberRepository.findById(memberId).orElseThrow(()
-                    -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
-            memberRepository.delete(foundMember);
-
+            //차단 기간
+            LocalDateTime expiryDate = LocalDateTime.now().plusDays(memberBanRequest.getDays());
+            return memberRepository.blockMembersForExpiryDate(expiryDate, memberBanRequest.getMemberIds(), memberBanRequest.getReason());
         } catch (Exception e) {
-            log.error("회원삭제에 실패하였습니다. {}", e.getMessage());
-            throw e;
+            log.error("회원차단에 실패하였습니다. {}", e.getMessage());
+            throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);
         }
     }
 
-    //회원 검색 - UserId
-    public List<MemberGetResponse> getMemberByUserId(String userIdValue) {
+    //회원 활성화
+    public void activeMembers() {
         try {
-            List<Member> members = memberRepository.searchMemberByUserId(userIdValue);
-            return members.stream().map(MemberGetResponse::new).toList();
+            memberRepository.activeBannedMembers(LocalDateTime.now());
         } catch (Exception e) {
-            log.error("UserId로 회원검색에 실패하였습니다. {}", e.getMessage());
-            throw e;
+            log.error("회원 차단기간 만료 후 자동 차단해제에 실패하였습니다. {}", e.getMessage());
+            throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);
         }
     }
 
-    //회원 검색 - Email
-    public List<MemberGetResponse> getMemberByEmail(String EmailValue) {
-        try {
-            List<Member> members = memberRepository.searchMemberByEmail(EmailValue);
-            return members.stream().map(MemberGetResponse::new).toList();
-        } catch (Exception e) {
-            log.error("Email로 회원검색에 실패하였습니다. {}", e.getMessage());
-            throw e;
-        }
-    }
-
-    //회원 검색 - Nickname
-    public List<MemberGetResponse> getMemberByNickname(String NicknameValue) {
-        try {
-            List<Member> members = memberRepository.searchMemberByNickname(NicknameValue);
-            return members.stream().map(MemberGetResponse::new).toList();
-        } catch (Exception e) {
-            log.error("Nickname로 회원검색에 실패하였습니다. {}", e.getMessage());
-            throw e;
-        }
-    }
-
-    //회원 리스트 조회, 주소포함
-    public Page<MemberGetResponse> getMemberList(PageRequestDTO pageRequestDTO) {
+    //회원 리스트 검색 - UserId
+    public Page<MemberGetResponseOnlyMember> getMemberListByUserId(
+            MemberGetRequestByUserId memberGetRequestByUserId, PageRequestDTO pageRequestDTO) {
         try {
             Sort sort = Sort.by("nickname").descending();
             Pageable pageable = pageRequestDTO.getPageable(sort);
-            List<Member> members = memberRepository.memberList();
-            List<MemberGetResponse> memberList = members.stream().map(MemberGetResponse::new)
-                    .toList();
 
-            int start = (int) pageable.getOffset();
-            int end = Math.min(start + pageable.getPageSize(), memberList.size());
-            List<MemberGetResponse> memberPage = memberList.subList(start, end);
+            //날짜 전처리 7, 15, 30일 이전으로
+            LocalDateTime createAt = LocalDateTime.now().minusDays(memberGetRequestByUserId.getDays());
+            Boolean isActive = memberGetRequestByUserId.getIsActive();
+            String userId = memberGetRequestByUserId.getUserId();
 
-            return new PageImpl<>(memberPage, pageable, memberList.size());
+            return memberRepository.memberListByUserId(isActive, userId, createAt, pageable);
         } catch (Exception e) {
             log.error("회원리스트 조회에 실패하였습니다. {}", e.getMessage());
-            throw e;
+            throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);
         }
     }
 
+    //회원 리스트 검색 - Email
+    public Page<MemberGetResponseOnlyMember> getMemberListByEmail(
+            MemberGetRequestByEmail memberGetRequestByEmail, PageRequestDTO pageRequestDTO) {
+        try {
+            Sort sort = Sort.by("nickname").descending();
+            Pageable pageable = pageRequestDTO.getPageable(sort);
+
+            //날짜 전처리 7, 15, 30일 이전으로
+            LocalDateTime createAt = LocalDateTime.now().minusDays(memberGetRequestByEmail.getDays());
+            Boolean isActive = memberGetRequestByEmail.getIsActive();
+            String email = memberGetRequestByEmail.getEmail();
+
+            return memberRepository.memberListByEmail(isActive, email, createAt, pageable);
+        } catch (Exception e) {
+            log.error("회원리스트 조회에 실패하였습니다. {}", e.getMessage());
+            throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);
+        }
+    }
+
+    //회원 리스트 검색 - Nickname
+    public Page<MemberGetResponseOnlyMember> getMemberListByNickname(
+            MemberGetRequestByNickname memberGetRequestByNickname, PageRequestDTO pageRequestDTO) {
+        try {
+            Sort sort = Sort.by("nickname").descending();
+            Pageable pageable = pageRequestDTO.getPageable(sort);
+
+            //날짜 전처리 7, 15, 30일 이전으로
+            LocalDateTime createAt = LocalDateTime.now().minusDays(memberGetRequestByNickname.getDays());
+            Boolean isActive = memberGetRequestByNickname.getIsActive();
+            String nickname = memberGetRequestByNickname.getNickname();
+
+            return memberRepository.memberListByNickname(isActive, nickname, createAt, pageable);
+        } catch (Exception e) {
+            log.error("회원리스트 조회에 실패하였습니다. {}", e.getMessage());
+            throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);
+        }
+    }
 }
