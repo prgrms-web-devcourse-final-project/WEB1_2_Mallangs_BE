@@ -10,9 +10,6 @@ public class MallangsApplication {
 
   public static void main(String[] args) {
     SpringApplication.run(MallangsApplication.class, args);
-    System.out.println();
-    System.out.println(org.hibernate.Version.getVersionString());
-//    implementation group: 'org.hibernate', name: 'hibernate-spatial', version: '5.6.9.Final'
   }
 
 }
