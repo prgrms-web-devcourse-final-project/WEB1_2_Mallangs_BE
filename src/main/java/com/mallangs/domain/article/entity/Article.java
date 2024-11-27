@@ -1,6 +1,6 @@
 package com.mallangs.domain.article.entity;
 
-import com.mallangs.domain.member.Member;
+import com.mallangs.domain.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
