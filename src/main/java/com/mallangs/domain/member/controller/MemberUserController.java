@@ -8,12 +8,14 @@ import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('USER')")
 @RequestMapping("api/member")
 @Tag(name = "회원", description = "회원 CRUD")
 public class MemberUserController {
@@ -35,15 +37,17 @@ public class MemberUserController {
 
     @PutMapping("/{memberId}")
     @Operation(summary = "회원수정", description = "회원수정 요청 API")
-    public void update(@Validated @RequestBody MemberUpdateRequest memberUpdateRequest,
+    public ResponseEntity<?> update(@Validated @RequestBody MemberUpdateRequest memberUpdateRequest,
                        @PathVariable ("memberId") Long memberId){
         memberUserService.update(memberUpdateRequest,memberId);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{memberId}")
     @Operation(summary = "회원탈퇴", description = "회원탈퇴 요청 API")
-    public void delete(@PathVariable ("memberId") Long memberId){
+    public ResponseEntity<?> delete(@PathVariable ("memberId") Long memberId){
         memberUserService.delete(memberId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/list")
@@ -67,9 +71,10 @@ public class MemberUserController {
         return ResponseEntity.ok(memberUserService.mailSend(mail));
     }
     @PostMapping("/check-password")
-    public void checkPassword(@Validated @RequestBody PasswordDTO passwordDTO
+    public ResponseEntity<?> checkPassword(@Validated @RequestBody PasswordDTO passwordDTO
                                 ,Authentication authentication ){
         String userId = authentication.getName();
         memberUserService.checkPassword(passwordDTO, userId);
+        return ResponseEntity.ok().build();
     }
 }

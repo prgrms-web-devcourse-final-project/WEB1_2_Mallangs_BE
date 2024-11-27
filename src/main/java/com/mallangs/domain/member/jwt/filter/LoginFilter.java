@@ -1,6 +1,5 @@
 package com.mallangs.domain.member.jwt.filter;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.embadded.UserId;

@@ -20,7 +20,7 @@ public class MemberAdminController {
 
     private final MemberAdminService memberAdminService;
 
-    @PostMapping()
+    @PostMapping("/ban")
     @Operation(summary = "회원차단", description = "회원차단 요청 API")
     public ResponseEntity<Integer> delete(@Validated @RequestBody MemberBanRequest memberBanRequest) {
         return ResponseEntity.ok(memberAdminService.banMember(memberBanRequest));
