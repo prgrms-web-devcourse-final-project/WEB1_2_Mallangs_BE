@@ -18,7 +18,7 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
 
     // 키워드로 통합 검색 (제목 + 내용)
     @Query("""
-            SELECT c FROM Community c WHERE (c.title LIKE %:keyword% OR c.content LIKE %:keyword% AND c.communityStatus = 'PUBLISHED') ORDER BY c.createdAt DESC
+            SELECT c FROM Community c WHERE c.communityStatus = 'PUBLISHED' AND (c.title LIKE %:keyword% OR c.content LIKE %:keyword%) ORDER BY c.createdAt DESC
             """)
     Page<Community> searchByTitleOrContent(@Param("keyword") String keyword, Pageable pageable);
 
@@ -32,11 +32,17 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     @Query("""
             SELECT c FROM Community c WHERE c.communityStatus = :status ORDER BY c.createdAt DESC
             """)
-    Page<Community> findByStatus(@Param("status")CommunityStatus status, Pageable pageable);
+    Page<Community> findByStatus(@Param("status") CommunityStatus status, Pageable pageable);
 
     // 관리자용 - 카테고리와 제목으로 게시글 검색
     @Query("""
             SELECT c FROM Community c WHERE c.category.categoryId = :categoryId AND c.title LIKE %:keyword% ORDER BY c.createdAt DESC
             """)
     Page<Community> searchForAdmin(@Param("categoryId") Long categoryId, @Param("keyword") String keyword, Pageable pageable);
+
+    // 관리자용 - 카테고리, 상태, 제목으로 게시글 검색
+    @Query("""
+            SELECT c FROM Community c WHERE c.category.categoryId = :categoryId AND c.communityStatus = :status AND c.title LIKE %:keyword% ORDER BY c.createdAt DESC
+            """)
+    Page<Community> searchForAdminWithStatus(@Param("categoryId") Long categoryId, @Param("status") CommunityStatus status, @Param("keyword") String keyword, Pageable pageable);
 }

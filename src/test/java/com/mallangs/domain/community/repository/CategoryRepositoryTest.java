@@ -20,12 +20,13 @@ class CategoryRepositoryTest {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    private Category saveCategory(String name, CategoryStatus status, int order) {
+    private Category saveCategory(String name, int order, int level, CategoryStatus status) {
         Category category = Category.builder()
                 .name(name)
-                .categoryStatus(status)
                 .categoryOrder(order)
+                .categoryLevel(level)
                 .build();
+        category.changeStatus(status);
         return categoryRepository.save(category);
     }
 
@@ -33,9 +34,9 @@ class CategoryRepositoryTest {
     @DisplayName("활성화된 카테고리 목록 조회")
     void findAllActiveCategoriesTest() {
         // given
-        saveCategory("일반게시판", CategoryStatus.ACTIVE, 0);
-        saveCategory("실종게시판", CategoryStatus.INACTIVE, 1);
-        saveCategory("목격게시판", CategoryStatus.ACTIVE, 2);
+        saveCategory("일반게시판", 0, 0, CategoryStatus.ACTIVE);
+        saveCategory("실종게시판", 1, 1, CategoryStatus.ACTIVE);
+        saveCategory("목격게시판", 2, 1, CategoryStatus.INACTIVE);
 
         // when
         List<Category> categories = categoryRepository.findAllActiveCategories();
@@ -43,14 +44,14 @@ class CategoryRepositoryTest {
         // then
         assertThat(categories).hasSize(2)
                 .extracting(Category::getName)
-                .containsExactly("일반게시판", "목격게시판");
+                .containsExactly("일반게시판", "실종게시판");
     }
 
     @Test
     @DisplayName("활성화된 카테고리 categoryId로 조회")
     void findActiveCategoryByIdTest() {
         // given
-        Category category = saveCategory("일반게시판", CategoryStatus.ACTIVE, 52);
+        Category category = saveCategory("일반게시판", 52, 0, CategoryStatus.ACTIVE);
 
         // when
         Optional<Category> foundCategory = categoryRepository.findActiveCategoryById(category.getCategoryId());
@@ -64,8 +65,8 @@ class CategoryRepositoryTest {
     @DisplayName("상태별 카테고리 목록 조회")
     void findAllByStatusOrderByCategoryOrder() {
         // given
-        saveCategory("실종게시판", CategoryStatus.ACTIVE, 1);
-        saveCategory("목격게시판", CategoryStatus.INACTIVE, 2);
+        saveCategory("실종게시판", 1, 0, CategoryStatus.ACTIVE);
+        saveCategory("목격게시판", 2, 1, CategoryStatus.INACTIVE);
 
         // when
         List<Category> activeCategories = categoryRepository.findAllByStatusOrderByCategoryOrder(CategoryStatus.ACTIVE);
@@ -85,10 +86,10 @@ class CategoryRepositoryTest {
     @DisplayName("이름으로 카테고리 검색")
     void findByNameContaining() {
         // given
-        saveCategory("일반게시판", CategoryStatus.ACTIVE, 0);
-        saveCategory("실종게시판", CategoryStatus.INACTIVE, 1);
-        saveCategory("목격게시판", CategoryStatus.ACTIVE, 2);
-        saveCategory("정보게시판", CategoryStatus.ACTIVE, 3);
+        saveCategory("일반게시판", 0, 0, CategoryStatus.ACTIVE);
+        saveCategory("실종게시판", 1, 0, CategoryStatus.INACTIVE);
+        saveCategory("목격게시판", 2, 1, CategoryStatus.INACTIVE);
+        saveCategory("정보게시판", 3, 1, CategoryStatus.INACTIVE);
 
         // when
         List<Category> categories = categoryRepository.findByNameContaining("일반");
@@ -103,16 +104,16 @@ class CategoryRepositoryTest {
     @DisplayName("카테고리 상태별 개수 확인")
     void countByCategoryStatus() {
         // given
-        saveCategory("일반게시판", CategoryStatus.ACTIVE, 0);
-        saveCategory("실종게시판", CategoryStatus.INACTIVE, 1);
-        saveCategory("목격게시판", CategoryStatus.ACTIVE, 2);
+        saveCategory("일반게시판", 0, 0, CategoryStatus.ACTIVE);
+        saveCategory("실종게시판", 1, 0, CategoryStatus.INACTIVE);
+        saveCategory("목격게시판", 2, 1, CategoryStatus.INACTIVE);
 
         // when
         long activeCount = categoryRepository.countByCategoryStatus(CategoryStatus.ACTIVE);
         long inactiveCount = categoryRepository.countByCategoryStatus(CategoryStatus.INACTIVE);
 
         // then
-        assertThat(activeCount).isEqualTo(2);
-        assertThat(inactiveCount).isEqualTo(1);
+        assertThat(activeCount).isEqualTo(1);
+        assertThat(inactiveCount).isEqualTo(2);
     }
 }

@@ -22,7 +22,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Query("""
         SELECT c FROM Category c WHERE c.categoryId = :categoryId AND c.categoryStatus = 'ACTIVE'
         """)
-    Optional<Category> findActiveCategoryById(@Param("category_id") Long categoryId);
+    Optional<Category> findActiveCategoryById(@Param("categoryId") Long categoryId);
 
     // 관리자용 기능
     // 카테고리 별 목록 조회

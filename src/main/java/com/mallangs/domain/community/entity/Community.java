@@ -8,6 +8,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -25,13 +28,22 @@ public class Community extends BaseTimeEntity {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 200)
     private String title;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    private String location;
+    @Column(precision = 10, scale = 8)
+    private BigDecimal latitude;
+
+    @Column(precision = 11, scale = 8)
+    private BigDecimal longitude;
+
+    @Column(length = 200)
+    private String address;
+
+    private LocalDateTime sightedAt;
 
     private String imgUrl;
 
@@ -47,13 +59,16 @@ public class Community extends BaseTimeEntity {
 
     @Builder
 
-    public Community(Member member, Category category, String title, String content,
-                     String location, String imgUrl) {
+    public Community(Member member, Category category, String title, String content, BigDecimal latitude,
+                     BigDecimal longitude, String address, LocalDateTime sightedAt, String imgUrl) {
         this.member = member;
         this.category = category;
         this.title = title;
         this.content = content;
-        this.location = location;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.address = address;
+        this.sightedAt = sightedAt;
         this.imgUrl = imgUrl;
         this.communityStatus = CommunityStatus.PUBLISHED;
         this.viewCnt = 0;
@@ -62,10 +77,14 @@ public class Community extends BaseTimeEntity {
     }
 
     // 게시글 정보 수정
-    public void change(String title, String content, String location, String imgUrl) {
+    public void change(String title, String content, BigDecimal latitude, BigDecimal longitude,
+                       String address, LocalDateTime sightedAt, String imgUrl) {
         this.title = title;
         this.content = content;
-        this.location = location;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.address = address;
+        this.sightedAt = sightedAt;
         this.imgUrl = imgUrl;
     }
 

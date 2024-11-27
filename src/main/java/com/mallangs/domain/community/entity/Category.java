@@ -1,8 +1,9 @@
 package com.mallangs.domain.community.entity;
 
-import com.mallangs.domain.community.entity.Community;
 import com.mallangs.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,10 +21,23 @@ public class Category extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long categoryId;
 
-    @Column(nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_category_id")
+    private Category parentCategory;
+
+    @OneToMany(mappedBy = "parentCategory")
+    private final List<Category> childrenCategory = new ArrayList<>();
+
+    @Column(nullable = false, length = 50)
     private String name;
 
+    @Column(length = 100)
     private String description;
+
+    @Column(nullable = false)
+    @Min(0)
+    @Max(2)
+    private int categoryLevel; // 0: 최상위 카테고리, 1: 1차 분류, 2: 2차 분류
 
     @Column(nullable = false)
     private int categoryOrder;
@@ -32,16 +46,15 @@ public class Category extends BaseTimeEntity {
     @Column(nullable = false)
     private CategoryStatus categoryStatus;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Community> communities = new ArrayList<>();
-
     @Builder
-    public Category(String name, String description, int categoryOrder, CategoryStatus categoryStatus) {
+    public Category(Category parentCategory, String name, String description, int categoryLevel,
+                    int categoryOrder) {
+        this.parentCategory = parentCategory;
         this.name = name;
         this.description = description;
+        this.categoryLevel = categoryLevel;
         this.categoryOrder = categoryOrder;
-        this.categoryStatus = categoryStatus;
-        this.communities = new ArrayList<>();
+        this.categoryStatus = CategoryStatus.ACTIVE;
     }
 
     // 카테고리 수정

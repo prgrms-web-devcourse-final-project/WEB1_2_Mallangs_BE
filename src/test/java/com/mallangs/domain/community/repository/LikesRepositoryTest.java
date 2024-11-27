@@ -12,6 +12,7 @@ import com.mallangs.domain.member.entity.embadded.Password;
 import com.mallangs.domain.member.entity.embadded.UserId;
 import com.mallangs.domain.member.repository.AddressRepository;
 import com.mallangs.domain.member.repository.MemberRepository;
+import com.mallangs.domain.member.util.GeometryUtil;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -62,7 +63,7 @@ class LikesRepositoryTest {
                 .addressName("testAddress")
                 .addressType("testAddressType")
                 .mainAddressNo("testmainAddressNo")
-                .point(new Point(1, 2))
+                .point(GeometryUtil.createPoint(1, 2))
                 .mountainYn("testMountainYn")
                 .region1depthName("testRegion1depthName")
                 .region2depthName("testRegion2depthName")
@@ -83,7 +84,6 @@ class LikesRepositoryTest {
     private Category saveCategory(String name) {
         Category category = Category.builder()
                 .name(name)
-                .categoryStatus(CategoryStatus.ACTIVE)
                 .categoryOrder(1)
                 .build();
         return categoryRepository.save(category);
