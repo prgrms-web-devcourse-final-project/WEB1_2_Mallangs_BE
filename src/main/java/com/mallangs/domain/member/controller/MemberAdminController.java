@@ -1,17 +1,17 @@
 package com.mallangs.domain.member.controller;
 
-import com.mallangs.domain.member.dto.MemberGetResponse;
-import com.mallangs.domain.member.dto.PageRequestDTO;
+import com.mallangs.domain.member.dto.*;
 import com.mallangs.domain.member.service.MemberAdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
+@PreAuthorize("hasRole('ADMIN')")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/member/admin")
@@ -20,36 +20,46 @@ public class MemberAdminController {
 
     private final MemberAdminService memberAdminService;
 
-    @DeleteMapping("/{memberId}")
-    @Operation(summary = "회원영구 삭제", description = "회원영구 삭제 요청 API")
-    public void delete(@PathVariable("memberId") Long memberId) {
-        memberAdminService.delete(memberId);
+    @PostMapping("/ban")
+    @Operation(summary = "회원차단", description = "회원차단 요청 API")
+    public ResponseEntity<Integer> delete(@Validated @RequestBody MemberBanRequest memberBanRequest) {
+        return ResponseEntity.ok(memberAdminService.banMember(memberBanRequest));
     }
 
-    @GetMapping("/user-id")
-    @Operation(summary = "유저 아이디로 회원검색", description = "유저 아이디로 회원검색 요청 API")
-    public ResponseEntity<List<MemberGetResponse>> searchByUserId(@RequestParam("userId") String userId) {
-        return ResponseEntity.ok(memberAdminService.getMemberByUserId(userId));
-    }
+    @PostMapping("/user-id")
+    @Operation(summary = "유저아이디로 회원리스트 검색", description = "유저아이디로 회원리스트 검색 요청 API")
+    public ResponseEntity<Page<MemberGetResponseOnlyMember>> listByUser(
+            @Validated @RequestBody MemberGetRequestByUserId memberGetRequestByUserId) {
 
-    @GetMapping("/email")
-    @Operation(summary = "유저 이메일로 회원검색", description = "유저 이메일 회원검색 요청 API")
-    public ResponseEntity<List<MemberGetResponse>> searchByEmail(@RequestParam("email") String email) {
-        return ResponseEntity.ok(memberAdminService.getMemberByEmail(email));
-    }
-
-    @GetMapping("/nickname")
-    @Operation(summary = "유저 닉네임으로 회원검색", description = "유저 닉네임으로 회원검색 요청 API")
-    public ResponseEntity<List<MemberGetResponse>> searchByNickname(@RequestParam("nickname") String nickname) {
-        return ResponseEntity.ok(memberAdminService.getMemberByNickname(nickname));
-    }
-
-    @GetMapping("/list")
-    @Operation(summary = "회원리스트 조회", description = "회원리스트 조회 요청 API")
-    public ResponseEntity<Page<MemberGetResponse>> list(@RequestParam(value = "page", defaultValue = "1") int page,
-                                                        @RequestParam(value = "size", defaultValue = "10") int size) {
+        int page = memberGetRequestByUserId.getPage();
+        int size = memberGetRequestByUserId.getSize();
         PageRequestDTO pageRequestDTO = PageRequestDTO.builder().page(page).size(size).build();
-        return ResponseEntity.ok(memberAdminService.getMemberList(pageRequestDTO));
+
+        return ResponseEntity.ok(memberAdminService.getMemberListByUserId(memberGetRequestByUserId, pageRequestDTO));
+    }
+
+    @PostMapping("/email")
+    @Operation(summary = "이메일로 회원리스트 검색", description = "이메일로 회원리스트 검색 요청 API")
+    public ResponseEntity<Page<MemberGetResponseOnlyMember>> listByEmail(
+            @Validated @RequestBody MemberGetRequestByEmail memberGetRequestByEmail) {
+
+        int page = memberGetRequestByEmail.getPage();
+        int size = memberGetRequestByEmail.getSize();
+        PageRequestDTO pageRequestDTO = PageRequestDTO.builder().page(page).size(size).build();
+
+        return ResponseEntity.ok(memberAdminService.getMemberListByEmail(memberGetRequestByEmail, pageRequestDTO));
+    }
+
+    @PostMapping("/nickname")
+    @Operation(summary = "닉네임으로 회원리스트 검색", description = "닉네임으로 회원리스트 검색 요청 API")
+    public ResponseEntity<Page<MemberGetResponseOnlyMember>> listByNickname(
+            @Validated @RequestBody MemberGetRequestByNickname memberGetRequestByNickname) {
+
+        int page = memberGetRequestByNickname.getPage();
+        int size = memberGetRequestByNickname.getSize();
+        PageRequestDTO pageRequestDTO = PageRequestDTO.builder().page(page).size(size).build();
+
+        return ResponseEntity.ok(memberAdminService.getMemberListByNickname(memberGetRequestByNickname, pageRequestDTO));
     }
 
 }

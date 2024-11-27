@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class Member extends BaseTimeEntity {
     @Builder.Default
     private MemberRole memberRole = MemberRole.ROLE_USER;
 
-    @Column(name = "profile_image")
+    @Column(name = "profile_image", columnDefinition = "TEXT")
     private String profileImage;
 
     @Column(name = "has_pet", nullable = false)
@@ -52,6 +53,15 @@ public class Member extends BaseTimeEntity {
     @Column(name = "is_active", nullable = false)
     @Builder.Default
     private Boolean isActive = true;
+
+    @Column(name = "expiry_date")
+    private LocalDateTime expiryDate;
+
+    @Column(name = "reason_for_ban")
+    private String reasonForBan;
+
+    @Column(name = "last_login_time")
+    private LocalDateTime lastLoginTime;
 
     // 회원가입
     public Member(String userId, String nickname, Password password, String email, String profileImage, Boolean hasPet){
@@ -83,4 +93,10 @@ public class Member extends BaseTimeEntity {
         this.addresses.add(address);
     }
 
+    public void recordLoginTime(){
+        this.lastLoginTime = LocalDateTime.now();
+    }
+    public void changeProfileImage(String profileImage){
+        this.profileImage = profileImage;
+    }
 }
