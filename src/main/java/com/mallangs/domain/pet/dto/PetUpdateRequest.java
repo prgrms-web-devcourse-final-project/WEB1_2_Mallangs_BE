@@ -19,4 +19,5 @@ public class PetUpdateRequest {
     private Boolean isOpenProfile;
     private Boolean isNeutering;
     private PetGender gender;
+    private String microChip;
 }

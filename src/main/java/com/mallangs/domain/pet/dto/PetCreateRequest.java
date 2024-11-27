@@ -31,6 +31,8 @@ public class PetCreateRequest {
 
     private String description;
 
+    private String microChip;
+
     //private Boolean isRepresentative;
 
     @NotNull(message = "프로필 공개 유무를 입력하세요")

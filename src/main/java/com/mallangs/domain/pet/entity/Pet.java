@@ -51,6 +51,9 @@ public class Pet extends BaseTimeEntity {
 
     private Boolean isRepresentative;
 
+    @Column(length = 255)
+    private String microChip;
+
     @Column(nullable = false)
     @Builder.Default
     private Boolean isActive = true; // 기본값은 true
@@ -75,7 +78,8 @@ public class Pet extends BaseTimeEntity {
                        String description,
                        Boolean isOpenProfile,
                        Boolean isNeutering,
-                       PetGender gender) {
+                       PetGender gender,
+                       String microChip) {
         this.name = name;
         this.petType = petType;
         this.image = image;
@@ -85,5 +89,6 @@ public class Pet extends BaseTimeEntity {
         this.isOpenProfile = isOpenProfile;
         this.isNeutering = isNeutering;
         this.gender = gender;
+        this.microChip = microChip;
     }
 }

@@ -110,7 +110,8 @@ public class PetService {
                     petUpdateRequest.getDescription() != null ? petUpdateRequest.getDescription() : pet.getDescription(),
                     petUpdateRequest.getIsOpenProfile() != null ? petUpdateRequest.getIsOpenProfile() : pet.getIsOpenProfile(),
                     petUpdateRequest.getIsNeutering() != null ? petUpdateRequest.getIsNeutering() : pet.getIsNeutering(),
-                    petUpdateRequest.getGender() != null ? petUpdateRequest.getGender() : pet.getGender()
+                    petUpdateRequest.getGender() != null ? petUpdateRequest.getGender() : pet.getGender(),
+                    petUpdateRequest.getMicroChip() != null ? petUpdateRequest.getMicroChip() : pet.getMicroChip()
             );
             petRepository.save(pet);
             return new PetResponse(pet);
