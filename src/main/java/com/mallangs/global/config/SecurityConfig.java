@@ -26,6 +26,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
@@ -60,9 +61,8 @@ public class SecurityConfig {
         // cors 필터
         http
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(request -> {
-
                     CorsConfiguration configuration = new CorsConfiguration();
-                    configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                    configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:8080"));
                     configuration.setAllowedMethods(Collections.singletonList("*"));
                     configuration.setAllowCredentials(true);
                     configuration.setAllowedHeaders(Collections.singletonList("*"));
@@ -90,6 +90,14 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable);
+        // oauth2
+        http
+                .oauth2Login((oauth2) -> oauth2
+                        .userInfoEndpoint((userInfo) -> userInfo
+                                .userService(customOAuth2MemberService))
+                        .successHandler(customSuccessHandler)
+                        .failureHandler(customFailureHandler)
+                );
 
         // 경로별 인가 작업
         http
@@ -98,9 +106,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/member/register", "/api/member/login",
                                 "/api/member/logout","/api/member/find-user-id",
                                 "/api/member/find-password").permitAll()
+                        .requestMatchers("/api/member/oauth2/**").permitAll()
                         .requestMatchers("/api/member/admin").hasRole("ADMIN")
                         .requestMatchers("/api/member/**").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/api/address/**").permitAll()
+                        .requestMatchers("/api/member-file-test").permitAll()
                         // Swagger UI 관련 경로 허용
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
@@ -114,25 +124,6 @@ public class SecurityConfig {
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JWTFilter(jwtUtil, refreshTokenService, accessTokenValidity, accessRefreshTokenValidity, accessTokenBlackList, memberRepository), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(logoutFilter, JWTFilter.class);
-        return http.build();
-    }
-    @Bean
-    public SecurityFilterChain oauth2SecurityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/oauth2/**").permitAll()
-                        .anyRequest().denyAll() // OAuth2 경로 외에는 이 체인에서 거부
-                )
-                .oauth2Login((oauth2) -> oauth2
-                        .userInfoEndpoint((userInfo) -> userInfo
-                                .userService(customOAuth2MemberService))
-                        .successHandler(customSuccessHandler)
-                        .failureHandler(customFailureHandler)
-                );
-
         return http.build();
     }
 }

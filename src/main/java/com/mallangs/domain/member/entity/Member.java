@@ -44,7 +44,7 @@ public class Member extends BaseTimeEntity {
     @Builder.Default
     private MemberRole memberRole = MemberRole.ROLE_USER;
 
-    @Column(name = "profile_image")
+    @Column(name = "profile_image", columnDefinition = "TEXT")
     private String profileImage;
 
     @Column(name = "has_pet", nullable = false)
@@ -95,5 +95,8 @@ public class Member extends BaseTimeEntity {
 
     public void recordLoginTime(){
         this.lastLoginTime = LocalDateTime.now();
+    }
+    public void changeProfileImage(String profileImage){
+        this.profileImage = profileImage;
     }
 }
