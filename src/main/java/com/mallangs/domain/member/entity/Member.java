@@ -1,5 +1,6 @@
 package com.mallangs.domain.member.entity;
 
+import com.mallangs.domain.chat.entity.ParticipatedRoom;
 import com.mallangs.domain.member.entity.embadded.*;
 import com.mallangs.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -39,6 +40,10 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Address> addresses = new ArrayList<>();
+
+    @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ParticipatedRoom> participatedRooms = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
