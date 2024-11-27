@@ -3,6 +3,8 @@ package com.mallangs.domain.member.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.locationtech.jts.geom.Point;
+
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.locationtech.jts.geom.Point;
@@ -68,8 +70,8 @@ public class Address {
     @Column(name = "mountain_yn")
     private String mountainYn; // Y / N 으로 입력됨
 
-    @Column(name = "point", nullable = false, columnDefinition = "POINT")
     @JdbcTypeCode(SqlTypes.GEOMETRY)
+    @Column(name = "point", nullable = false, columnDefinition = "POINT SRID 4326")
     private Point point;
 
     public void addMember(Member member) {
