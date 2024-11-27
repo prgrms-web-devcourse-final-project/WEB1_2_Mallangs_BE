@@ -1,8 +1,7 @@
 package com.mallangs.domain.article.entity;
 
 import com.mallangs.domain.article.dto.request.PlaceCreateRequest;
-import com.mallangs.domain.article.entity.Article;
-import com.mallangs.domain.member.Member;
+import com.mallangs.domain.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
@@ -13,19 +12,10 @@ import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
-//@Builder
-//@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DiscriminatorValue("place")
 @SuperBuilder
 public class PlaceArticle extends Article {
-//
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Long placeId;
-//
-//  @Column(length = 50)
-//  private String name;
 
   @Column(length = 255)
   private String businessHours;
@@ -41,8 +31,16 @@ public class PlaceArticle extends Article {
   public void applyChanges(Article updatedArticle) {
     super.applyChanges(updatedArticle);
 
-    if (businessHours != null) {
-      this.businessHours = updatedArticle
+    PlaceArticle updatedPlaceArticle = (PlaceArticle) updatedArticle;
+
+    if (updatedPlaceArticle.getBusinessHours() != null) {
+      this.businessHours = updatedPlaceArticle.getBusinessHours();
+    }
+    if (updatedPlaceArticle.getCloseDays() != null) {
+      this.closeDays = updatedPlaceArticle.getCloseDays();
+    }
+    if (updatedPlaceArticle.getWebsite() != null) {
+      this.website = updatedPlaceArticle.getWebsite();
     }
   }
 
