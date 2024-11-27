@@ -17,13 +17,17 @@ public class ChatRoom {
     @Column(name = "chat_room_id")
     private Long chatRoomId;
 
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    //상대방이 나가도 채팅방 유지 되야하기에 Cascade, orphan X
+    @OneToMany(mappedBy = "chatRoom")
     @Builder.Default
     private List<ParticipatedRoom> occupiedRooms = new ArrayList<>();
 
     @Column(name = "chat_room_name")
     private String chatRoomName;
 
-    @Enumerated(EnumType.STRING)
-    private RoomStatus roomStatus;
+    public void addParticipatedRoom (ParticipatedRoom participatedRoom) {
+        occupiedRooms.add(participatedRoom);
+        participatedRoom.changeChatRoom(this);
+    }
+
 }
