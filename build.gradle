@@ -89,6 +89,9 @@ dependencies {
     implementation 'org.locationtech.jts:jts-core:1.19.0'
     implementation 'com.querydsl:querydsl-spatial'
 
+    //CSV 데이터 저장
+    implementation 'com.opencsv:opencsv:5.9'
+
 }
 
 tasks.named('test') {
