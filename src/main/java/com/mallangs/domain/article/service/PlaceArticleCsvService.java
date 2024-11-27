@@ -19,12 +19,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
+/*
+장소 정보를 DB에 저장하기 위해서는 memberId가 필수입니다 (장소 글타래가 공통 글타래를 상속받기 때문에) memberId는 null 값을 가질 수 없게 되었습니다.
+따라서 장소 정보를 저장할 때 memberId를 1로 고정하고, 앞으로도 memberId 1은 관리자 계정 또는 비활성화된 객체로 활용해야 합니다.
+ */
 public class PlaceArticleCsvService {
     @Value("${csv.file.path}")
     private String csvFilePath;
@@ -45,7 +52,7 @@ public class PlaceArticleCsvService {
         List<PlaceArticle> placeArticles = new ArrayList<>();
         Member member = memberRepository.findById(1L).orElseThrow(() -> new IllegalArgumentException("Member not found"));
         GeometryFactory geometryFactory = new GeometryFactory();
-        try (CSVReader reader = new CSVReaderBuilder(new FileReader(filePath))
+        try (CSVReader reader = new CSVReaderBuilder(new FileReader(filePath, StandardCharsets.UTF_8))
                 .withSkipLines(1) // 헤더 라인 스킵
                 .build()) {
             String[] line;
@@ -80,6 +87,7 @@ public class PlaceArticleCsvService {
         double latitude = Double.parseDouble(line[11]); // 위도
         Coordinate coordinate = new Coordinate(longitude, latitude);
         Point point = geometryFactory.createPoint(coordinate);
+        point.setSRID(4326);
         Boolean hasParking = "Y".equalsIgnoreCase(line[20]); // 주차 가능 여부
         Boolean isPetFriendly = "Y".equalsIgnoreCase(line[22]); // 반려동물 동반 여부
         String businessHours = line[19];
@@ -100,6 +108,7 @@ public class PlaceArticleCsvService {
                 .isPetFriendly(isPetFriendly)
                 .businessHours(businessHours)
                 .closeDays(closeDays)
+                .createdAt(LocalDateTime.now())
                 .build();
     }
 }

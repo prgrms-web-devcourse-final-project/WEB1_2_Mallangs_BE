@@ -19,7 +19,7 @@ public class PlaceArticle extends Article {
     @Column(length = 255)
     private String businessHours;
 
-    @Column(length = 50)
+    @Column(length = 500)
     private String closeDays;
 
     @Column(nullable = true, columnDefinition = "TEXT")
