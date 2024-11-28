@@ -1,4 +1,4 @@
-package com.mallangs.domain.community.entity;
+package com.mallangs.domain.board.entity;
 
 import com.mallangs.global.common.BaseTimeEntity;
 import jakarta.persistence.*;

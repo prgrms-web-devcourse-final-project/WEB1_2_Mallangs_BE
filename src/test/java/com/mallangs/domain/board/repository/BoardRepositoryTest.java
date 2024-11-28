@@ -1,12 +1,11 @@
-package com.mallangs.domain.community.repository;
+package com.mallangs.domain.board.repository;
 
-import com.mallangs.domain.community.entity.Category;
-import com.mallangs.domain.community.entity.CategoryStatus;
-import com.mallangs.domain.community.entity.Community;
-import com.mallangs.domain.community.entity.CommunityStatus;
+import com.mallangs.domain.board.entity.Board;
+import com.mallangs.domain.board.entity.BoardStatus;
+import com.mallangs.domain.board.entity.BoardType;
+import com.mallangs.domain.board.entity.Category;
 import com.mallangs.domain.member.entity.Address;
 import com.mallangs.domain.member.entity.Member;
-import com.mallangs.domain.member.entity.MemberRole;
 import com.mallangs.domain.member.entity.embadded.Email;
 import com.mallangs.domain.member.entity.embadded.Nickname;
 import com.mallangs.domain.member.entity.embadded.Password;
@@ -22,22 +21,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.geo.Point;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.annotation.Commit;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
-class CommunityRepositoryTest {
+class BoardRepositoryTest {
 
     @Autowired
-    private CommunityRepository communityRepository;
+    private BoardRepository boardRepository;
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -94,8 +90,8 @@ class CommunityRepositoryTest {
         return categoryRepository.save(category);
     }
 
-    private Community saveCommunity(Member member, Category category, String title, String content) {
-        Community community = Community.builder()
+    private Board saveCommunity(Member member, Category category, String title, String content) {
+        Board board = Board.builder()
                 .member(member)
                 .category(category)
                 .title(title)
@@ -105,19 +101,20 @@ class CommunityRepositoryTest {
                 .address("서울특별시 중구 세종대로 110")
                 .sightedAt(LocalDateTime.now())
                 .imgUrl("test-image.jpg")
+                .boardType(BoardType.COMMUNITY)
                 .build();
-        return communityRepository.save(community);
+        return boardRepository.save(board);
     }
 
     private Member testMember;
     private Category testCategory;
-    private Community testCommunity;
+    private Board testBoard;
 
     @BeforeEach
     void setUp() {
         testMember = saveMember();
         testCategory = saveCategory("일반게시판");
-        testCommunity = saveCommunity(testMember, testCategory, "테스트 제목", "테스트 내용");
+        testBoard = saveCommunity(testMember, testCategory, "테스트 제목", "테스트 내용");
     }
 
     @Test
@@ -125,71 +122,71 @@ class CommunityRepositoryTest {
     void findByCategoryId() {
         // given
         // DRAFT 상태의 게시글 생성
-        Community draftCommunity = saveCommunity(testMember, testCategory, "임시저장 게시글", "임시저장 내용");
-        draftCommunity.changeStatus(CommunityStatus.DRAFT);
-        communityRepository.save(draftCommunity);
+        Board draftBoard = saveCommunity(testMember, testCategory, "임시저장 게시글", "임시저장 내용");
+        draftBoard.changeStatus(BoardStatus.DRAFT);
+        boardRepository.save(draftBoard);
 
         // when
-        Page<Community> result = communityRepository.findByCategoryId(testCategory.getCategoryId(), PageRequest.of(0, 10));
+        Page<Board> result = boardRepository.findByCategoryId(testCategory.getCategoryId(), BoardType.COMMUNITY, PageRequest.of(0, 10));
 
         // then
         assertThat(result.getContent()).hasSize(1);  // PUBLISH 상태의 게시글만 조회
         assertThat(result.getContent().get(0).getTitle()).isEqualTo("테스트 제목");
-        assertThat(result.getContent().get(0).getCommunityStatus()).isEqualTo(CommunityStatus.PUBLISHED);
+        assertThat(result.getContent().get(0).getBoardStatus()).isEqualTo(BoardStatus.PUBLISHED);
     }
 
     @Test
     @DisplayName("키워드로 게시글 검색 - PUBLISHED 상태만 검색되어야 함")
     void searchByTitleOrContent() {
         // given
-        Community draftCommunity = saveCommunity(testMember, testCategory, "임시저장 테스트", "임시저장 내용");
-        draftCommunity.changeStatus(CommunityStatus.DRAFT);
-        communityRepository.save(draftCommunity);
+        Board draftBoard = saveCommunity(testMember, testCategory, "임시저장 테스트", "임시저장 내용");
+        draftBoard.changeStatus(BoardStatus.DRAFT);
+        boardRepository.save(draftBoard);
 
         // when
-        Page<Community> result = communityRepository.searchByTitleOrContent("테스트", PageRequest.of(0, 10));
+        Page<Board> result = boardRepository.searchByTitleOrContent("테스트", PageRequest.of(0, 10));
 
         // then
         assertThat(result.getContent()).hasSize(1);  // PUBLISHED 상태의 게시글만 조회
-        Community foundCommunity = result.getContent().get(0);
-        assertThat(foundCommunity.getTitle()).contains("테스트");
-        assertThat(foundCommunity.getCommunityStatus()).isEqualTo(CommunityStatus.PUBLISHED);
+        Board foundBoard = result.getContent().get(0);
+        assertThat(foundBoard.getTitle()).contains("테스트");
+        assertThat(foundBoard.getBoardStatus()).isEqualTo(BoardStatus.PUBLISHED);
     }
 
     @Test
     @DisplayName("회원별 게시글 조회 - PUBLISHED 상태만 조회되어야 함")
     void findByMemberId() {
         // given
-        Community hiddenCommunity = saveCommunity(testMember, testCategory, "숨김 게시글", "숨김 내용");
-        hiddenCommunity.changeStatus(CommunityStatus.HIDDEN);
-        communityRepository.save(hiddenCommunity);
+        Board hiddenBoard = saveCommunity(testMember, testCategory, "숨김 게시글", "숨김 내용");
+        hiddenBoard.changeStatus(BoardStatus.HIDDEN);
+        boardRepository.save(hiddenBoard);
 
         // when
-        Page<Community> result = communityRepository.findByMemberId(
+        Page<Board> result = boardRepository.findByMemberId(
                 testMember.getMemberId(),
                 PageRequest.of(0, 10)
         );
 
         // then
         assertThat(result.getContent()).hasSize(1);
-        assertThat(result.getContent().get(0).getCommunityStatus()).isEqualTo(CommunityStatus.PUBLISHED);
+        assertThat(result.getContent().get(0).getBoardStatus()).isEqualTo(BoardStatus.PUBLISHED);
     }
 
     @Test
     @DisplayName("상태별 게시글 조회")
     void findByStatus() {
         // given
-        Community draftCommunity = saveCommunity(testMember, testCategory, "임시저장", "임시저장");
-        draftCommunity.changeStatus(CommunityStatus.DRAFT);
-        communityRepository.save(draftCommunity);
+        Board draftBoard = saveCommunity(testMember, testCategory, "임시저장", "임시저장");
+        draftBoard.changeStatus(BoardStatus.DRAFT);
+        boardRepository.save(draftBoard);
 
         // when
-        Page<Community> publishedResult = communityRepository.findByStatus(
-                CommunityStatus.PUBLISHED,
+        Page<Board> publishedResult = boardRepository.findByStatus(
+                BoardStatus.PUBLISHED,
                 PageRequest.of(0, 10)
         );
-        Page<Community> draftResult = communityRepository.findByStatus(
-                CommunityStatus.DRAFT,
+        Page<Board> draftResult = boardRepository.findByStatus(
+                BoardStatus.DRAFT,
                 PageRequest.of(0, 10)
         );
 
@@ -202,12 +199,12 @@ class CommunityRepositoryTest {
     @DisplayName("관리자용 - 카테고리와 제목으로 게시글 검색")
     void searchForAdmin() {
         // given
-        Community hiddenCommunity = saveCommunity(testMember, testCategory, "테스트 숨김", "숨김 내용");
-        hiddenCommunity.changeStatus(CommunityStatus.HIDDEN);
-        communityRepository.save(hiddenCommunity);
+        Board hiddenBoard = saveCommunity(testMember, testCategory, "테스트 숨김", "숨김 내용");
+        hiddenBoard.changeStatus(BoardStatus.HIDDEN);
+        boardRepository.save(hiddenBoard);
 
         // when
-        Page<Community> result = communityRepository.searchForAdmin(
+        Page<Board> result = boardRepository.searchForAdmin(
                 testCategory.getCategoryId(),
                 "테스트",
                 PageRequest.of(0, 10)
@@ -223,14 +220,14 @@ class CommunityRepositoryTest {
     @DisplayName("관리자용 - 카테고리, 상태, 제목으로 게시글 검색")
     void searchForAdminWithStatus() {
         // given
-        Community hiddenCommunity = saveCommunity(testMember, testCategory, "테스트 숨김", "숨김 내용");
-        hiddenCommunity.changeStatus(CommunityStatus.HIDDEN);
-        communityRepository.save(hiddenCommunity);
+        Board hiddenBoard = saveCommunity(testMember, testCategory, "테스트 숨김", "숨김 내용");
+        hiddenBoard.changeStatus(BoardStatus.HIDDEN);
+        boardRepository.save(hiddenBoard);
 
         // when
-        Page<Community> result = communityRepository.searchForAdminWithStatus(
+        Page<Board> result = boardRepository.searchForAdminWithStatus(
                 testCategory.getCategoryId(),
-                CommunityStatus.HIDDEN,
+                BoardStatus.HIDDEN,
                 "테스트",
                 PageRequest.of(0, 10)
         );
@@ -238,6 +235,6 @@ class CommunityRepositoryTest {
         // then
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).getTitle()).isEqualTo("테스트 숨김");
-        assertThat(result.getContent().get(0).getCommunityStatus()).isEqualTo(CommunityStatus.HIDDEN);
+        assertThat(result.getContent().get(0).getBoardStatus()).isEqualTo(BoardStatus.HIDDEN);
     }
 }

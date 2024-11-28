@@ -1,7 +1,7 @@
-package com.mallangs.domain.community.repository;
+package com.mallangs.domain.board.repository;
 
-import com.mallangs.domain.community.entity.Category;
-import com.mallangs.domain.community.entity.CategoryStatus;
+import com.mallangs.domain.board.entity.Category;
+import com.mallangs.domain.board.entity.CategoryStatus;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

@@ -1,4 +1,4 @@
-package com.mallangs.domain.community.entity;
+package com.mallangs.domain.board.entity;
 
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.global.common.BaseTimeEntity;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Community extends BaseTimeEntity {
+public class Board extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,6 +27,10 @@ public class Community extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private BoardType boardType;
 
     @Column(nullable = false, length = 200)
     private String title;
@@ -55,12 +59,12 @@ public class Community extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private CommunityStatus communityStatus;
+    private BoardStatus boardStatus;
 
     @Builder
 
-    public Community(Member member, Category category, String title, String content, BigDecimal latitude,
-                     BigDecimal longitude, String address, LocalDateTime sightedAt, String imgUrl) {
+    public Board(Member member, Category category, String title, String content, BigDecimal latitude,
+                 BigDecimal longitude, String address, LocalDateTime sightedAt, String imgUrl, BoardType boardType) {
         this.member = member;
         this.category = category;
         this.title = title;
@@ -70,7 +74,8 @@ public class Community extends BaseTimeEntity {
         this.address = address;
         this.sightedAt = sightedAt;
         this.imgUrl = imgUrl;
-        this.communityStatus = CommunityStatus.PUBLISHED;
+        this.boardType = boardType;
+        this.boardStatus = BoardStatus.PUBLISHED;
         this.viewCnt = 0;
         this.commentCnt = 0;
         this.likeCnt = 0;
@@ -89,8 +94,8 @@ public class Community extends BaseTimeEntity {
     }
 
     // 게시글 상태 변경
-    public void changeStatus(CommunityStatus status) {
-        this.communityStatus = status;
+    public void changeStatus(BoardStatus status) {
+        this.boardStatus = status;
     }
 
     // 조회수 증가
