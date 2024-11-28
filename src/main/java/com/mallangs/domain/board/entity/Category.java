@@ -28,6 +28,9 @@ public class Category extends BaseTimeEntity {
     @OneToMany(mappedBy = "parentCategory")
     private final List<Category> childrenCategories = new ArrayList<>();
 
+    @OneToMany(mappedBy = "category")
+    private final List<Board> boards = new ArrayList<>();
+
     @Column(nullable = false, length = 50)
     private String name;
 
@@ -74,5 +77,4 @@ public class Category extends BaseTimeEntity {
     public void changeOrder(int categoryOrder) {
         this.categoryOrder = categoryOrder;
     }
-
 }
