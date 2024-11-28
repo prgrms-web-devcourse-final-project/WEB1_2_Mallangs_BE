@@ -1,4 +1,4 @@
-package com.mallangs.domain.board.dto;
+package com.mallangs.domain.board.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

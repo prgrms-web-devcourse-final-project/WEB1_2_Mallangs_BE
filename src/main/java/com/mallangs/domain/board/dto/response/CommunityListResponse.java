@@ -1,4 +1,4 @@
-package com.mallangs.domain.board.dto;
+package com.mallangs.domain.board.dto.response;
 
 import com.mallangs.domain.board.entity.Board;
 import com.mallangs.domain.member.entity.embadded.Nickname;

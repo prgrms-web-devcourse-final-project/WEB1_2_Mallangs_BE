@@ -1,4 +1,4 @@
-package com.mallangs.domain.board.dto;
+package com.mallangs.domain.board.dto.request;
 
 import com.mallangs.domain.board.entity.Board;
 import com.mallangs.domain.board.entity.BoardType;
@@ -10,7 +10,6 @@ import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.geolatte.geom.M;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

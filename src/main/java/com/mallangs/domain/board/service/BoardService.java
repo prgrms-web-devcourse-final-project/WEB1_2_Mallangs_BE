@@ -1,6 +1,10 @@
 package com.mallangs.domain.board.service;
 
-import com.mallangs.domain.board.dto.*;
+import com.mallangs.domain.board.dto.request.CommunityCreateRequest;
+import com.mallangs.domain.board.dto.request.CommunityUpdateRequest;
+import com.mallangs.domain.board.dto.request.SightingCreateRequest;
+import com.mallangs.domain.board.dto.request.SightingUpdateRequest;
+import com.mallangs.domain.board.dto.response.*;
 import com.mallangs.domain.board.entity.Board;
 import com.mallangs.domain.board.entity.BoardStatus;
 import com.mallangs.domain.board.entity.BoardType;

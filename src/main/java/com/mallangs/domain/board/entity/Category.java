@@ -26,7 +26,7 @@ public class Category extends BaseTimeEntity {
     private Category parentCategory;
 
     @OneToMany(mappedBy = "parentCategory")
-    private final List<Category> childrenCategory = new ArrayList<>();
+    private final List<Category> childrenCategories = new ArrayList<>();
 
     @Column(nullable = false, length = 50)
     private String name;
