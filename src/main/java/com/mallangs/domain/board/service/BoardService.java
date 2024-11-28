@@ -112,25 +112,26 @@ public class BoardService {
         );
     }
 
-    // 게시글 삭제
-    @Transactional
-    public void deleteBoard(Long boardId, Long memberId, BoardType boardType) {
-        Board board = getBoardWithMemberValidation(boardId, memberId, boardType);
-        board.changeStatus(BoardStatus.HIDDEN);
-    }
-
     // 커뮤니티 게시글 상세 조회
+
     public CommunityDetailResponse getCommunityBoard(Long boardId) {
         Board board = getBoardWithTypeValidation(boardId, BoardType.COMMUNITY);
         board.increaseViewCount();
         return new CommunityDetailResponse(board);
     }
-
     // 실종신고 - 목격제보 게시글 상세 조회
+
     public SightingDetailResponse getSightingBoard(Long boardId) {
         Board board = getBoardWithTypeValidation(boardId, BoardType.SIGHTING);
         board.increaseViewCount();
         return new SightingDetailResponse(board);
+    }
+
+    // 게시글 삭제
+    @Transactional
+    public void deleteBoard(Long boardId, Long memberId, BoardType boardType) {
+        Board board = getBoardWithMemberValidation(boardId, memberId, boardType);
+        board.changeStatus(BoardStatus.HIDDEN);
     }
 
     // 카테고리별 커뮤니티 게시글 목록 조회
@@ -167,22 +168,6 @@ public class BoardService {
     public Page<SightingListResponse> getMemberSightingBoards(Long memberId, Pageable pageable) {
         return boardRepository.findByMemberId(memberId, pageable)
                 .map(SightingListResponse::new);
-    }
-
-    // 좋아요 증가
-    @Transactional
-    public void increaseLike(Long boardId) {
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new MallangsCustomException(ErrorCode.BOARD_NOT_FOUND));
-        board.increaseLikeCount();
-    }
-
-    // 좋아요 감소
-    @Transactional
-    public void decreaseLike(Long boardId) {
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new MallangsCustomException(ErrorCode.BOARD_NOT_FOUND));
-        board.decreaseLikeCount();
     }
 
     // 관리자용 - 상태별 게시글 조회

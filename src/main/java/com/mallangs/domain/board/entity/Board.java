@@ -114,16 +114,4 @@ public class Board extends BaseTimeEntity {
             this.commentCnt--;
         }
     }
-
-    // 좋아요수 증가
-    public void increaseLikeCount() {
-        this.likeCnt++;
-    }
-
-    // 좋아요수 감소
-    public void decreaseLikeCount() {
-        if (this.likeCnt > 0) {
-            this.likeCnt--;
-        }
-    }
 }
