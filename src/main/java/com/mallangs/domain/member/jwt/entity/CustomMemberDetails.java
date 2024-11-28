@@ -61,4 +61,8 @@ public class CustomMemberDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public Long getMemberId() {
+        return member.getMemberId();
+    }
 }

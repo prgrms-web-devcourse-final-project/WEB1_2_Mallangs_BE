@@ -38,10 +38,10 @@ public class Board extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(nullable = false, precision = 10, scale = 8)
+    @Column(precision = 10, scale = 8)
     private BigDecimal latitude;
 
-    @Column(nullable = false, precision = 11, scale = 8)
+    @Column(precision = 11, scale = 8)
     private BigDecimal longitude;
 
     @Column(length = 200)
@@ -79,6 +79,37 @@ public class Board extends BaseTimeEntity {
         this.viewCnt = 0;
         this.commentCnt = 0;
         this.likeCnt = 0;
+    }
+
+    // 커뮤니티 게시글용 생성 메서드
+    public static Board createCommunityBoard(Member member, Category category,
+                                             String title, String content, String imgUrl) {
+        return Board.builder()
+                .member(member)
+                .category(category)
+                .title(title)
+                .content(content)
+                .imgUrl(imgUrl)
+                .boardType(BoardType.COMMUNITY)
+                .build();
+    }
+
+    // 실종신고-목격제보용 생성 메서드
+    public static Board createSightingBoard(Member member, Category category,
+                                            String title, String content, BigDecimal latitude, BigDecimal longitude,
+                                            String address, LocalDateTime sightedAt, String imgUrl) {
+        return Board.builder()
+                .member(member)
+                .category(category)
+                .title(title)
+                .content(content)
+                .latitude(latitude)
+                .longitude(longitude)
+                .address(address)
+                .sightedAt(sightedAt)
+                .imgUrl(imgUrl)
+                .boardType(BoardType.SIGHTING)
+                .build();
     }
 
     // 게시글 정보 수정
