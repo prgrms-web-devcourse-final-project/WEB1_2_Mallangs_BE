@@ -1,7 +1,5 @@
-package com.mallangs.domain.chat.dto;
+package com.mallangs.domain.chat.dto.request;
 
-import com.mallangs.domain.chat.entity.ChatMessage;
-import com.mallangs.domain.chat.entity.ParticipatedRoom;
 import lombok.Getter;
 import lombok.ToString;
 import org.hibernate.validator.constraints.Length;

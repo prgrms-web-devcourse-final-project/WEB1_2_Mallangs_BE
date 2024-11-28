@@ -1,4 +1,4 @@
-package com.mallangs.domain.chat.dto;
+package com.mallangs.domain.chat.dto.response;
 
 import com.mallangs.domain.chat.entity.MessageType;
 import lombok.Builder;

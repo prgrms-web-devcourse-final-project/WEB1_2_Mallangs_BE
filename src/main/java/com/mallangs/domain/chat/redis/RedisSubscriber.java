@@ -1,7 +1,7 @@
 package com.mallangs.domain.chat.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mallangs.domain.chat.dto.ChatMessageResponse;
+import com.mallangs.domain.chat.dto.response.ChatMessageResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.redis.connection.Message;

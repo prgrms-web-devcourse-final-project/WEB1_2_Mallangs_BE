@@ -1,13 +1,11 @@
-package com.mallangs.domain.chat.dto;
+package com.mallangs.domain.chat.dto.response;
 
-import com.mallangs.domain.chat.entity.ChatMessage;
 import com.mallangs.domain.member.entity.embadded.Nickname;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @ToString

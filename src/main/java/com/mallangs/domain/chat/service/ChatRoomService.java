@@ -1,7 +1,7 @@
 package com.mallangs.domain.chat.service;
 
-import com.mallangs.domain.chat.dto.ChatRoomChangeNameRequest;
-import com.mallangs.domain.chat.dto.ParticipatedRoomListResponse;
+import com.mallangs.domain.chat.dto.request.ChatRoomChangeNameRequest;
+import com.mallangs.domain.chat.dto.response.ParticipatedRoomListResponse;
 import com.mallangs.domain.chat.entity.ChatRoom;
 import com.mallangs.domain.chat.entity.ParticipatedRoom;
 import com.mallangs.domain.chat.repository.ChatRoomRepository;

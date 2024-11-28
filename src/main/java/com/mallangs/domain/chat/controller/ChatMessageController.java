@@ -1,6 +1,6 @@
 package com.mallangs.domain.chat.controller;
 
-import com.mallangs.domain.chat.dto.ChatMessageRequest;
+import com.mallangs.domain.chat.dto.request.ChatMessageRequest;
 import com.mallangs.domain.chat.service.ChatMessageService;
 import com.mallangs.domain.member.service.MemberUserService;
 import io.swagger.v3.oas.annotations.tags.Tag;

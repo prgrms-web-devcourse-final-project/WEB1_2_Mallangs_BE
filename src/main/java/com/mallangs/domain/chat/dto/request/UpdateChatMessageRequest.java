@@ -1,4 +1,4 @@
-package com.mallangs.domain.chat.dto;
+package com.mallangs.domain.chat.dto.request;
 
 import lombok.Getter;
 import lombok.ToString;

@@ -1,14 +1,13 @@
 package com.mallangs.domain.chat.service;
 
-import com.mallangs.domain.chat.dto.ChatMessageRequest;
-import com.mallangs.domain.chat.dto.ChatMessageResponse;
-import com.mallangs.domain.chat.dto.UpdateChatMessageRequest;
+import com.mallangs.domain.chat.dto.request.ChatMessageRequest;
+import com.mallangs.domain.chat.dto.response.ChatMessageResponse;
+import com.mallangs.domain.chat.dto.request.UpdateChatMessageRequest;
 import com.mallangs.domain.chat.entity.ChatMessage;
 import com.mallangs.domain.chat.entity.ParticipatedRoom;
 import com.mallangs.domain.chat.redis.RedisSubscriber;
 import com.mallangs.domain.chat.repository.ChatMessageRepository;
 import com.mallangs.domain.chat.repository.ParticipatedRoomRepository;
-import com.mallangs.domain.member.dto.MemberGetResponse;
 import com.mallangs.domain.member.dto.PageRequestDTO;
 import com.mallangs.global.exception.ErrorCode;
 import com.mallangs.global.exception.MallangsCustomException;
@@ -23,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Log4j2
 @Service
