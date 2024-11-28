@@ -1,6 +1,7 @@
 package com.mallangs.global.config;
 
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 public class MvcConfig implements WebMvcConfigurer {
@@ -11,5 +12,10 @@ public class MvcConfig implements WebMvcConfigurer {
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")  // 허용할 HTTP 메서드
                 .allowedHeaders("*")  // 허용할 헤더
                 .allowCredentials(true);  // 인증 정보 허용 여부
+    }
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/file/**")
+                .addResourceLocations("file:./uploads/");
     }
 }
