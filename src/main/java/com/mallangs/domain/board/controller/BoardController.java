@@ -1,10 +1,7 @@
 package com.mallangs.domain.board.controller;
 
 import com.mallangs.domain.board.dto.request.*;
-import com.mallangs.domain.board.dto.response.AdminBoardResponse;
-import com.mallangs.domain.board.dto.response.CommunityListResponse;
-import com.mallangs.domain.board.dto.response.SightingDetailResponse;
-import com.mallangs.domain.board.dto.response.SightingListResponse;
+import com.mallangs.domain.board.dto.response.*;
 import com.mallangs.domain.board.entity.BoardStatus;
 import com.mallangs.domain.board.entity.BoardType;
 import com.mallangs.domain.board.service.BoardService;
@@ -28,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
-@Tag(name = "게시글 API", description = "게시글 관련 API")
+@Tag(name = "커뮤니티 & 실종신고-목격제보 API", description = "커뮤니티/실종신고-목격제보 관련 API")
 @RestController
 @RequestMapping("/api/board")
 @RequiredArgsConstructor
@@ -36,7 +33,6 @@ import java.net.URI;
 public class BoardController {
 
     private final BoardService boardService;
-    private final CategoryService categoryService;
 
     // 커뮤니티 관련
     @Operation(summary = "커뮤니티 게시글 작성", description = "커뮤니티 게시판에 글을 작성합니다.")
@@ -48,11 +44,11 @@ public class BoardController {
     @PostMapping("/community")
     public ResponseEntity<Long> createCommunity(@Valid @RequestBody CommunityCreateRequest request,
                                                 @AuthenticationPrincipal UserDetails userDetails) {
-        Long postId = boardService.createCommunityBoard(request, Long.parseLong(userDetails.getUsername()));
-        return ResponseEntity.created(URI.create("/api/board/community/" + postId)).body(postId);
+        Long boardId = boardService.createCommunityBoard(request, Long.parseLong(userDetails.getUsername()));
+        return ResponseEntity.created(URI.create("/api/board/community/" + boardId)).body(boardId);
     }
 
-    @Operation(summary = "카테고리별 게시글 목록 조회", description = "특정 카테고리의 커뮤니티 게시글 목록을 조회합니다.")
+    @Operation(summary = "커뮤니티 카테고리별 게시글 목록 조회", description = "특정 카테고리의 커뮤니티 게시글 목록을 조회합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "카테고리가 존재하지 않습니다.")
@@ -63,6 +59,18 @@ public class BoardController {
             @Parameter(description = "페이지네이션 정보") @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity.ok(boardService.getCommunityBoardsByCategory(categoryId, pageable));
+    }
+
+    @Operation(summary = "커뮤니티 게시글 상세 조회", description = "특정 커뮤니티 게시글의 상세 내용을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "게시글이 존재하지 않음")
+    })
+    @GetMapping("/community/{boardId}")
+    public ResponseEntity<CommunityDetailResponse> getCommunityPost(
+            @Parameter(description = "게시글 ID") @PathVariable Long boardId
+    ) {
+        return ResponseEntity.ok(boardService.getCommunityBoard(boardId));
     }
 
     @Operation(summary = "커뮤니티 게시글 수정", description = "기존 커뮤니티 게시글을 수정합니다.")
@@ -83,8 +91,8 @@ public class BoardController {
         return ResponseEntity.noContent().build();
     }
 
-    // 실종신고 - 목격제보 관련
-    @Operation(summary = "실종/목격 게시글 작성", description = "새로운 실종/목격 게시글을 작성합니다.")
+    // 실종신고-목격제보 관련
+    @Operation(summary = "실종신고-목격제보 게시글 작성", description = "새로운 실종신고-목격제보 게시글을 작성합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "게시글 작성 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
@@ -95,11 +103,11 @@ public class BoardController {
             @Valid @RequestBody SightingCreateRequest request,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        Long postId = boardService.createSightingBoard(request, Long.parseLong(userDetails.getUsername()));
-        return ResponseEntity.created(URI.create("/api/board/sighting/" + postId)).body(postId);
+        Long boardId = boardService.createSightingBoard(request, Long.parseLong(userDetails.getUsername()));
+        return ResponseEntity.created(URI.create("/api/board/sighting/" + boardId)).body(boardId);
     }
 
-    @Operation(summary = "카테고리별 목격 게시글 목록 조회", description = "특정 카테고리의 실종/목격 게시글 목록을 조회합니다.")
+    @Operation(summary = "실종신고-목격제보 카테고리별 목격 게시글 목록 조회", description = "특정 카테고리의 실종신고-목격제보 게시글 목록을 조회합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "카테고리가 존재하지 않음")
@@ -112,19 +120,19 @@ public class BoardController {
         return ResponseEntity.ok(boardService.getSightingBoardsByCategory(categoryId, pageable));
     }
 
-    @Operation(summary = "실종/목격 게시글 상세 조회", description = "특정 실종/목격 게시글의 상세 내용을 조회합니다.")
+    @Operation(summary = "실종신고-목격제보 게시글 상세 조회", description = "특정 실종신고-목격제보 게시글의 상세 내용을 조회합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "게시글이 존재하지 않음")
     })
-    @GetMapping("/sighting/{postId}")
+    @GetMapping("/sighting/{boardId}")
     public ResponseEntity<SightingDetailResponse> getSightingPost(
-            @Parameter(description = "게시글 ID") @PathVariable Long postId
+            @Parameter(description = "게시글 ID") @PathVariable Long boardId
     ) {
-        return ResponseEntity.ok(boardService.getSightingBoard(postId));
+        return ResponseEntity.ok(boardService.getSightingBoard(boardId));
     }
 
-    @Operation(summary = "실종/목격 게시글 수정", description = "기존 실종/목격 게시글을 수정합니다.")
+    @Operation(summary = "실종신고-목격제보 게시글 수정", description = "기존 실종신고-목격제보 게시글을 수정합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "수정 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
@@ -132,13 +140,13 @@ public class BoardController {
             @ApiResponse(responseCode = "403", description = "권한 없음"),
             @ApiResponse(responseCode = "404", description = "게시글이 존재하지 않음")
     })
-    @PutMapping("/sighting/{postId}")
+    @PutMapping("/sighting/{boardId}")
     public ResponseEntity<Void> updateSightingPost(
-            @Parameter(description = "게시글 ID") @PathVariable Long postId,
+            @Parameter(description = "게시글 ID") @PathVariable Long boardId,
             @Valid @RequestBody SightingUpdateRequest request,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        boardService.updateSightingBoard(postId, request, Long.parseLong(userDetails.getUsername()));
+        boardService.updateSightingBoard(boardId, request, Long.parseLong(userDetails.getUsername()));
         return ResponseEntity.noContent().build();
     }
 
@@ -150,13 +158,13 @@ public class BoardController {
             @ApiResponse(responseCode = "403", description = "권한 없음"),
             @ApiResponse(responseCode = "404", description = "게시글이 존재하지 않음")
     })
-    @DeleteMapping("/{postId}")
+    @DeleteMapping("/{boardId}")
     public ResponseEntity<Void> deletePost(
-            @Parameter(description = "게시글 ID") @PathVariable Long postId,
+            @Parameter(description = "게시글 ID") @PathVariable Long boardId,
             @Parameter(description = "게시글 타입") @RequestParam BoardType boardType,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        boardService.deleteBoard(postId, Long.parseLong(userDetails.getUsername()), boardType);
+        boardService.deleteBoard(boardId, Long.parseLong(userDetails.getUsername()), boardType);
         return ResponseEntity.noContent().build();
     }
 
