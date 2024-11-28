@@ -11,4 +11,8 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface ParticipatedRoomRepository extends JpaRepository<ParticipatedRoom, Long> {
+
+    @Query("SELECT p FROM ParticipatedRoom p join fetch p.participant WHERE p.participant.memberId = :memberId")
+    List<ParticipatedRoom> findByMemberId(@Param("memberId") Long memberId);
+
 }
