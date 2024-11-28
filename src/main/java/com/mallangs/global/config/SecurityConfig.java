@@ -1,14 +1,15 @@
 package com.mallangs.global.config;
 
-import com.mallangs.domain.jwt.filter.JWTFilter;
-import com.mallangs.domain.jwt.filter.LoginFilter;
-import com.mallangs.domain.jwt.filter.LogoutFilter;
-import com.mallangs.domain.jwt.service.AccessTokenBlackList;
-import com.mallangs.domain.jwt.service.RefreshTokenService;
-import com.mallangs.domain.jwt.util.JWTUtil;
+import com.mallangs.domain.member.jwt.filter.JWTFilter;
+import com.mallangs.domain.member.jwt.filter.LoginFilter;
+import com.mallangs.domain.member.jwt.filter.LogoutFilter;
+import com.mallangs.domain.member.jwt.service.AccessTokenBlackList;
+import com.mallangs.domain.member.jwt.service.RefreshTokenService;
+import com.mallangs.domain.member.jwt.util.JWTUtil;
+import com.mallangs.domain.member.oauth2.handler.CustomFailureHandler;
 import com.mallangs.domain.member.repository.MemberRepository;
-import com.mallangs.domain.oauth2.handler.CustomSuccessHandler;
-import com.mallangs.domain.oauth2.service.CustomOAuth2MemberService;
+import com.mallangs.domain.member.oauth2.handler.CustomSuccessHandler;
+import com.mallangs.domain.member.oauth2.service.CustomOAuth2MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
@@ -47,6 +49,7 @@ public class SecurityConfig {
     private final MemberRepository memberRepository;
     private final CustomOAuth2MemberService customOAuth2MemberService;
     private final CustomSuccessHandler customSuccessHandler;
+    private final CustomFailureHandler customFailureHandler;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -54,13 +57,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         // cors 필터
         http
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(request -> {
-
                     CorsConfiguration configuration = new CorsConfiguration();
-                    configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                    configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:8080"));
                     configuration.setAllowedMethods(Collections.singletonList("*"));
                     configuration.setAllowCredentials(true);
                     configuration.setAllowedHeaders(Collections.singletonList("*"));
@@ -76,7 +78,8 @@ public class SecurityConfig {
         AuthenticationManager authManager = authenticationManager(authenticationConfiguration);
 
         // 로그인 필터 생성 및 설정
-        LoginFilter loginFilter = new LoginFilter(accessTokenValidity, accessRefreshTokenValidity, authManager, jwtUtil, refreshTokenService);
+        LoginFilter loginFilter = new LoginFilter(accessTokenValidity, accessRefreshTokenValidity,
+                                        authManager, jwtUtil, refreshTokenService,memberRepository);
         loginFilter.setFilterProcessesUrl("/api/member/login");
 
         //로그아웃 필터 생성
@@ -92,15 +95,22 @@ public class SecurityConfig {
                 .oauth2Login((oauth2) -> oauth2
                         .userInfoEndpoint((userInfo) -> userInfo
                                 .userService(customOAuth2MemberService))
-                        .successHandler(customSuccessHandler));
+                        .successHandler(customSuccessHandler)
+                        .failureHandler(customFailureHandler)
+                );
+
         // 경로별 인가 작업
         http
-                .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/api/member/login", "/api/member/register", "/api/member/logout", "/api/member/oauth2").permitAll()
+                .authorizeHttpRequests((auth) ->
+                        auth
+                        .requestMatchers("/api/member/register", "/api/member/login",
+                                "/api/member/logout","/api/member/find-user-id",
+                                "/api/member/find-password").permitAll()
+                        .requestMatchers("/api/member/oauth2/**").permitAll()
                         .requestMatchers("/api/member/admin").hasRole("ADMIN")
-                        .requestMatchers("/api/member/**").permitAll()
+                        .requestMatchers("/api/member/**").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/api/address/**").permitAll()
-
+                        .requestMatchers("/api/member-file-test").permitAll()
                         // Swagger UI 관련 경로 허용
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()

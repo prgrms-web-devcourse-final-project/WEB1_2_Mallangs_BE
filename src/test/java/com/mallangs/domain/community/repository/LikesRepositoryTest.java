@@ -62,7 +62,7 @@ class LikesRepositoryTest {
                 .addressName("testAddress")
                 .addressType("testAddressType")
                 .mainAddressNo("testmainAddressNo")
-                .point(new Point(1, 2))
+//                .point(new Point(1, 2))
                 .mountainYn("testMountainYn")
                 .region1depthName("testRegion1depthName")
                 .region2depthName("testRegion2depthName")
