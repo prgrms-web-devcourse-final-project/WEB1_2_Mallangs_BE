@@ -39,6 +39,9 @@ public abstract class Article {
   @Column(name = "article_id")
   private Long id;
 
+  @Column(name = "type", nullable = false)
+  private String type;
+
   @Enumerated(EnumType.STRING)
   @Column(name = "map_visibility", nullable = false)
   private MapVisibility mapVisibility;
@@ -46,25 +49,17 @@ public abstract class Article {
   @Column(nullable = false, length = 100)
   private String title; // 장소인 경우 장소 이름
 
-//  @Column(nullable = false)
-//  private Double latitude;
-//
-//  @Column(nullable = false)
-//  private Double longitude;
-
   @Column(nullable = false, columnDefinition = "POINT SRID 4326")
   private Point geography;
 
   @Column(length = 500)
   private String description;
 
-  private String contact;
-
   @Column(columnDefinition = "TEXT")
   private String image;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "member_id")
+  @JoinColumn(name = "member_id", nullable = true) // member 삭제 후에도 글은 남아있음
   private Member member;
 
   @CreatedDate
@@ -77,18 +72,20 @@ public abstract class Article {
 
 
   public void applyChanges(Article updatedArticle) {
+    if (updatedArticle.getType() != null) {
+      this.type = updatedArticle.getType();
+    }
     if (updatedArticle.getMapVisibility() != null) {
       this.mapVisibility = updatedArticle.getMapVisibility();
     }
     if (updatedArticle.getTitle() != null) {
       this.title = updatedArticle.getTitle();
     }
-    // 위도 경도 수정
+    if (updatedArticle.getGeography() != null) {
+      this.geography = updatedArticle.getGeography();
+    }
     if (updatedArticle.getDescription() != null) {
       this.description = updatedArticle.getDescription();
-    }
-    if (updatedArticle.getContact() != null) {
-      this.contact = updatedArticle.getContact();
     }
     if (updatedArticle.getImage() != null) {
       this.image = updatedArticle.getImage();
