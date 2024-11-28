@@ -6,7 +6,7 @@ import com.mallangs.domain.board.entity.BoardStatus;
 import com.mallangs.domain.board.entity.BoardType;
 import com.mallangs.domain.board.service.BoardService;
 import com.mallangs.domain.board.service.CategoryService;
-import com.mallangs.domain.member.jwt.entity.CustomMemberDetails;
+import com.mallangs.global.jwt.entity.CustomMemberDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
