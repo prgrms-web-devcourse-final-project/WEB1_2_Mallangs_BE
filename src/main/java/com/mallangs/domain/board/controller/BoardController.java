@@ -6,6 +6,7 @@ import com.mallangs.domain.board.entity.BoardStatus;
 import com.mallangs.domain.board.entity.BoardType;
 import com.mallangs.domain.board.service.BoardService;
 import com.mallangs.domain.board.service.CategoryService;
+import com.mallangs.domain.member.jwt.entity.CustomMemberDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -43,8 +44,8 @@ public class BoardController {
     })
     @PostMapping("/community")
     public ResponseEntity<Long> createCommunity(@Valid @RequestBody CommunityCreateRequest request,
-                                                @AuthenticationPrincipal UserDetails userDetails) {
-        Long boardId = boardService.createCommunityBoard(request, Long.parseLong(userDetails.getUsername()));
+                                                @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
+        Long boardId = boardService.createCommunityBoard(request, customMemberDetails.getMemberId());
         return ResponseEntity.created(URI.create("/api/board/community/" + boardId)).body(boardId);
     }
 

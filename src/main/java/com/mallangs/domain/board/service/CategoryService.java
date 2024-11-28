@@ -9,6 +9,7 @@ import com.mallangs.domain.board.repository.CategoryRepository;
 import com.mallangs.global.exception.ErrorCode;
 import com.mallangs.global.exception.MallangsCustomException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
@@ -41,6 +43,7 @@ public class CategoryService {
     // 카테고리 생성
     @Transactional
     public CategoryResponse createCategory(CategoryCreateRequest request) {
+        log.info("=== Service creating category: {}", request);
         Category parentCategory = null;
         if (request.getParentCategoryId() != null) {
             parentCategory = categoryRepository.findById(request.getParentCategoryId())

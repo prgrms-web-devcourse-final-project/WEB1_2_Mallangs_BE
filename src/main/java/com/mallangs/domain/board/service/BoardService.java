@@ -12,6 +12,7 @@ import com.mallangs.domain.board.entity.Category;
 import com.mallangs.domain.board.repository.BoardRepository;
 import com.mallangs.domain.board.repository.CategoryRepository;
 import com.mallangs.domain.member.entity.Member;
+import com.mallangs.domain.member.entity.embadded.UserId;
 import com.mallangs.domain.member.repository.MemberRepository;
 import com.mallangs.global.exception.ErrorCode;
 import com.mallangs.global.exception.MallangsCustomException;
@@ -35,6 +36,25 @@ public class BoardService {
     private final CategoryRepository categoryRepository;
     
     // 커뮤니티 게시글 작성
+//    @Transactional
+//    public Long createCommunityBoard(CommunityCreateRequest request, String userId) {
+//        Member member = memberRepository.findByUserId(new UserId(userId))
+//                .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+//
+//        Category category = categoryRepository.findById(request.getCategoryId())
+//                .orElseThrow(() -> new MallangsCustomException(ErrorCode.CATEGORY_NOT_FOUND));
+//
+//        Board board = Board.createCommunityBoard(
+//                member,
+//                category,
+//                request.getTitle(),
+//                request.getContent(),
+//                request.getContent()
+//        );
+//
+//        return boardRepository.save(board).getBoardId();
+//    }
+
     @Transactional
     public Long createCommunityBoard(CommunityCreateRequest request, Long memberId) {
         Member member = memberRepository.findById(memberId)
@@ -43,14 +63,13 @@ public class BoardService {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.CATEGORY_NOT_FOUND));
 
-        Board board = Board.builder()
-                .member(member)
-                .category(category)
-                .title(request.getTitle())
-                .content(request.getContent())
-                .imgUrl(request.getImgUrl())
-                .boardType(BoardType.COMMUNITY)
-                .build();
+        Board board = Board.createCommunityBoard(
+                member,
+                category,
+                request.getTitle(),
+                request.getContent(),
+                request.getContent()
+        );
 
         return boardRepository.save(board).getBoardId();
     }
@@ -64,18 +83,17 @@ public class BoardService {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.CATEGORY_NOT_FOUND));
 
-        Board board = Board.builder()
-                .member(member)
-                .category(category)
-                .title(request.getTitle())
-                .content(request.getContent())
-                .imgUrl(request.getImgUrl())
-                .boardType(BoardType.SIGHTING)
-                .latitude(request.getLatitude())
-                .longitude(request.getLongitude())
-                .address(request.getAddress())
-                .sightedAt(request.getSightedAt())
-                .build();
+        Board board = Board.createSightingBoard(
+                member,
+                category,
+                request.getTitle(),
+                request.getContent(),
+                request.getLatitude(),
+                request.getLongitude(),
+                request.getAddress(),
+                request.getSightedAt(),
+                request.getImgUrl()
+        );
 
         return boardRepository.save(board).getBoardId();
     }

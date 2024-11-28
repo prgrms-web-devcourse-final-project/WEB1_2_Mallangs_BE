@@ -47,8 +47,9 @@ public class JWTFilter extends OncePerRequestFilter {
         try {
             //등록된 URI 필터 제외
             if (request.getRequestURI().startsWith("/api/member/register")||
-                    request.getRequestURI().startsWith("/api/member/find-user-id")||
-                    request.getRequestURI().startsWith("/api/member/find-password")) {
+                request.getRequestURI().startsWith("/api/member/find-user-id")||
+                request.getRequestURI().startsWith("/api/member/login")||
+                request.getRequestURI().startsWith("/api/member/find-password")) {
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -98,7 +99,7 @@ public class JWTFilter extends OncePerRequestFilter {
                                     response.setCharacterEncoding("UTF-8");
                                     response.getWriter().write(
                                             "{\"AccessToken\": \"" + newAccessToken + "\"," +
-                                                    " \"RefreshToken\": \"" + newRefreshToken + "\",");
+                                            " \"RefreshToken\": \"" + newRefreshToken + "\",");
 
                                     response.addHeader("Authorization", "Bearer " + accessToken);
                                     response.addCookie(createCookie(newRefreshToken));
@@ -132,10 +133,13 @@ public class JWTFilter extends OncePerRequestFilter {
                         handleException(response, new Exception("INVALID TOKEN PAYLOAD"));
                         return;
                     }
+                    log.info("맴버아이디 토큰 필터 {}",claims.get("memberId"));
+                    Long memberId = ((Integer)claims.get("memberId")).longValue();
                     String userId = claims.get("userId").toString();
                     String email = claims.get("email").toString();
                     String role = claims.get("role").toString();
                     Member member = Member.builder()
+                            .memberId(memberId)
                             .userId(new UserId(userId))
                             .email(new Email(email))
                             .memberRole(MemberRole.valueOf(role))

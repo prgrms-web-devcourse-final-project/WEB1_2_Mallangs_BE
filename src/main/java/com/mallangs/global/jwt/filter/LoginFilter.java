@@ -50,6 +50,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, String> requestMap = objectMapper.readValue(request.getInputStream(), Map.class);
 
+            log.info("기본 로그인 사용");
             String userId = requestMap.get("userId");
             String password = requestMap.get("password");
 
@@ -66,6 +67,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         CustomMemberDetails customUserDetails = (CustomMemberDetails) authentication.getPrincipal();
 
         //customUserDetails에서 인증정보 꺼내기
+        Long memberId = customUserDetails.getMemberId();
         String userId = customUserDetails.getUsername();
         String email = customUserDetails.getEmail();
         String role = authentication.getAuthorities().stream()
@@ -75,6 +77,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         // Access 토큰 생성
         Map<String, Object> AccessPayloadMap = new HashMap<>();
+        AccessPayloadMap.put("memberId", memberId);
         AccessPayloadMap.put("userId", userId);
         AccessPayloadMap.put("email", email);
         AccessPayloadMap.put("role", role);
