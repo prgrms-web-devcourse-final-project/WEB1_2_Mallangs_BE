@@ -53,7 +53,7 @@ public class BoardController {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "카테고리가 존재하지 않습니다.")
     })
-    @GetMapping("/community/category/{categoryId")
+    @GetMapping("/community/category/{categoryId}")
     public ResponseEntity<Page<CommunityListResponse>> getCommunityPostByCategory(
             @Parameter(description = "카테고리 ID") @PathVariable Long categoryId,
             @Parameter(description = "페이지네이션 정보") @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
