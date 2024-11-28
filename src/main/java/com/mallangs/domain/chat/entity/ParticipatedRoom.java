@@ -29,7 +29,7 @@ public class ParticipatedRoom {
     @JsonIgnore
     private ChatRoom chatRoom;
 
-    @OneToMany(mappedBy = "participatedRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "participatedRoom", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
     @Builder.Default
     private List<ChatMessage> messages = new ArrayList<>();
 
