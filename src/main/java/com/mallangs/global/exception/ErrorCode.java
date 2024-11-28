@@ -24,7 +24,13 @@ public enum ErrorCode {
   // ChatRoom
   CHATROOM_NOT_FOUND(NOT_FOUND, "채팅방 정보를 찾을 수 없습니다"),
   FAILED_DELETE_CHATROOM(UNAUTHORIZED, "참여 채팅방 삭제 권한이 없는 사용자 입니다."),
-  PARTICIPATED_ROOM_NOT_FOUND(NOT_FOUND,"참여채팅방 정보를 찾을 수 없습니다.");
+  PARTICIPATED_ROOM_NOT_FOUND(NOT_FOUND,"참여채팅방 정보를 찾을 수 없습니다."),
+
+  //ChatMessage
+  FAILED_GET_CHAT_MESSAGE(BAD_REQUEST, "채팅 조회에 실패하였습니다."),
+  FAILED_DELETE_CHAT_MESSAGE(INTERNAL_SERVER_ERROR, "채팅 삭제에 실패하였습니다."),
+  FAILED_CREATE_CHAT_MESSAGE(INTERNAL_SERVER_ERROR, "채팅 등록에 실패하였습니다."),
+  CHAT_MESSAGE_NOT_FOUND(NOT_FOUND,"채팅 정보를 찾을 수 없습니다.");
 
   private final HttpStatus httpStatus;
   private final String message;
