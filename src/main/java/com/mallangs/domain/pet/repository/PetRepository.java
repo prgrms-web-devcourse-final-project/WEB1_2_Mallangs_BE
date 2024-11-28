@@ -13,16 +13,19 @@ import java.util.Optional;
 @Repository
 public interface PetRepository extends JpaRepository<Pet, Long> {
 
+    //본인 반려동물 조회
     @Query("SELECT p FROM Pet p LEFT JOIN FETCH p.member m WHERE m.memberId = :memberId ")
-    Page<Pet> findAllPetsByMemberId(@Param("memberId") Long memberId, Pageable pageable); //본인 반려동물 조회
+    Page<Pet> findAllPetsByMemberId(@Param("memberId") Long memberId, Pageable pageable);
 
     //모든 반려동물 조회, 공개프로필과 활성상태
     @Query("SELECT p FROM Pet p WHERE p.isOpenProfile = TRUE AND p.isActive = true")
     Page<Pet> findAllOpenProfilePets(Pageable pageable);
 
+    //등록한 반려동물 확인
     @Query( "SELECT COUNT(p) > 0 FROM Pet p WHERE p.member.memberId = :memberId")
     boolean existsByMemberId(Long memberId);
 
+    //대표 반려동물 찾기
     @Query("SELECT p FROM Pet p LEFT JOIN FETCH p.member m WHERE m.memberId = :memberId AND p.isRepresentative = true")
     Optional<Pet> findRepresentativePetByMemberId(Long memberId);
 

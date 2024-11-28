@@ -14,9 +14,6 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
 public class PetCreateRequest {
-    //시큐리티 설정 완료시 삭제?
-    private Long memberId;
-
     @NotBlank(message = "이름을 입력하세요.")
     private String name;
 

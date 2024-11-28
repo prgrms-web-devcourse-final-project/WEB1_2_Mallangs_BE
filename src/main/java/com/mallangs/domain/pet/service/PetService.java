@@ -1,6 +1,8 @@
 package com.mallangs.domain.pet.service;
 
+import com.mallangs.domain.jwt.entity.CustomMemberDetails;
 import com.mallangs.domain.member.entity.Member;
+import com.mallangs.domain.member.entity.embadded.UserId;
 import com.mallangs.domain.member.repository.MemberRepository;
 import com.mallangs.domain.pet.dto.*;
 import com.mallangs.domain.pet.entity.Pet;
@@ -12,6 +14,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,11 +27,13 @@ public class PetService {
     private final MemberRepository memberRepository;
 
     //본인의 반려동물 목록 조회
-    public Page<PetResponse> getAllMyPets(PageRequest pageRequest, Long memberId) {
+    // memberId는 member 객체 기본키, userId는 로그인시 아이디
+    public Page<PetResponse> getAllMyPets(PageRequest pageRequest, CustomMemberDetails customMemberDetails) {
+        Member member = getMember(customMemberDetails);
         try {
             Sort sort = Sort.by("petId").descending();
             Pageable pageable = pageRequest.getPageable(sort);
-            Page<Pet> pets = petRepository.findAllPetsByMemberId(memberId, pageable);
+            Page<Pet> pets = petRepository.findAllPetsByMemberId(member.getMemberId(), pageable);
             return pets.map(PetResponse::new);
         } catch (Exception e) {
             log.error("getAllMyPets error: {}", e.getMessage());
@@ -37,31 +42,32 @@ public class PetService {
     }
 
     //반려동물 조회
-    public PetResponse getPet(Long petId, Long memberId) {
+    public PetResponse getPet(Long petId, CustomMemberDetails customMemberDetails) {
         Pet pet = petRepository.findById(petId).orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
-
+        Member member = getMember(customMemberDetails);
         //타인의 비활성화 반려동물 조회시 예외 던짐
-        if (!pet.getIsActive() && !pet.getMember().getMemberId().equals(memberId)) {
+        if (!pet.getIsActive() && !pet.getMember().getMemberId().equals(member.getMemberId())) {
             throw new MallangsCustomException(ErrorCode.PET_NOT_ACTIVATE);
         }
 
         //타인의 비공개 반려동물 조회시 예외 던짐
-        if (!pet.getIsOpenProfile() && !pet.getMember().getMemberId().equals(memberId)) {
+        if (!pet.getIsOpenProfile() && !pet.getMember().getMemberId().equals(member.getMemberId())) {
             throw new MallangsCustomException(ErrorCode.PET_NOT_PROFILE_OPEN);
         }
         return new PetResponse(pet);
     }
 
     //대표 말랑이(반려동물) 조회
-    public PetResponse getRepresentativePet(Long memberId) {
-        Pet pet =petRepository.findRepresentativePetByMemberId(memberId).orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
+    public PetResponse getRepresentativePet(CustomMemberDetails customMemberDetails) {
+        Member member = getMember(customMemberDetails);
+        Pet pet =petRepository.findRepresentativePetByMemberId(member.getMemberId()).orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
 
         return new PetResponse(pet);
     }
 
     //반려동물 등록
-    public PetResponse createPet(PetCreateRequest petCreateRequest) {
-        Member member = getMember(petCreateRequest);
+    public PetResponse createPet(PetCreateRequest petCreateRequest, CustomMemberDetails customMemberDetails) {
+        Member member = getMember(customMemberDetails);
 
         // 사용자의 첫 반려동물인지 확인
         boolean isFirstPet = !petRepository.existsByMemberId(member.getMemberId());
@@ -80,10 +86,11 @@ public class PetService {
     }
 
     //대표 말랑이(반려동물) 등록
-    public void createRepresentativePet(Long memberId, Long petId) {
+    public void createRepresentativePet(CustomMemberDetails customMemberDetails, Long petId) {
+        Member member = getMember(customMemberDetails);
         try {
             // 기존 대표 반려동물이 있다면 조회하여 대표상태 해제
-            petRepository.findRepresentativePetByMemberId(memberId)
+            petRepository.findRepresentativePetByMemberId(member.getMemberId())
                     .ifPresent(currentRepresentative -> currentRepresentative.changeRepresentative(false));
 
             // 새로운 대표 반려동물 설정
@@ -96,11 +103,16 @@ public class PetService {
     }
 
     //반려동물 정보 수정
-    public PetResponse updatePet(PetUpdateRequest petUpdateRequest, Long petId) {
+    public PetResponse updatePet(PetUpdateRequest petUpdateRequest, Long petId, CustomMemberDetails customMemberDetails) {
+        Pet pet = petRepository.findById(petId).orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
+        Member member = getMember(customMemberDetails);
+
+        //반려동물 수정시도시 예외 던짐
+        if (!pet.getMember().getMemberId().equals(member.getMemberId())) {
+            throw new MallangsCustomException(ErrorCode.PET_NOT_OWNED);
+        }
 
         try {
-            Pet pet = petRepository.findById(petId).orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
-
             pet.change(
                     petUpdateRequest.getName() != null ? petUpdateRequest.getName() : pet.getName(),
                     petUpdateRequest.getPetType() != null ? petUpdateRequest.getPetType() : pet.getPetType(),
@@ -123,10 +135,11 @@ public class PetService {
     }
 
     //반려동물 삭제 (비활성화)
-    public PetResponse deletePet(Long petId, Long memberId) {
+    public PetResponse deletePet(Long petId, CustomMemberDetails customMemberDetails) {
+        Member member = getMember(customMemberDetails);
         try {
             Pet pet = petRepository.findById(petId).orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
-            if (!pet.getMember().getMemberId().equals(memberId)) {
+            if (!pet.getMember().getMemberId().equals(member.getMemberId())) {
                 throw new MallangsCustomException(ErrorCode.PET_NOT_OWNED);
             }
             pet.deactivate();
@@ -139,10 +152,11 @@ public class PetService {
     }
 
     //반려동물 복원 (활성화)
-    public PetResponse restorePet(Long petId, Long memberId) {
+    public PetResponse restorePet(Long petId, CustomMemberDetails customMemberDetails) {
+        Member member = getMember(customMemberDetails);
         try {
             Pet pet = petRepository.findById(petId).orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
-            if (!pet.getMember().getMemberId().equals(memberId)) {
+            if (!pet.getMember().getMemberId().equals(member.getMemberId())) {
                 throw new MallangsCustomException(ErrorCode.PET_NOT_OWNED);
             }
             pet.activate();
@@ -155,7 +169,7 @@ public class PetService {
     }
 
     //반경 내 반려동물 조회
-    public Page<PetResponse> getNearbyPets(PetLocationRequest petLocationRequest,
+    public Page<PetNearbyResponse> getNearbyPets(PetLocationRequest petLocationRequest,
                                            PageRequest pageRequest) {
         try {
             validateLocationSearch(petLocationRequest);
@@ -175,7 +189,7 @@ public class PetService {
             );
 
             return pets.map(pet -> {
-                PetResponse dto = new PetResponse(pet);
+                PetNearbyResponse dto = new PetNearbyResponse(pet);
                 // 거리 계산 추가
                 double distance = calculateDistance(
                         petLocationRequest.getY(),  // latitude -> y
@@ -226,9 +240,10 @@ public class PetService {
         return R * c;
     }
 
-    private Member getMember(PetCreateRequest petCreateRequest) {
+    private Member getMember(CustomMemberDetails customMemberDetails) {
+        UserId userId = new UserId(customMemberDetails.getUserId());
 
-        return memberRepository.findById(petCreateRequest.getMemberId()).orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+        return memberRepository.findByUserId(userId).orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
 

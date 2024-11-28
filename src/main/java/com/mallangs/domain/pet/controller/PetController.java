@@ -1,5 +1,8 @@
 package com.mallangs.domain.pet.controller;
 
+import com.mallangs.domain.jwt.entity.CustomMemberDetails;
+import com.mallangs.domain.jwt.service.CustomerMemberDetailService;
+import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.pet.dto.*;
 import com.mallangs.domain.pet.service.PetService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,8 +26,9 @@ public class PetController {
     @GetMapping
     public ResponseEntity<Page<PetResponse>> getAllMyPets(
             @ModelAttribute PageRequest pageRequestDTO,
-            @AuthenticationPrincipal Long memberId) {
-        Page<PetResponse> pets = petService.getAllMyPets(pageRequestDTO, memberId);
+            @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
+
+        Page<PetResponse> pets = petService.getAllMyPets(pageRequestDTO, customMemberDetails);
         return ResponseEntity.ok(pets);
     }
 
@@ -33,8 +37,8 @@ public class PetController {
     @GetMapping("/{petId}")
     public ResponseEntity<PetResponse> getPet(
             @PathVariable Long petId,
-            @AuthenticationPrincipal Long memberId) {
-        PetResponse pet = petService.getPet(petId, memberId);
+            @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
+        PetResponse pet = petService.getPet(petId, customMemberDetails);
         return ResponseEntity.ok(pet);
     }
 
@@ -42,8 +46,8 @@ public class PetController {
     @GetMapping("/representative")
     @Operation(summary = "대표 반려동물(말랑이) 정보조회", description = "대표 반려동물(말랑이) 정보를 조회하는 API")
     public ResponseEntity<PetResponse> getRepresentativePet(
-            @AuthenticationPrincipal Long memberId) {
-        PetResponse pet = petService.getRepresentativePet(memberId);
+            @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
+        PetResponse pet = petService.getRepresentativePet(customMemberDetails);
         return ResponseEntity.ok(pet);
     }
 
@@ -51,8 +55,9 @@ public class PetController {
     @PostMapping
     @Operation(summary = "반려동물 등록", description = "반려동물을 등록하는 API")
     public ResponseEntity<PetResponse> createPet(
-            @RequestBody PetCreateRequest petCreateRequest) {
-        PetResponse pet = petService.createPet(petCreateRequest);
+            @RequestBody PetCreateRequest petCreateRequest,
+            @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
+        PetResponse pet = petService.createPet(petCreateRequest, customMemberDetails);
         return ResponseEntity.ok(pet);
     }
 
@@ -60,9 +65,9 @@ public class PetController {
     @PutMapping("/representative/{petId}")
     @Operation(summary = "대표 반려동물(말랑이) 변경", description = "대표 반려동물(말랑이)을 변경하는 API")
     public ResponseEntity<Void> updateRepresentativePet(
-            @AuthenticationPrincipal Long memberId,
+            @AuthenticationPrincipal CustomMemberDetails customMemberDetails,
             @PathVariable Long petId) {
-        petService.createRepresentativePet(memberId, petId);
+        petService.createRepresentativePet(customMemberDetails, petId);
         return ResponseEntity.ok().build();
     }
 
@@ -71,17 +76,18 @@ public class PetController {
     @Operation(summary = "반려동물 정보 수정", description = "반려동물을 정보를 수정하는 API")
     public ResponseEntity<PetResponse> updatePet(
             @RequestBody PetUpdateRequest petUpdateDTO,
-            @PathVariable Long petId) {
-        PetResponse pet = petService.updatePet(petUpdateDTO, petId);
+            @PathVariable Long petId,
+            @AuthenticationPrincipal CustomMemberDetails customMemberDetails){
+        PetResponse pet = petService.updatePet(petUpdateDTO, petId, customMemberDetails);
         return ResponseEntity.ok(pet);
     }
     //근처 반려동물 조회
     @GetMapping("/nearby")
     @Operation(summary = "근처의 반려동물 목록을 조회", description = "클라이언트로부터 위도 경도 ,시/군/구 등의 데이터를 받았을때 위도 경도를 기준으로 거리를 계산하여 반경내(20km)의 반려동물 목록을 조회")
-    public ResponseEntity<Page<PetResponse>> getNearbyPets(
+    public ResponseEntity<Page<PetNearbyResponse>> getNearbyPets(
             @ModelAttribute PetLocationRequest petLocationDTO,
             @ModelAttribute PageRequest pageRequestDTO) {
-        Page<PetResponse> pets = petService.getNearbyPets(petLocationDTO, pageRequestDTO);
+        Page<PetNearbyResponse> pets = petService.getNearbyPets(petLocationDTO, pageRequestDTO);
         return ResponseEntity.ok(pets);
     }
 
@@ -89,8 +95,8 @@ public class PetController {
     @Operation(summary = "반려동물 삭제 (비활성화)", description = "특정 반려동물을 삭제(비활성화)하는 API")
     public ResponseEntity<PetResponse> deletePet(
             @PathVariable Long petId,
-            @AuthenticationPrincipal Long memberId) {
-        PetResponse pet = petService.deletePet(petId, memberId);
+            @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
+        PetResponse pet = petService.deletePet(petId, customMemberDetails);
         return ResponseEntity.ok(pet);
     }
 
@@ -98,8 +104,8 @@ public class PetController {
     @Operation(summary = "반려동물 복원 (활성화)", description = "삭제된 반려동물을 복원(활성화)하는 API")
     public ResponseEntity<PetResponse> restorePet(
             @PathVariable Long petId,
-            @AuthenticationPrincipal Long memberId) {
-        PetResponse pet = petService.restorePet(petId, memberId);
+            @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
+        PetResponse pet = petService.restorePet(petId, customMemberDetails);
         return ResponseEntity.ok(pet);
     }
 
