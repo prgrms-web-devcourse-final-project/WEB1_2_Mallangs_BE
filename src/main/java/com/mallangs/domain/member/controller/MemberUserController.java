@@ -1,6 +1,7 @@
 package com.mallangs.domain.member.controller;
 
 import com.mallangs.domain.member.dto.*;
+import com.mallangs.domain.member.jwt.entity.CustomMemberDetails;
 import com.mallangs.domain.member.service.MemberUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -8,7 +9,9 @@ import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +30,7 @@ public class MemberUserController {
     }
 
     @GetMapping("")
+    @PreAuthorize("hasRole('USER')")
     @Operation(summary = "회원조회", description = "회원조회 요청 API")
     public ResponseEntity<MemberGetResponse> get(Authentication authentication){
         String userId = authentication.getName();
@@ -34,19 +38,24 @@ public class MemberUserController {
     }
 
     @PutMapping("/{memberId}")
+    @PreAuthorize("hasRole('USER')")
     @Operation(summary = "회원수정", description = "회원수정 요청 API")
-    public void update(@Validated @RequestBody MemberUpdateRequest memberUpdateRequest,
-                       @PathVariable ("memberId") Long memberId){
+    public ResponseEntity<?> update(@Validated @RequestBody MemberUpdateRequest memberUpdateRequest,
+                                    @PathVariable ("memberId") Long memberId){
         memberUserService.update(memberUpdateRequest,memberId);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{memberId}")
+    @PreAuthorize("hasRole('USER')")
     @Operation(summary = "회원탈퇴", description = "회원탈퇴 요청 API")
-    public void delete(@PathVariable ("memberId") Long memberId){
+    public ResponseEntity<?> delete(@PathVariable ("memberId") Long memberId){
         memberUserService.delete(memberId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/list")
+    @PreAuthorize("hasRole('USER')")
     @Operation(summary = "회원리스트 조회", description = "회원리스트 조회 요청 API")
     public ResponseEntity<Page<MemberGetResponse>> list(@RequestParam(value = "page", defaultValue = "1") int page,
                                                         @RequestParam(value = "size", defaultValue = "10") int size){
@@ -65,5 +74,13 @@ public class MemberUserController {
     public ResponseEntity<String> findPassword(@Validated @RequestBody MemberFindPasswordRequest memberFindPasswordRequest) throws MessagingException {
         MemberSendMailResponse mail = memberUserService.findPassword(memberFindPasswordRequest);
         return ResponseEntity.ok(memberUserService.mailSend(mail));
+    }
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/check-password")
+    public ResponseEntity<?> checkPassword(@Validated @RequestBody PasswordDTO passwordDTO
+            ,Authentication authentication ){
+        String userId = authentication.getName();
+        memberUserService.checkPassword(passwordDTO, userId);
+        return ResponseEntity.ok().build();
     }
 }

@@ -12,6 +12,11 @@ public enum ErrorCode {
 
   // Member
   MEMBER_NOT_FOUND(NOT_FOUND, "회원 정보를 찾을 수 없습니다."),
+  FAILURE_REQUEST(BAD_REQUEST,"잘못된 요청입니다."),
+  UNMATCHED_PASSWORD(BAD_REQUEST,"입력한 정보가 일치하지 않습니다."),
+  BANNED_MEMBER(NOT_ACCEPTABLE,"차단된 계정입니다."),
+  NOT_FOUND_PROFILE_IMAGE(NOT_FOUND, "이미지 파일이 존재하지 않습니다."),
+  UNSUPPORTED_FILE_TYPE(NOT_FOUND, "지원하지 않는 파일 형식입니다."),
 
   // Address
   ADDRESS_NOT_FOUND(NOT_FOUND, "주소 정보를 찾을 수 없습니다."),
