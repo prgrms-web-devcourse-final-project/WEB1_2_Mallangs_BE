@@ -1,6 +1,7 @@
 package com.mallangs.domain.chat.dto;
 
-import com.mallangs.domain.chat.entity.ParticipatedRoom;
+import com.mallangs.domain.chat.entity.MessageType;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -9,16 +10,23 @@ import lombok.ToString;
 public class ChatMessageResponse {
 
     private Long chatMessageId;
-    private ParticipatedRoom participatedRoom;
+    private Long chatRoomId;
+    private String profileImage;
+    private String imageUrl;
     private String sender;
     private String message;
+    private MessageType type;
     private Boolean isRead;
 
-    public ChatMessageResponse(Long chatMessageId, ParticipatedRoom participatedRoom, String sender, String message, Boolean isRead) {
+    @Builder
+    public ChatMessageResponse(Long chatMessageId, Long chatRoomId, String profileImage, String sender, String message,String imageUrl, MessageType type, Boolean isRead) {
         this.chatMessageId = chatMessageId;
-        this.participatedRoom = participatedRoom;
+        this.chatRoomId = chatRoomId;
+        this.profileImage = profileImage;
         this.sender = sender;
         this.message = message;
+        this.imageUrl = imageUrl;
+        this.type = type;
         this.isRead = isRead;
     }
 }
