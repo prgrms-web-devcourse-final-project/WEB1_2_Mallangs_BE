@@ -104,4 +104,8 @@ public class Member extends BaseTimeEntity {
     public void changeProfileImage(String profileImage){
         this.profileImage = profileImage;
     }
+    public void addParticipatedRoom(ParticipatedRoom participatedRoom){
+        this.participatedRooms.add(participatedRoom);
+        participatedRoom.changeParticipant(this);
+    }
 }
