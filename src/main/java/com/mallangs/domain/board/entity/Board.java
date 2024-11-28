@@ -1,4 +1,4 @@
-package com.mallangs.domain.community.entity;
+package com.mallangs.domain.board.entity;
 
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.global.common.BaseTimeEntity;
@@ -8,10 +8,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Community extends BaseTimeEntity {
+public class Board extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,13 +28,26 @@ public class Community extends BaseTimeEntity {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    private BoardType boardType;
+
+    @Column(nullable = false, length = 200)
     private String title;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    private String location;
+    @Column(precision = 10, scale = 8)
+    private BigDecimal latitude;
+
+    @Column(precision = 11, scale = 8)
+    private BigDecimal longitude;
+
+    @Column(length = 200)
+    private String address;
+
+    private LocalDateTime sightedAt;
 
     private String imgUrl;
 
@@ -43,35 +59,43 @@ public class Community extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private CommunityStatus communityStatus;
+    private BoardStatus boardStatus;
 
     @Builder
 
-    public Community(Member member, Category category, String title, String content,
-                     String location, String imgUrl) {
+    public Board(Member member, Category category, String title, String content, BigDecimal latitude,
+                 BigDecimal longitude, String address, LocalDateTime sightedAt, String imgUrl, BoardType boardType) {
         this.member = member;
         this.category = category;
         this.title = title;
         this.content = content;
-        this.location = location;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.address = address;
+        this.sightedAt = sightedAt;
         this.imgUrl = imgUrl;
-        this.communityStatus = CommunityStatus.PUBLISHED;
+        this.boardType = boardType;
+        this.boardStatus = BoardStatus.PUBLISHED;
         this.viewCnt = 0;
         this.commentCnt = 0;
         this.likeCnt = 0;
     }
 
     // 게시글 정보 수정
-    public void change(String title, String content, String location, String imgUrl) {
+    public void change(String title, String content, BigDecimal latitude, BigDecimal longitude,
+                       String address, LocalDateTime sightedAt, String imgUrl) {
         this.title = title;
         this.content = content;
-        this.location = location;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.address = address;
+        this.sightedAt = sightedAt;
         this.imgUrl = imgUrl;
     }
 
     // 게시글 상태 변경
-    public void changeStatus(CommunityStatus status) {
-        this.communityStatus = status;
+    public void changeStatus(BoardStatus status) {
+        this.boardStatus = status;
     }
 
     // 조회수 증가
