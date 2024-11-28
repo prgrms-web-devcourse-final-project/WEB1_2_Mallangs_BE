@@ -92,6 +92,7 @@ public class PlaceArticleCsvService {
         Boolean isPetFriendly = "Y".equalsIgnoreCase(line[22]); // 반려동물 동반 여부
         String businessHours = line[19];
         String closeDays = line[18];
+        String webSite = line[17];
 
 
         return PlaceArticle.builder()
@@ -102,13 +103,14 @@ public class PlaceArticleCsvService {
                 .category(category)
                 .address(address)
                 .roadAddress(roadAddress)
-                .basicInfo(basicInfo)
+                .description(basicInfo)
                 .contact(contact)
                 .hasParking(hasParking)
                 .isPetFriendly(isPetFriendly)
                 .businessHours(businessHours)
                 .closeDays(closeDays)
                 .createdAt(LocalDateTime.now())
+                .website(webSite)
                 .build();
     }
 }

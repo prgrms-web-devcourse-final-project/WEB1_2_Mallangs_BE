@@ -36,9 +36,6 @@ public class PlaceArticle extends Article {
     private String roadAddress; // 주소
 
     @Column
-    private String basicInfo; // 기본정보필드
-
-    @Column
     private Boolean hasParking; // 주차 가능 여부
 
     @Column
@@ -65,9 +62,6 @@ public class PlaceArticle extends Article {
         }
         if (updatedPlaceArticle.getAddress() != null) {
             this.address = updatedPlaceArticle.getAddress();
-        }
-        if (updatedPlaceArticle.getBasicInfo() != null) {
-            this.basicInfo = updatedPlaceArticle.getBasicInfo();
         }
         if (updatedPlaceArticle.getHasParking() != null) {
             this.hasParking = updatedPlaceArticle.getHasParking();
