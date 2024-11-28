@@ -1,4 +1,4 @@
-package com.mallangs.domain.member.oauth2.dto;
+package com.mallangs.global.oauth2.dto;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

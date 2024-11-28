@@ -1,9 +1,9 @@
-package com.mallangs.domain.member.jwt.filter;
+package com.mallangs.global.jwt.filter;
 
 
-import com.mallangs.domain.member.jwt.service.AccessTokenBlackList;
-import com.mallangs.domain.member.jwt.service.RefreshTokenService;
-import com.mallangs.domain.member.jwt.util.JWTUtil;
+import com.mallangs.global.jwt.service.AccessTokenBlackList;
+import com.mallangs.global.jwt.service.RefreshTokenService;
+import com.mallangs.global.jwt.util.JWTUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;

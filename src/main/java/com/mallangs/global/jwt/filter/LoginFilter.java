@@ -1,12 +1,12 @@
-package com.mallangs.domain.member.jwt.filter;
+package com.mallangs.global.jwt.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.embadded.UserId;
-import com.mallangs.domain.member.jwt.entity.CustomMemberDetails;
-import com.mallangs.domain.member.jwt.entity.TokenCategory;
-import com.mallangs.domain.member.jwt.service.RefreshTokenService;
-import com.mallangs.domain.member.jwt.util.JWTUtil;
+import com.mallangs.global.jwt.entity.CustomMemberDetails;
+import com.mallangs.global.jwt.entity.TokenCategory;
+import com.mallangs.global.jwt.service.RefreshTokenService;
+import com.mallangs.global.jwt.util.JWTUtil;
 import com.mallangs.domain.member.repository.MemberRepository;
 import com.mallangs.global.exception.ErrorCode;
 import com.mallangs.global.exception.MallangsCustomException;
@@ -28,7 +28,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;

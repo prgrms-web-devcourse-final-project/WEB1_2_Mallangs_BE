@@ -1,4 +1,4 @@
-package com.mallangs.domain.member.jwt.entity;
+package com.mallangs.global.jwt.entity;
 
 public enum TokenCategory {
     REFRESH_TOKEN,ACCESS_TOKEN;

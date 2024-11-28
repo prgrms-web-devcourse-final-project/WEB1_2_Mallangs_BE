@@ -2,8 +2,8 @@ package com.mallangs.global.handler;
 
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.embadded.UserId;
-import com.mallangs.domain.member.jwt.entity.CustomMemberDetails;
-import com.mallangs.domain.member.jwt.util.JWTUtil;
+import com.mallangs.global.jwt.entity.CustomMemberDetails;
+import com.mallangs.global.jwt.util.JWTUtil;
 import com.mallangs.domain.member.repository.MemberRepository;
 import com.mallangs.global.exception.ErrorCode;
 import com.mallangs.global.exception.MallangsCustomException;

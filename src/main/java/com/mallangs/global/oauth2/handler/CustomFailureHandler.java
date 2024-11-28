@@ -1,4 +1,4 @@
-package com.mallangs.domain.member.oauth2.handler;
+package com.mallangs.global.oauth2.handler;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

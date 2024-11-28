@@ -1,9 +1,9 @@
-package com.mallangs.domain.member.oauth2.handler;
+package com.mallangs.global.oauth2.handler;
 
-import com.mallangs.domain.member.jwt.entity.TokenCategory;
-import com.mallangs.domain.member.jwt.service.RefreshTokenService;
-import com.mallangs.domain.member.jwt.util.JWTUtil;
-import com.mallangs.domain.member.oauth2.dto.CustomOAuth2Member;
+import com.mallangs.global.jwt.entity.TokenCategory;
+import com.mallangs.global.jwt.service.RefreshTokenService;
+import com.mallangs.global.jwt.util.JWTUtil;
+import com.mallangs.global.oauth2.dto.CustomOAuth2Member;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

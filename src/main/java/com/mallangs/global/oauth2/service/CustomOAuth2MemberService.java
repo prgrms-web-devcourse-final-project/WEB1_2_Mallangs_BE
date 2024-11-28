@@ -1,17 +1,17 @@
-package com.mallangs.domain.member.oauth2.service;
+package com.mallangs.global.oauth2.service;
 
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.embadded.Email;
 import com.mallangs.domain.member.entity.embadded.Nickname;
 import com.mallangs.domain.member.entity.embadded.Password;
 import com.mallangs.domain.member.entity.embadded.UserId;
-import com.mallangs.domain.member.oauth2.response.GoogleResponse;
+import com.mallangs.global.oauth2.response.GoogleResponse;
 import com.mallangs.domain.member.repository.MemberRepository;
 import com.mallangs.domain.member.util.PasswordGenerator;
-import com.mallangs.domain.member.oauth2.dto.CustomOAuth2Member;
-import com.mallangs.domain.member.oauth2.dto.MemberOAuth2DTO;
-import com.mallangs.domain.member.oauth2.response.NaverResponse;
-import com.mallangs.domain.member.oauth2.response.OAuth2Response;
+import com.mallangs.global.oauth2.dto.CustomOAuth2Member;
+import com.mallangs.global.oauth2.dto.MemberOAuth2DTO;
+import com.mallangs.global.oauth2.response.NaverResponse;
+import com.mallangs.global.oauth2.response.OAuth2Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.password.PasswordEncoder;

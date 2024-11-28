@@ -1,10 +1,10 @@
-package com.mallangs.domain.member.jwt.filter;
+package com.mallangs.global.jwt.filter;
 
-import com.mallangs.domain.member.jwt.entity.CustomMemberDetails;
-import com.mallangs.domain.member.jwt.entity.TokenCategory;
-import com.mallangs.domain.member.jwt.service.AccessTokenBlackList;
-import com.mallangs.domain.member.jwt.service.RefreshTokenService;
-import com.mallangs.domain.member.jwt.util.JWTUtil;
+import com.mallangs.global.jwt.entity.CustomMemberDetails;
+import com.mallangs.global.jwt.entity.TokenCategory;
+import com.mallangs.global.jwt.service.AccessTokenBlackList;
+import com.mallangs.global.jwt.service.RefreshTokenService;
+import com.mallangs.global.jwt.util.JWTUtil;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.MemberRole;
 import com.mallangs.domain.member.entity.embadded.Email;

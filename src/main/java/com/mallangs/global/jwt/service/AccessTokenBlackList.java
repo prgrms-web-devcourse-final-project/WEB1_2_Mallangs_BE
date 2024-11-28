@@ -1,6 +1,6 @@
-package com.mallangs.domain.member.jwt.service;
+package com.mallangs.global.jwt.service;
 
-import com.mallangs.domain.member.jwt.util.JWTUtil;
+import com.mallangs.global.jwt.util.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.redis.core.RedisTemplate;

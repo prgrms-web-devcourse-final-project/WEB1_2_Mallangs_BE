@@ -1,15 +1,15 @@
 package com.mallangs.global.config;
 
-import com.mallangs.domain.member.jwt.filter.JWTFilter;
-import com.mallangs.domain.member.jwt.filter.LoginFilter;
-import com.mallangs.domain.member.jwt.filter.LogoutFilter;
-import com.mallangs.domain.member.jwt.service.AccessTokenBlackList;
-import com.mallangs.domain.member.jwt.service.RefreshTokenService;
-import com.mallangs.domain.member.jwt.util.JWTUtil;
-import com.mallangs.domain.member.oauth2.handler.CustomFailureHandler;
+import com.mallangs.global.jwt.filter.JWTFilter;
+import com.mallangs.global.jwt.filter.LoginFilter;
+import com.mallangs.global.jwt.filter.LogoutFilter;
+import com.mallangs.global.jwt.service.AccessTokenBlackList;
+import com.mallangs.global.jwt.service.RefreshTokenService;
+import com.mallangs.global.jwt.util.JWTUtil;
+import com.mallangs.global.oauth2.handler.CustomFailureHandler;
 import com.mallangs.domain.member.repository.MemberRepository;
-import com.mallangs.domain.member.oauth2.handler.CustomSuccessHandler;
-import com.mallangs.domain.member.oauth2.service.CustomOAuth2MemberService;
+import com.mallangs.global.oauth2.handler.CustomSuccessHandler;
+import com.mallangs.global.oauth2.service.CustomOAuth2MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
