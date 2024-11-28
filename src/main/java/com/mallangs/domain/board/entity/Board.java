@@ -38,10 +38,10 @@ public class Board extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(precision = 10, scale = 8)
+    @Column(nullable = false, precision = 10, scale = 8)
     private BigDecimal latitude;
 
-    @Column(precision = 11, scale = 8)
+    @Column(nullable = false, precision = 11, scale = 8)
     private BigDecimal longitude;
 
     @Column(length = 200)
@@ -112,18 +112,6 @@ public class Board extends BaseTimeEntity {
     public void decreaseCommentCount() {
         if (this.commentCnt > 0) {
             this.commentCnt--;
-        }
-    }
-
-    // 좋아요수 증가
-    public void increaseLikeCount() {
-        this.likeCnt++;
-    }
-
-    // 좋아요수 감소
-    public void decreaseLikeCount() {
-        if (this.likeCnt > 0) {
-            this.likeCnt--;
         }
     }
 }
