@@ -3,6 +3,7 @@ package com.mallangs.domain.article.entity;
 import com.mallangs.domain.board.entity.BoardStatus;
 import com.mallangs.domain.member.entity.Member;
 import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
@@ -28,7 +29,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-//@DiscriminatorColumn(name = "article_type") // db 에 존재
+@DiscriminatorColumn(name = "article_type") // db 에 존재
 @Getter
 @NoArgsConstructor
 @SuperBuilder
