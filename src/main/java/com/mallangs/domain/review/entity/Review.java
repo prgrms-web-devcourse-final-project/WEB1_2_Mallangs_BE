@@ -1,9 +1,9 @@
 package com.mallangs.domain.review.entity;
 
+import com.mallangs.domain.article.entity.PlaceArticle;
+import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.place.entity.Place;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.*;
 
 @Entity
@@ -18,12 +18,12 @@ public class Review {
     private Long reviewId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "place_id")
-    private Place place;
+    @JoinColumn(name = "article_id") //별도의 Place 키가 없고 아티클에 종속됨
+    private PlaceArticle placeArticle;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "member_id")
-//    private Member member;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @Column(nullable = false)
     private Integer score;
