@@ -9,6 +9,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 
 @Entity
 @Getter
@@ -26,6 +29,7 @@ public class PlaceArticle extends Article {
   @Column(nullable = true, columnDefinition = "TEXT")
   private String website; //웹사이트링크
 
+  private String contact;
 
   @Override
   public void applyChanges(Article updatedArticle) {
@@ -42,13 +46,35 @@ public class PlaceArticle extends Article {
     if (updatedPlaceArticle.getWebsite() != null) {
       this.website = updatedPlaceArticle.getWebsite();
     }
+    if (updatedPlaceArticle.getContact() != null) {
+      this.contact = updatedPlaceArticle.getContact();
+    }
   }
 
   public static PlaceArticle createPlaceArticle(Member member, PlaceCreateRequest createRequest) {
+    // GeometryFactory 객체 생성
+    GeometryFactory geometryFactory = new GeometryFactory();
+
+    // 위도와 경도를 기반으로 Coordinate 객체 생성
+    Coordinate coordinate = new Coordinate(createRequest.getLongitude(),
+        createRequest.getLatitude());
+
+    // Point 객체 생성
+    Point geography = geometryFactory.createPoint(coordinate);
+    geography.setSRID(4326);  // SRID 4326 (WGS 84) 설정
+
     return PlaceArticle.builder()
         .businessHours(createRequest.getBusinessHours())
         .closeDays(createRequest.getCloseDays())
         .website(createRequest.getWebsite())
+        .contact(createRequest.getContact())
+        .member(member)
+        .type(createRequest.getArticleType())
+        .mapVisibility(createRequest.getMapVisibility())
+        .title(createRequest.getTitle())
+        .geography(geography)
+        .description(createRequest.getDescription())
+        .image(createRequest.getImage())
         .build();
   }
 }
