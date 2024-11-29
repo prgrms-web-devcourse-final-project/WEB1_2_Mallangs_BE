@@ -51,7 +51,15 @@ public enum ErrorCode {
   BOARD_NOT_FOUND(NOT_FOUND, "게시글을 찾을 수 없습니다."),
   UNAUTHORIZED_BOARD_ACCESS(FORBIDDEN, "게시글에 대한 권한이 없습니다."),
   INVALID_BOARD_TYPE(BAD_REQUEST, "잘못된 게시판 타입입니다."),
-  INVALID_BOARD_STATUS(BAD_REQUEST, "게시글을 볼 수 없는 상태입니다.");
+  INVALID_BOARD_STATUS(BAD_REQUEST, "게시글을 볼 수 없는 상태입니다."),
+
+  //Review
+  REVIEW_NOT_FOUND(NOT_FOUND, "리뷰 정보를 찾을 수 없습니다."),
+  REVIEW_NOT_OWNED(FORBIDDEN, "해당 리뷰에 권한이 없습니다"),
+  REVIEW_NOT_OPEN(FORBIDDEN, "해당 리뷰가 숨김 상태 입니다."),
+  REVIEW_NOT_CREATED(INTERNAL_SERVER_ERROR, "리뷰 등록에 실패하였습니다"),
+  REVIEW_NOT_UPDATED(INTERNAL_SERVER_ERROR, "리뷰 수정에 실패하였습니다"),
+  REVIEW_NOT_DELETE(INTERNAL_SERVER_ERROR, "리뷰 삭제에 실패하였습니다");
 
   private final HttpStatus httpStatus;
   private final String message;
