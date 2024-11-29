@@ -168,20 +168,20 @@ public class BoardService {
     }
 
     // 관리자용 - 상태별 게시글 조회
-    public Page<AdminBoardResponse> getBoardsByStatus(BoardStatus status, BoardType boardType, Pageable pageable) {
+    public Page<AdminBoardResponse> getBoardsByStatus(BoardStatus status, Pageable pageable) {
         return boardRepository.findByStatus(status, pageable)
                 .map(AdminBoardResponse::from);
     }
 
     // 관리자용 - 카테고리와 제목으로 게시글 검색
-    public Page<AdminBoardResponse> searchBoardsForAdmin(Long categoryId, String keyword, BoardType boardType, Pageable pageable) {
+    public Page<AdminBoardResponse> searchBoardsForAdmin(Long categoryId, String keyword, Pageable pageable) {
         return boardRepository.searchForAdmin(categoryId, keyword, pageable)
                 .map(AdminBoardResponse::from);
     }
 
     // 관리자용 - 카테고리, 상태, 제목으로 게시글 검색
     public Page<AdminBoardResponse> searchBoardsForAdminWithStatus(
-            Long categoryId, BoardStatus status, String keyword, BoardType boardType, Pageable pageable) {
+            Long categoryId, BoardStatus status, String keyword, Pageable pageable) {
         return boardRepository.searchForAdminWithStatus(categoryId, status, keyword, pageable)
                 .map(AdminBoardResponse::from);
     }

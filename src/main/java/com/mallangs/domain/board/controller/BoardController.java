@@ -181,21 +181,20 @@ public class BoardController {
     @GetMapping("/admin/search")
     public ResponseEntity<Page<AdminBoardResponse>> searchPosts(
             @Parameter(description = "게시글 상태") @RequestParam(required = false) BoardStatus status,
-            @Parameter(description = "게시글 타입") @RequestParam(required = false) BoardType boardType,
             @Parameter(description = "카테고리 ID") @RequestParam(required = false) Long categoryId,
             @Parameter(description = "검색어") @RequestParam(required = false) String keyword,
             @Parameter(description = "페이지네이션 정보") @PageableDefault(size = 10) Pageable pageable
     ) {
         if (status != null && categoryId != null) {
             return ResponseEntity.ok(
-                    boardService.searchBoardsForAdminWithStatus(categoryId, status, keyword, boardType, pageable)
+                    boardService.searchBoardsForAdminWithStatus(categoryId, status, keyword, pageable)
             );
         } else if (categoryId != null) {
             return ResponseEntity.ok(
-                    boardService.searchBoardsForAdmin(categoryId, keyword, boardType, pageable)
+                    boardService.searchBoardsForAdmin(categoryId, keyword, pageable)
             );
         }
-        return ResponseEntity.ok(boardService.getBoardsByStatus(status, boardType, pageable));
+        return ResponseEntity.ok(boardService.getBoardsByStatus(status, pageable));
     }
 
     @Operation(summary = "관리자용 게시글 상태 변경", description = "관리자가 게시글의 상태를 변경합니다.")
