@@ -16,11 +16,14 @@ public class PlaceResponse extends ArticleResponse {
 
   private String website;
 
+  private String contact;
+
   public PlaceResponse(PlaceArticle article) {
     super(article);
     this.businessHours = article.getBusinessHours();
     this.closeDays = article.getCloseDays();
     this.website = article.getWebsite();
+    this.contact = article.getContact();
   }
 
 }
