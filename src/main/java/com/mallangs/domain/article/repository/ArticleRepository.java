@@ -1,3 +1,4 @@
+
 package com.mallangs.domain.article.repository;
 
 import com.mallangs.domain.article.entity.Article;

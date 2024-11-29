@@ -66,7 +66,9 @@ public class ChatMessageService {
     }
 
     //채팅 수정
+
     public ChatMessageResponse update(UpdateChatMessageRequest chatMessageRequest) {
+
         ChatMessage foundChatMessage = chatMessageRepository.findByChatMessageId(chatMessageRequest.getChatMessageId())
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.CHAT_MESSAGE_NOT_FOUND));
 

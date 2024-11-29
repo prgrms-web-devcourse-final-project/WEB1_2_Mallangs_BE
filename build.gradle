@@ -97,6 +97,9 @@ dependencies {
     //thymeleaf 의존성
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
+    //CSV 데이터 저장
+    implementation 'com.opencsv:opencsv:5.9'
+
 }
 
 tasks.named('test') {

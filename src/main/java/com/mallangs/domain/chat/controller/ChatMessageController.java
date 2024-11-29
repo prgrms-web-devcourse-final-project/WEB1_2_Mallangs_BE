@@ -78,4 +78,5 @@ public class ChatMessageController {
         chatMessageService.delete(chatMessageId);
         return ResponseEntity.ok().build();
     }
+
 }
