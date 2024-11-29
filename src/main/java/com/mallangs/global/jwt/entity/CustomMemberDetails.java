@@ -26,11 +26,6 @@ public class CustomMemberDetails implements UserDetails {
         return member.getUserId().getValue();
     }
 
-    public Long getMemberId() {
-        log.info("Accessing Member ID: {}", member.getMemberId());
-        return member.getMemberId();
-    }
-
     public String getEmail() {
         return member.getEmail().getValue();
     }

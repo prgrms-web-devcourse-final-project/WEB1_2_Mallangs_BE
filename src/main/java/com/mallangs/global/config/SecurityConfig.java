@@ -106,6 +106,7 @@ public class SecurityConfig {
                                 "/api/member/find-password").permitAll()
                         .requestMatchers("/api/member/oauth2/**").permitAll()
                         .requestMatchers("/api/member/admin").hasRole("ADMIN")
+                        .requestMatchers("/api/chat/websocket-test").permitAll()
                         .requestMatchers("/api/member/**").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/api/address/**").permitAll()
                         .requestMatchers("/api/member-file-test").permitAll()
