@@ -1,6 +1,6 @@
 package com.mallangs.domain.pet.service;
 
-import com.mallangs.domain.jwt.entity.CustomMemberDetails;
+
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.embadded.UserId;
 import com.mallangs.domain.member.repository.MemberRepository;
@@ -9,6 +9,7 @@ import com.mallangs.domain.pet.entity.Pet;
 import com.mallangs.domain.pet.repository.PetRepository;
 import com.mallangs.global.exception.ErrorCode;
 import com.mallangs.global.exception.MallangsCustomException;
+import com.mallangs.global.jwt.entity.CustomMemberDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;

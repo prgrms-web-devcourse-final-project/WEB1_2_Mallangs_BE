@@ -111,7 +111,7 @@ public class ReviewService {
     //장소에 달린 리뷰 목록 조회
     public Page<ReviewInfoResponse> getReviewsByPlaceArticleId(Long placeArticleId, PageRequest pageRequest) {
         try{
-            Sort sort = Sort.by("review_id").descending();
+            Sort sort = Sort.by("reviewId").descending();
             Pageable pageable = pageRequest.getPageable(sort);
             Page<Review> reviews = reviewRepository.findByPlaceArticleId(placeArticleId, pageable);
             return reviews.map(ReviewInfoResponse::new);
@@ -140,7 +140,7 @@ public class ReviewService {
     public Page<ReviewInfoResponse> getMyReviews(CustomMemberDetails customMemberDetails, PageRequest pageRequest) {
         Member member = getMember(customMemberDetails);
         try {
-            Sort sort = Sort.by("review_id").descending();
+            Sort sort = Sort.by("reviewId").descending();
             Pageable pageable = pageRequest.getPageable(sort);
             Page<Review> reviews = reviewRepository.findByMemberId(member.getMemberId(), pageable);
             return reviews.map(ReviewInfoResponse::new);
