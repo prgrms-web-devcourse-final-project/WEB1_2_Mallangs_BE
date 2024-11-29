@@ -31,7 +31,7 @@ public class ChatMessageController {
     private final MemberUserService memberUserService;
 
     //클라이언트로 부터 오는 메세지 수신 -> Redis로 송신
-    @MessageMapping("/send-message")
+    @MessageMapping("/api/chat/send-message")
     public void sendMessage(ChatMessageRequest message) {
         chatMessageService.sendMessage(message);
     }

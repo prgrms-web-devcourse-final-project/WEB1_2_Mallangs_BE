@@ -107,6 +107,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/member/oauth2/**").permitAll() //소셜로그인
                         .requestMatchers("/api/member/admin/**").hasRole("ADMIN") //관리자
                         .requestMatchers("/api/chat/websocket-test").permitAll() //웹소켓 테스터
+                        .requestMatchers("//chat-rooms/**").permitAll() // 웹소켓 테스터2
                         .requestMatchers("/api/member/**").hasAnyRole("USER","ADMIN") //회원
                         .requestMatchers("/api/chat-room/**").hasAnyRole("USER","ADMIN") //채팅방
                         .requestMatchers("/api/address/**").permitAll() //주소

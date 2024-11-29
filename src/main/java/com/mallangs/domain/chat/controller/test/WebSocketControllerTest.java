@@ -1,5 +1,6 @@
 package com.mallangs.domain.chat.controller.test;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,7 @@ public class WebSocketControllerTest {
 
     //웹소켓 연결 확인 url
     @GetMapping("api/chat/websocket-test")
+    @Operation(summary = "테스트 사용X", description = "테스트용 컨트롤러 사용X")
     public String websocketTest(Model model) {
         // 토큰을 동적으로 설정 가능
         String token = "put Token here"; // 토큰 예시

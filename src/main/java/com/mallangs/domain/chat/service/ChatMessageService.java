@@ -36,6 +36,7 @@ public class ChatMessageService {
     //채팅 메세지 생성/송신
     public void sendMessage(ChatMessageRequest chatMessageRequest) {
         try {
+            log.info("보내진 채팅 정보: {}", chatMessageRequest.toString());
         //참여 채팅 정보 추출
         ParticipatedRoom foundPartRoom = participatedRoomRepository.findByParticipatedRoomId(chatMessageRequest.getParticipatedRoomId())
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.PARTICIPATED_ROOM_NOT_FOUND));
@@ -47,7 +48,8 @@ public class ChatMessageService {
                 .imageUrl(chatMessageRequest.getImageUrl()).build();
         chatMessageRepository.save(chatMessage);
 
-        // 채팅에 보여지는 값
+            log.info("저장된 보낸 채팅 정보: {}", chatMessage.toString());
+            // 채팅에 보여지는 값
         ChatMessageResponse chatMessageResponse = ChatMessageResponse.builder()
                 .chatMessageId(chatMessage.getChatMessageId())
                 .chatRoomId(foundPartRoom.getChatRoom().getChatRoomId())
@@ -58,6 +60,7 @@ public class ChatMessageService {
                 .type(chatMessage.getType())
                 .isRead(chatMessage.getIsRead()).build();
 
+            log.info("마지막 메세지 보낼 채팅 정보: {}", chatMessageResponse.toString());
         //채팅 보내기
         redisSubscriber.sendMessage(chatMessageResponse);
         }catch (Exception e){
