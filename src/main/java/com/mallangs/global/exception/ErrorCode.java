@@ -1,5 +1,7 @@
 package com.mallangs.global.exception;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import lombok.Getter;
@@ -18,7 +20,11 @@ public enum ErrorCode {
 
   // Article
   ARTICLE_TYPE_NOT_FOUND(NOT_FOUND, "해당하는 글타래 타입을 찾을 수 없습니다."),
-  ARTICLE_NOT_FOUND(NOT_FOUND, "글타래 정보를 찾을 수 없습니다.");
+  ARTICLE_NOT_FOUND(NOT_FOUND, "글타래 정보를 찾을 수 없습니다."),
+  UNAUTHORIZED_MODIFY(FORBIDDEN, "이 리소스를 수정할 권한이 없습니다."),
+  UNAUTHORIZED_DELETE(FORBIDDEN, "이 리소스를 삭제할 권한이 없습니다."),
+  RESOURCE_NOT_MODIFIABLE(FORBIDDEN, "이 리소스는 수정할 수 없습니다."),
+  RESOURCE_NOT_DELETABLE(FORBIDDEN, "이 리소스는 삭제할 수 없습니다."),
 
   // Board
   CATEGORY_NOT_FOUND(NOT_FOUND, "카테고리 정보를 찾을 수 없습니다."),
