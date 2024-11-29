@@ -81,6 +81,37 @@ public class Board extends BaseTimeEntity {
         this.likeCnt = 0;
     }
 
+    // 커뮤니티 게시글용 생성 메서드
+    public static Board createCommunityBoard(Member member, Category category,
+                                             String title, String content, String imgUrl) {
+        return Board.builder()
+                .member(member)
+                .category(category)
+                .title(title)
+                .content(content)
+                .imgUrl(imgUrl)
+                .boardType(BoardType.COMMUNITY)
+                .build();
+    }
+
+    // 실종신고-목격제보용 생성 메서드
+    public static Board createSightingBoard(Member member, Category category,
+                                            String title, String content, BigDecimal latitude, BigDecimal longitude,
+                                            String address, LocalDateTime sightedAt, String imgUrl) {
+        return Board.builder()
+                .member(member)
+                .category(category)
+                .title(title)
+                .content(content)
+                .latitude(latitude)
+                .longitude(longitude)
+                .address(address)
+                .sightedAt(sightedAt)
+                .imgUrl(imgUrl)
+                .boardType(BoardType.SIGHTING)
+                .build();
+    }
+
     // 게시글 정보 수정
     public void change(String title, String content, BigDecimal latitude, BigDecimal longitude,
                        String address, LocalDateTime sightedAt, String imgUrl) {
@@ -112,18 +143,6 @@ public class Board extends BaseTimeEntity {
     public void decreaseCommentCount() {
         if (this.commentCnt > 0) {
             this.commentCnt--;
-        }
-    }
-
-    // 좋아요수 증가
-    public void increaseLikeCount() {
-        this.likeCnt++;
-    }
-
-    // 좋아요수 감소
-    public void decreaseLikeCount() {
-        if (this.likeCnt > 0) {
-            this.likeCnt--;
         }
     }
 }
