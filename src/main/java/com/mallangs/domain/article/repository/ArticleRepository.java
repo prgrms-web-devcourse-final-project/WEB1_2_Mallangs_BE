@@ -15,10 +15,10 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
 
 
   // 글타래 종류 별 조회
-  List<Article> findArticleListByArticleType();
+//  List<Article> findArticleListByArticleType();
 
   // 멤버 개인 글타래 목록 조회
-  List<Article> findArticleListByMember(Long memberId);
+//  List<Article> findArticleListByMember(Long memberId);
 
   // 위치 기준 검색
   //

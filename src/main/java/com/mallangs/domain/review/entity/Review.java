@@ -1,6 +1,6 @@
 package com.mallangs.domain.review.entity;
 
-import com.mallangs.domain.place.entity.Place;
+//import com.mallangs.domain.place.entity.Place;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -17,9 +17,9 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reviewId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "place_id")
-    private Place place;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "place_id")
+//    private Place place;
 
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "member_id")

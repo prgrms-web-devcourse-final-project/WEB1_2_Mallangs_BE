@@ -1,7 +1,7 @@
 package com.mallangs.domain.article.entity;
 
 import com.mallangs.domain.article.dto.request.RescueCreateRequest;
-import com.mallangs.domain.member.Member;
+import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.pet.entity.PetType;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
@@ -36,7 +36,7 @@ public class RescueArticle extends Article {
   }
 
   public static RescueArticle createRescueArticle(Member member,
-      RescueCreateRequest createRequest) {
+                                                  RescueCreateRequest createRequest) {
     return RescueArticle.builder()
         .petType(createRequest.getPetType())
         .member(member)
