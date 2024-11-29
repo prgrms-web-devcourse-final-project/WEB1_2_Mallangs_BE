@@ -86,9 +86,9 @@ public class BoardController {
     public ResponseEntity<Void> updateCommunityPost(
             @Parameter(description = "게시글 ID") @PathVariable Long boardId,
             @Valid @RequestBody CommunityUpdateRequest request,
-            @AuthenticationPrincipal UserDetails userDetails
+            @AuthenticationPrincipal CustomMemberDetails customMemberDetails
     ) {
-        boardService.updateCommunityBoard(boardId, request, Long.parseLong(userDetails.getUsername()));
+        boardService.updateCommunityBoard(boardId, request, customMemberDetails.getMemberId());
         return ResponseEntity.noContent().build();
     }
 
@@ -102,9 +102,9 @@ public class BoardController {
     @PostMapping("/sighting")
     public ResponseEntity<Long> createSightingPost(
             @Valid @RequestBody SightingCreateRequest request,
-            @AuthenticationPrincipal UserDetails userDetails
+            @AuthenticationPrincipal CustomMemberDetails customMemberDetails
     ) {
-        Long boardId = boardService.createSightingBoard(request, Long.parseLong(userDetails.getUsername()));
+        Long boardId = boardService.createSightingBoard(request, customMemberDetails.getMemberId());
         return ResponseEntity.created(URI.create("/api/board/sighting/" + boardId)).body(boardId);
     }
 
@@ -145,9 +145,9 @@ public class BoardController {
     public ResponseEntity<Void> updateSightingPost(
             @Parameter(description = "게시글 ID") @PathVariable Long boardId,
             @Valid @RequestBody SightingUpdateRequest request,
-            @AuthenticationPrincipal UserDetails userDetails
+            @AuthenticationPrincipal CustomMemberDetails customMemberDetails
     ) {
-        boardService.updateSightingBoard(boardId, request, Long.parseLong(userDetails.getUsername()));
+        boardService.updateSightingBoard(boardId, request, customMemberDetails.getMemberId());
         return ResponseEntity.noContent().build();
     }
 
