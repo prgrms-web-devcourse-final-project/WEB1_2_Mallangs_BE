@@ -35,19 +35,21 @@ public class PlaceArticle extends Article {
   public void applyChanges(Article updatedArticle) {
     super.applyChanges(updatedArticle);
 
-    PlaceArticle updatedPlaceArticle = (PlaceArticle) updatedArticle;
+    if (updatedArticle instanceof PlaceArticle) {
+      PlaceArticle updatedPlaceArticle = (PlaceArticle) updatedArticle;
 
-    if (updatedPlaceArticle.getBusinessHours() != null) {
-      this.businessHours = updatedPlaceArticle.getBusinessHours();
-    }
-    if (updatedPlaceArticle.getCloseDays() != null) {
-      this.closeDays = updatedPlaceArticle.getCloseDays();
-    }
-    if (updatedPlaceArticle.getWebsite() != null) {
-      this.website = updatedPlaceArticle.getWebsite();
-    }
-    if (updatedPlaceArticle.getContact() != null) {
-      this.contact = updatedPlaceArticle.getContact();
+      if (updatedPlaceArticle.getBusinessHours() != null) {
+        this.businessHours = updatedPlaceArticle.getBusinessHours();
+      }
+      if (updatedPlaceArticle.getCloseDays() != null) {
+        this.closeDays = updatedPlaceArticle.getCloseDays();
+      }
+      if (updatedPlaceArticle.getWebsite() != null) {
+        this.website = updatedPlaceArticle.getWebsite();
+      }
+      if (updatedPlaceArticle.getContact() != null) {
+        this.contact = updatedPlaceArticle.getContact();
+      }
     }
   }
 
@@ -69,8 +71,8 @@ public class PlaceArticle extends Article {
         .website(createRequest.getWebsite())
         .contact(createRequest.getContact())
         .member(member)
-        .type(createRequest.getArticleType())
-        .mapVisibility(createRequest.getMapVisibility())
+        .type(createRequest.getType())
+        .articleStatus(createRequest.getArticleStatus())
         .title(createRequest.getTitle())
         .geography(geography)
         .description(createRequest.getDescription())
