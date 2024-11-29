@@ -9,6 +9,8 @@ import com.mallangs.domain.board.service.CategoryService;
 import com.mallangs.global.jwt.entity.CustomMemberDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -179,7 +181,7 @@ public class BoardController {
     })
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/search")
-    public ResponseEntity<Page<AdminBoardResponse>> searchPosts(
+    public ResponseEntity<AdminBoardsResponse> searchPosts(
             @Parameter(description = "게시글 상태") @RequestParam(required = false) BoardStatus status,
             @Parameter(description = "카테고리 ID") @RequestParam(required = false) Long categoryId,
             @Parameter(description = "검색어") @RequestParam(required = false) String keyword,
@@ -197,13 +199,20 @@ public class BoardController {
         return ResponseEntity.ok(boardService.getBoardsByStatus(status, pageable));
     }
 
-    @Operation(summary = "관리자용 게시글 상태 변경", description = "관리자가 게시글의 상태를 변경합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "상태 변경 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
-            @ApiResponse(responseCode = "401", description = "인증 실패"),
-            @ApiResponse(responseCode = "403", description = "권한 없음")
-    })
+    @Operation(summary = "관리자용 게시글 상태 변경", description = """
+        관리자가 게시글의 상태를 변경합니다.
+        변경 가능한 상태: PUBLISHED(공개), HIDDEN(숨김), DRAFT(임시저장)
+        """)
+    @ApiResponse(
+            responseCode = "200",
+            description = "게시글 상태 수정 성공",
+            content = @Content(
+                    mediaType = "application/json",
+                    examples = @ExampleObject(
+                            value = "{\"boardIds\": [1, 2, 3, 4], \"status\": \"DRAFT\"}"
+                    )
+            )
+    )
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/admin/status")
     public ResponseEntity<Void> changePostsStatus(

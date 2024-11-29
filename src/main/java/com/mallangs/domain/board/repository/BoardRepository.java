@@ -1,5 +1,6 @@
 package com.mallangs.domain.board.repository;
 
+import com.mallangs.domain.board.dto.response.BoardStatusCount;
 import com.mallangs.domain.board.entity.Board;
 import com.mallangs.domain.board.entity.BoardStatus;
 import com.mallangs.domain.board.entity.BoardType;
@@ -31,9 +32,20 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     // 관리자용 - 상태별 게시글 조회
     @Query("""
-            SELECT b FROM Board b WHERE b.boardStatus = :status ORDER BY b.createdAt DESC
+            SELECT b FROM Board b WHERE (:status IS NULL OR b.boardStatus = :status) ORDER BY b.createdAt DESC
             """)
     Page<Board> findByStatus(@Param("status") BoardStatus status, Pageable pageable);
+
+    @Query("""
+            SELECT new com.mallangs.domain.board.dto.response.BoardStatusCount(
+                COUNT(b), 
+                COUNT(CASE WHEN b.boardStatus = 'PUBLIC' THEN 1 END),
+                COUNT(CASE WHEN b.boardStatus = 'HIDDEN' THEN 1 END),
+                COUNT(CASE WHEN b.boardStatus = 'DRAFT' THEN 1 END)
+            )
+            FROM Board b
+            """)
+    BoardStatusCount countByStatus();
 
     // 관리자용 - 카테고리와 제목으로 게시글 검색
     @Query("""
