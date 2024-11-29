@@ -55,14 +55,14 @@ public class MemberUserService {
     public String create(MemberCreateRequest memberCreateRequest) {
         try {
             Member member = memberCreateRequest.toEntityMember();
-            member.changePassword(new Password(memberCreateRequest.getPassword(),passwordEncoder));
+            member.changePassword(new Password(memberCreateRequest.getPassword(), passwordEncoder));
             memberRepository.save(member);
             Address address = memberCreateRequest.toEntityAddress();
             address.addMember(member);
             addressRepository.save(address);
             member.addAddress(address);
             memberRepository.save(member);
-            return member.getUserId().getValue();
+            return member.getNickname().getValue();
         } catch (Exception e) {
             log.error("회원가입에 실패하였습니다. {}", e.getMessage());
             throw e;
@@ -71,18 +71,16 @@ public class MemberUserService {
 
     //회원조회
     public MemberGetResponse get(String userId) {
-        try {
-            Member foundMember = memberRepository.findByUserId(new UserId(userId)).orElseThrow(() ->
-                    new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
-            return new MemberGetResponse(foundMember);
-        } catch (Exception e) {
-            log.error("회원조회에 실패하였습니다. {}", e.getMessage());
-            throw e;
+        Member foundMember = memberRepository.findByUserId(new UserId(userId))
+                .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+        if (foundMember.getIsActive().equals(false)) {
+            throw new MallangsCustomException(ErrorCode.BANNED_MEMBER);
         }
+        return new MemberGetResponse(foundMember);
     }
 
     //회원정보 수정
-    public void update(MemberUpdateRequest memberUpdateRequest,Long memberId) {
+    public void update(MemberUpdateRequest memberUpdateRequest, Long memberId) {
         try {
             Member foundMember = memberRepository.findById(memberId)
                     .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
@@ -98,11 +96,11 @@ public class MemberUserService {
             memberRepository.save(foundMember);
         } catch (Exception e) {
             log.error("회원수정에 실패하였습니다. {}", e.getMessage());
-            throw e;
+            throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);
         }
     }
 
-    //회원 비활성화
+    //회원 탈퇴
     public void delete(Long memberId) {
         try {
             Member foundMember = memberRepository.findByMemberId(memberId).orElseThrow(()
@@ -111,11 +109,11 @@ public class MemberUserService {
             memberRepository.save(foundMember);
         } catch (Exception e) {
             log.error("회원비활성화에 실패하였습니다. {}", e.getMessage());
-            throw e;
+            throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);
         }
     }
 
-    //회원 리스트 조회, 주소포함
+    //나랑 관련된 회원 리스트 조회, 주소포함
     public Page<MemberGetResponse> getMemberList(PageRequestDTO pageRequestDTO) {
         try {
             //페이저블 만들기
@@ -134,7 +132,7 @@ public class MemberUserService {
             return new PageImpl<>(memberPage, pageable, memberList.size());
         } catch (Exception e) {
             log.error("회원리스트 조회에 실패하였습니다. {}", e.getMessage());
-            throw e;
+            throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);
         }
     }
 
@@ -150,7 +148,17 @@ public class MemberUserService {
             return foundMember.getUserId().getValue();
         } catch (Exception e) {
             log.error("회원 아이디찾기에 실패하였습니다. {}", e.getMessage());
-            throw e;
+            throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);
+        }
+    }
+
+    //비밀번호 확인
+    public void checkPassword(PasswordDTO passwordDTO, String userId) {
+        Member foundMember = memberRepository.findByUserId(new UserId(userId)).orElseThrow(
+                () -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+        //패스워드 인코더 매치 사용해서 해시 암호화된 비밀번호 비교
+        if (!passwordEncoder.matches(passwordDTO.getPassword(),foundMember.getPassword().getValue())){
+            throw new MallangsCustomException(ErrorCode.UNMATCHED_PASSWORD);
         }
     }
 
@@ -175,10 +183,11 @@ public class MemberUserService {
             return writeMessage(email.getValue(), tempPassword);
         } catch (Exception e) {
             log.error("회원 비밀번호 찾기에 실패하였습니다. {}", e.getMessage());
-            throw e;
+            throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);
         }
     }
 
+    //이메일에 전송될 메세지 작성
     public MemberSendMailResponse writeMessage(String email, String tempPassword) {
         MemberSendMailResponse dto = new MemberSendMailResponse();
         dto.setEmail(email);
@@ -189,7 +198,7 @@ public class MemberUserService {
         return dto;
     }
 
-    //메일 전송하기
+    //메일 전송
     public String mailSend(MemberSendMailResponse memberSendMailResponse) throws MessagingException {
         try {
             //MimeMessageHelper 로 message + multi file 전송
