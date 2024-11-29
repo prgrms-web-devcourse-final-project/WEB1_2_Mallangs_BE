@@ -1,20 +1,24 @@
 package com.mallangs.global.config;
 
-import com.mallangs.domain.jwt.filter.JWTFilter;
-import com.mallangs.domain.jwt.filter.LoginFilter;
-import com.mallangs.domain.jwt.filter.LogoutFilter;
-import com.mallangs.domain.jwt.service.AccessTokenBlackList;
-import com.mallangs.domain.jwt.service.RefreshTokenService;
-import com.mallangs.domain.jwt.util.JWTUtil;
+import com.mallangs.global.jwt.filter.JWTFilter;
+import com.mallangs.global.jwt.filter.LoginFilter;
+import com.mallangs.global.jwt.filter.LogoutFilter;
+import com.mallangs.global.jwt.service.AccessTokenBlackList;
+import com.mallangs.global.jwt.service.CustomerMemberDetailService;
+import com.mallangs.global.jwt.service.RefreshTokenService;
+import com.mallangs.global.jwt.util.JWTUtil;
+import com.mallangs.global.oauth2.handler.CustomFailureHandler;
 import com.mallangs.domain.member.repository.MemberRepository;
-import com.mallangs.domain.oauth2.handler.CustomSuccessHandler;
-import com.mallangs.domain.oauth2.service.CustomOAuth2MemberService;
+import com.mallangs.global.oauth2.handler.CustomSuccessHandler;
+import com.mallangs.global.oauth2.service.CustomOAuth2MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -25,6 +29,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
@@ -47,6 +52,7 @@ public class SecurityConfig {
     private final MemberRepository memberRepository;
     private final CustomOAuth2MemberService customOAuth2MemberService;
     private final CustomSuccessHandler customSuccessHandler;
+    private final CustomFailureHandler customFailureHandler;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -54,13 +60,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         // cors 필터
         http
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(request -> {
-
                     CorsConfiguration configuration = new CorsConfiguration();
-                    configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                    configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:8080"));
                     configuration.setAllowedMethods(Collections.singletonList("*"));
                     configuration.setAllowCredentials(true);
                     configuration.setAllowedHeaders(Collections.singletonList("*"));
@@ -75,10 +80,6 @@ public class SecurityConfig {
         // 서버 접근 설정
         AuthenticationManager authManager = authenticationManager(authenticationConfiguration);
 
-        // 로그인 필터 생성 및 설정
-        LoginFilter loginFilter = new LoginFilter(accessTokenValidity, accessRefreshTokenValidity, authManager, jwtUtil, refreshTokenService);
-        loginFilter.setFilterProcessesUrl("/api/member/login");
-
         //로그아웃 필터 생성
         LogoutFilter logoutFilter = new LogoutFilter(accessTokenBlackList, jwtUtil, refreshTokenService);
 
@@ -88,19 +89,29 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable);
         // oauth2
-        http
-                .oauth2Login((oauth2) -> oauth2
-                        .userInfoEndpoint((userInfo) -> userInfo
-                                .userService(customOAuth2MemberService))
-                        .successHandler(customSuccessHandler));
+//        http
+//                .oauth2Login((oauth2) -> oauth2
+//                        .userInfoEndpoint((userInfo) -> userInfo
+//                                .userService(customOAuth2MemberService))
+//                        .successHandler(customSuccessHandler)
+//                        .failureHandler(customFailureHandler)
+//                );
+
         // 경로별 인가 작업
         http
-                .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/api/member/login", "/api/member/register", "/api/member/logout", "/api/member/oauth2").permitAll()
-                        .requestMatchers("/api/member/admin").hasRole("ADMIN")
-                        .requestMatchers("/api/member/**").permitAll()
-                        .requestMatchers("/api/address/**").permitAll()
-
+                .authorizeHttpRequests((auth) ->
+                        auth
+                        .requestMatchers("/api/member/register", "/api/member/login",
+                                "/api/member/logout","/api/member/find-user-id",
+                                "/api/member/find-password").permitAll() //회원가입,로그인,로그아웃,비번찾기,아이디찾기
+                        .requestMatchers("/api/member/oauth2/**").permitAll() //소셜로그인
+                        .requestMatchers("/api/member/admin/**").hasRole("ADMIN") //관리자
+                        .requestMatchers("/api/chat/websocket-test").permitAll() //웹소켓 테스터
+                        .requestMatchers("//chat-rooms/**").permitAll() // 웹소켓 테스터2
+                        .requestMatchers("/api/member/**").hasAnyRole("USER","ADMIN") //회원
+                        .requestMatchers("/api/chat-room/**").hasAnyRole("USER","ADMIN") //채팅방
+                        .requestMatchers("/api/address/**").permitAll() //주소
+                        .requestMatchers("/api/member-file-test").permitAll() //파일,이미지업로드
                         // Swagger UI 관련 경로 허용
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
@@ -110,8 +121,7 @@ public class SecurityConfig {
         // 필터
         http
                 .sessionManagement((session) -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(new JWTFilter(jwtUtil, refreshTokenService, accessTokenValidity, accessRefreshTokenValidity, accessTokenBlackList, memberRepository), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(logoutFilter, JWTFilter.class);
         return http.build();
