@@ -1,5 +1,6 @@
 package com.mallangs.domain.article.entity;
 
+import com.mallangs.domain.board.entity.BoardStatus;
 import com.mallangs.domain.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
@@ -47,7 +48,11 @@ public abstract class Article {
 
   @Enumerated(EnumType.STRING)
   @Column(name = "map_visibility", nullable = false)
-  private MapVisibility mapVisibility = MapVisibility.VISIBLE;
+  private MapVisibility mapVisibility = MapVisibility.VISIBLE; // 지도 표시 여부
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "article_status", nullable = false)
+  private BoardStatus articleStatus; // 게시 상태
 
   @Column(nullable = false, length = 100)
   private String title; // 장소인 경우 장소 이름
@@ -75,15 +80,22 @@ public abstract class Article {
 
   // 논리 삭제를 위한 메서드
   public void deactivate() {
+    this.mapVisibility = MapVisibility.HIDDEN;
     this.isDeleted = true;
+  }
+
+  public void hideInMap() {
+    if (this.articleStatus != BoardStatus.PUBLISHED) {
+      this.mapVisibility = MapVisibility.HIDDEN;
+    }
   }
 
   public void applyChanges(Article updatedArticle) {
     if (updatedArticle.getType() != null) {
       this.type = updatedArticle.getType();
     }
-    if (updatedArticle.getMapVisibility() != null) {
-      this.mapVisibility = updatedArticle.getMapVisibility();
+    if (updatedArticle.getArticleStatus() != null) {
+      this.articleStatus = updatedArticle.getArticleStatus();
     }
     if (updatedArticle.getTitle() != null) {
       this.title = updatedArticle.getTitle();
