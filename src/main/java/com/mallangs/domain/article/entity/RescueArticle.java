@@ -37,7 +37,7 @@ public class RescueArticle extends Article {
 
   public static RescueArticle createRescueArticle(Member member,
       RescueCreateRequest createRequest) {
-    return RescueArticle.builder()
+    return RescueArticle.builder()g
         .petType(createRequest.getPetType())
         .member(member)
         .mapVisibility(createRequest.getMapVisibility())
