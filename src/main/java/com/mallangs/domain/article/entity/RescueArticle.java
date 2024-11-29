@@ -51,7 +51,6 @@ public class RescueArticle extends Article {
     Point geography = geometryFactory.createPoint(coordinate);
     geography.setSRID(4326);  // SRID 4326 (WGS 84) 설정
 
-                                                  RescueCreateRequest createRequest) {
     return RescueArticle.builder()
         .petType(createRequest.getPetType())
         .member(member)
