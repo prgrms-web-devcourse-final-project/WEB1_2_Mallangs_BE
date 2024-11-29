@@ -33,6 +33,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     // 카테고리 이름으로 검색
     List<Category> findByNameContaining(String name);
+    List<Category> findByNameContainingAndCategoryStatus(String name, CategoryStatus categoryStatus);
 
     // 카테고리 상태 별 개수 파악
     long countByCategoryStatus(CategoryStatus categoryStatus);
