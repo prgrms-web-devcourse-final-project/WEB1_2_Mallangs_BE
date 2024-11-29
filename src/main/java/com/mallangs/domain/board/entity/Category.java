@@ -61,9 +61,10 @@ public class Category extends BaseTimeEntity {
     }
 
     // 카테고리 수정
-    public void changeCategory(String name, String description, int categoryOrder, CategoryStatus categoryStatus) {
+    public void changeCategory(String name, String description, int categoryLevel, int categoryOrder, CategoryStatus categoryStatus) {
         this.name = name;
         this.description = description;
+        this.categoryLevel = categoryLevel;
         this.categoryOrder = categoryOrder;
         this.categoryStatus = categoryStatus;
     }
