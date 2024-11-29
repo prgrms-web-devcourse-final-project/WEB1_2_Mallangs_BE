@@ -20,7 +20,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Optional<Review> findByReviewId(Long reviewId);
 
     // 장소에 달려있는 리뷰 목록 보기 (PlaceArticle ID로 조회)
-    @Query("select r from Review r where r.placeArticle.id = :placeArticleId")
+    @Query("select r from Review r where r.placeArticle.id = :placeArticleId and r.status = 'PUBLISHED'")
     Page<Review> findByPlaceArticleId(Long placeArticleId, Pageable pageable);
 
     // 장소에 달려있는 리뷰 중에 내 리뷰 보기 (PlaceArticle ID와 Member ID로 조회)
@@ -32,7 +32,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Page<Review> findByMemberId(Long memberId, Pageable pageable);
 
     // 특정 장소의 평균 평점 계산
-    @Query("select avg(r.score) from Review r where r.placeArticle.id = :placeArticleId")
+    @Query("select avg(r.score) from Review r where r.placeArticle.id = :placeArticleId and r.status = 'PUBLISHED'")
     Double getAverageScoreByPlaceArticleId(Long placeArticleId);
 
 }
