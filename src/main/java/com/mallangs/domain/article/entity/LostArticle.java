@@ -1,7 +1,7 @@
 package com.mallangs.domain.article.entity;
 
 import com.mallangs.domain.article.dto.request.LostCreateRequest;
-import com.mallangs.domain.member.Member;
+import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.pet.entity.PetGender;
 import com.mallangs.domain.pet.entity.PetType;
 import jakarta.persistence.Column;
@@ -13,6 +13,9 @@ import java.time.LocalDate;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 
 @Entity
 @Getter
@@ -27,7 +30,7 @@ public class LostArticle extends Article {
 
   private String breed;
 
-  private String petName;
+  private String name;
 
   private Integer petAge;
 
@@ -35,7 +38,7 @@ public class LostArticle extends Article {
   @Column(nullable = false)
   private PetGender petGender;
 
-  private Boolean neutered;
+  private Boolean isNeutering;
 
   private String chipNumber;
 
@@ -43,10 +46,11 @@ public class LostArticle extends Article {
 
   private String lastSeenLocation;
 
+  private String contact;
+
   @Enumerated(EnumType.STRING)
   @Column(name = "lost_status", nullable = false)
   private LostStatus lostStatus;
-
 
   @Override
   public void applyChanges(Article updatedArticle) {
@@ -60,8 +64,8 @@ public class LostArticle extends Article {
       if (updatedLostArticle.getBreed() != null) {
         this.breed = updatedLostArticle.getBreed();
       }
-      if (updatedLostArticle.getPetName() != null) {
-        this.petName = updatedLostArticle.getPetName();
+      if (updatedLostArticle.getName() != null) {
+        this.name = updatedLostArticle.getName();
       }
       if (updatedLostArticle.getPetAge() != null) {
         this.petAge = updatedLostArticle.getPetAge();
@@ -69,8 +73,8 @@ public class LostArticle extends Article {
       if (updatedLostArticle.getPetGender() != null) {
         this.petGender = updatedLostArticle.getPetGender();
       }
-      if (updatedLostArticle.getNeutered() != null) {
-        this.neutered = updatedLostArticle.getNeutered();
+      if (updatedLostArticle.getIsNeutering() != null) {
+        this.isNeutering = updatedLostArticle.getIsNeutering();
       }
       if (updatedLostArticle.getChipNumber() != null) {
         this.chipNumber = updatedLostArticle.getChipNumber();
@@ -81,6 +85,9 @@ public class LostArticle extends Article {
       if (updatedLostArticle.getLastSeenLocation() != null) {
         this.lastSeenLocation = updatedLostArticle.getLastSeenLocation();
       }
+      if (updatedLostArticle.getContact() != null) {
+        this.contact = updatedLostArticle.getContact();
+      }
       if (updatedLostArticle.getLostStatus() != null) {
         this.lostStatus = updatedLostArticle.getLostStatus();
       }
@@ -88,23 +95,35 @@ public class LostArticle extends Article {
   }
 
   public static LostArticle createLostArticle(Member member, LostCreateRequest createRequest) {
+    // GeometryFactory 객체 생성
+    GeometryFactory geometryFactory = new GeometryFactory();
+
+    // 위도와 경도를 기반으로 Coordinate 객체 생성
+    Coordinate coordinate = new Coordinate(createRequest.getLongitude(),
+        createRequest.getLatitude());
+
+    // Point 객체 생성
+    Point geography = geometryFactory.createPoint(coordinate);
+    geography.setSRID(4326);  // SRID 4326 (WGS 84) 설정
+
     return LostArticle.builder()
         .petType(createRequest.getPetType())
         .breed(createRequest.getBreed())
-        .petName(createRequest.getPetName())
+        .name(createRequest.getName())
         .petAge(createRequest.getPetAge())
         .petGender(createRequest.getPetGender())
-        .neutered(createRequest.getNeutered())
+        .isNeutering(createRequest.getIsNeutering())
         .chipNumber(createRequest.getChipNumber())
         .lostDate(createRequest.getLostDate())
         .lastSeenLocation(createRequest.getLastSeenLocation())
+        .contact(createRequest.getContact())
         .lostStatus(createRequest.getLostStatus())
         .member(member)
+        .type(createRequest.getArticleType())
         .mapVisibility(createRequest.getMapVisibility())
         .title(createRequest.getTitle())
-        .geography(createRequest.getGeography())
+        .geography(geography)
         .description(createRequest.getDescription())
-        .contact(createRequest.getContact())
         .image(createRequest.getImage())
         .build();
   }
