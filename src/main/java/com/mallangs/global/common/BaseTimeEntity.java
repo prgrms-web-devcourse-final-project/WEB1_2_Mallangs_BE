@@ -21,15 +21,5 @@ public abstract class BaseTimeEntity {
   @LastModifiedDate
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
-//
-//  @PrePersist
-//  public void prePersist() {
-//    this.createdAt = LocalDateTime.now();
-//    this.updatedAt = null;
-//  }
-//
-//  @PreUpdate
-//  public void preUpdate() {
-//    this.updatedAt = LocalDateTime.now();
-//  }
+
 }
