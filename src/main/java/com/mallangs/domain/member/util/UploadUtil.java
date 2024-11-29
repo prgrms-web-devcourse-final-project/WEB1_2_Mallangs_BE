@@ -57,7 +57,7 @@ public class UploadUtil {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return saveFilename;
+        return "/uploads/" + saveFilename;
     }
 
     //업로드 파일 삭제

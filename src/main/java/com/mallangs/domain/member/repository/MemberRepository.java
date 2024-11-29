@@ -23,6 +23,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Boolean existsByUserId(UserId userId);
     Boolean existsByEmail(Email email);
 
+    //오직 회원만 조회
+    @Query("SELECT m FROM Member m WHERE m.userId =:userId")
+    Optional<Member> findMemberOnlyByUserId(@Param("userId") UserId userId);
+
     //비밀번호 확인
     @Query("SELECT m FROM Member m WHERE m.password.value =:password")
     Optional<Member> findByPassword(@Param("password")String password);

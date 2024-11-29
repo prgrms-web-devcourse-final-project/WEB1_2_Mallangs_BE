@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>WebSocket Test</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/webjars/sockjs-client/1.1.2/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/2.3.3-1/stomp.min.js"></script>
+    <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+<div>
+    <h1>WebSocket Test</h1>
+
+    <!-- Token 입력 -->
+    <label for="token">Token:</label>
+    <input type="text" id="token" th:value="${token}" placeholder="Enter your token here">
+    <br><br>
+
+    <!-- 연결 상태 -->
+    <div id="connection-status">Disconnected</div>
+
+    <!-- 메시지 송수신 -->
+    <textarea id="message-input" placeholder="Enter message"></textarea>
+    <button id="send-button">Send</button>
+    <div id="message-log"></div>
+</div>
+
+<script>
+    // WebSocket 관련 변수
+    var sock = new SockJS("/ws-stomp");
+    var ws = Stomp.over(sock);
+    var isConnected = false;
+
+    // DOM 요소 가져오기
+    var tokenInput = document.getElementById("token");
+    var sendButton = document.getElementById("send-button");
+    var messageInput = document.getElementById("message-input");
+    var connectionStatus = document.getElementById("connection-status");
+    var messageLog = document.getElementById("message-log");
+
+    // 메시지 표시 함수
+    function displayMessage(message) {
+        var messageElement = document.createElement("div");
+        messageElement.textContent = message;
+        messageLog.appendChild(messageElement);
+    }
+
+    // 버튼 클릭 이벤트
+    sendButton.addEventListener("click", function () {
+        var token = tokenInput.value.trim();
+        var message = messageInput.value.trim();
+
+        if (!token) {
+            alert("Please enter a token.");
+            return;
+        }
+
+        if (!isConnected) {
+            // WebSocket 연결
+            ws.connect({ Authorization: "Bearer " + token }, function (frame) {
+                console.log("Connected with token: ", token);
+                connectionStatus.textContent = "Connected";
+                isConnected = true;
+
+                ws.subscribe("/sub/test", function (message) {
+                    var recv = JSON.parse(message.body);
+                    displayMessage("Received: " + recv.message);
+                });
+            }, function (error) {
+                console.error("Connection failed: ", error);
+                connectionStatus.textContent = "Disconnected";
+            });
+        }
+
+        if (message) {
+            ws.send("/pub/test", {}, JSON.stringify({ message: message }));
+            displayMessage("Sent: " + message);
+            messageInput.value = "";
+        }
+    });
+</script>
+</body>
+</html>

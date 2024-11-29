@@ -12,7 +12,6 @@ import com.mallangs.domain.board.entity.Category;
 import com.mallangs.domain.board.repository.BoardRepository;
 import com.mallangs.domain.board.repository.CategoryRepository;
 import com.mallangs.domain.member.entity.Member;
-import com.mallangs.domain.member.entity.embadded.UserId;
 import com.mallangs.domain.member.repository.MemberRepository;
 import com.mallangs.global.exception.ErrorCode;
 import com.mallangs.global.exception.MallangsCustomException;
@@ -36,25 +35,6 @@ public class BoardService {
     private final CategoryRepository categoryRepository;
     
     // 커뮤니티 게시글 작성
-//    @Transactional
-//    public Long createCommunityBoard(CommunityCreateRequest request, String userId) {
-//        Member member = memberRepository.findByUserId(new UserId(userId))
-//                .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
-//
-//        Category category = categoryRepository.findById(request.getCategoryId())
-//                .orElseThrow(() -> new MallangsCustomException(ErrorCode.CATEGORY_NOT_FOUND));
-//
-//        Board board = Board.createCommunityBoard(
-//                member,
-//                category,
-//                request.getTitle(),
-//                request.getContent(),
-//                request.getContent()
-//        );
-//
-//        return boardRepository.save(board).getBoardId();
-//    }
-
     @Transactional
     public Long createCommunityBoard(CommunityCreateRequest request, Long memberId) {
         Member member = memberRepository.findById(memberId)
@@ -131,14 +111,13 @@ public class BoardService {
     }
 
     // 커뮤니티 게시글 상세 조회
-
     public CommunityDetailResponse getCommunityBoard(Long boardId) {
         Board board = getBoardWithTypeValidation(boardId, BoardType.COMMUNITY);
         board.increaseViewCount();
         return new CommunityDetailResponse(board);
     }
-    // 실종신고 - 목격제보 게시글 상세 조회
 
+    // 실종신고 - 목격제보 게시글 상세 조회
     public SightingDetailResponse getSightingBoard(Long boardId) {
         Board board = getBoardWithTypeValidation(boardId, BoardType.SIGHTING);
         board.increaseViewCount();

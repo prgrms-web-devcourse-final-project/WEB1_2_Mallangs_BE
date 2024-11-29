@@ -2,9 +2,11 @@ package com.mallangs.domain.board.dto.response;
 
 import com.mallangs.domain.board.entity.Board;
 import com.mallangs.domain.member.entity.embadded.Nickname;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+@Getter
 public class CommunityListResponse {
 
     private final Long boardId;
