@@ -1,6 +1,10 @@
 package com.mallangs.domain.board.service;
 
-import com.mallangs.domain.board.dto.*;
+import com.mallangs.domain.board.dto.request.CommunityCreateRequest;
+import com.mallangs.domain.board.dto.request.CommunityUpdateRequest;
+import com.mallangs.domain.board.dto.request.SightingCreateRequest;
+import com.mallangs.domain.board.dto.request.SightingUpdateRequest;
+import com.mallangs.domain.board.dto.response.*;
 import com.mallangs.domain.board.entity.Board;
 import com.mallangs.domain.board.entity.BoardStatus;
 import com.mallangs.domain.board.entity.BoardType;
@@ -39,14 +43,13 @@ public class BoardService {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.CATEGORY_NOT_FOUND));
 
-        Board board = Board.builder()
-                .member(member)
-                .category(category)
-                .title(request.getTitle())
-                .content(request.getContent())
-                .imgUrl(request.getImgUrl())
-                .boardType(BoardType.COMMUNITY)
-                .build();
+        Board board = Board.createCommunityBoard(
+                member,
+                category,
+                request.getTitle(),
+                request.getContent(),
+                request.getContent()
+        );
 
         return boardRepository.save(board).getBoardId();
     }
@@ -60,18 +63,17 @@ public class BoardService {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.CATEGORY_NOT_FOUND));
 
-        Board board = Board.builder()
-                .member(member)
-                .category(category)
-                .title(request.getTitle())
-                .content(request.getContent())
-                .imgUrl(request.getImgUrl())
-                .boardType(BoardType.SIGHTING)
-                .latitude(request.getLatitude())
-                .longitude(request.getLongitude())
-                .address(request.getAddress())
-                .sightedAt(request.getSightedAt())
-                .build();
+        Board board = Board.createSightingBoard(
+                member,
+                category,
+                request.getTitle(),
+                request.getContent(),
+                request.getLatitude(),
+                request.getLongitude(),
+                request.getAddress(),
+                request.getSightedAt(),
+                request.getImgUrl()
+        );
 
         return boardRepository.save(board).getBoardId();
     }
@@ -108,13 +110,6 @@ public class BoardService {
         );
     }
 
-    // 게시글 삭제
-    @Transactional
-    public void deleteBoard(Long boardId, Long memberId, BoardType boardType) {
-        Board board = getBoardWithMemberValidation(boardId, memberId, boardType);
-        board.changeStatus(BoardStatus.HIDDEN);
-    }
-
     // 커뮤니티 게시글 상세 조회
     public CommunityDetailResponse getCommunityBoard(Long boardId) {
         Board board = getBoardWithTypeValidation(boardId, BoardType.COMMUNITY);
@@ -127,6 +122,13 @@ public class BoardService {
         Board board = getBoardWithTypeValidation(boardId, BoardType.SIGHTING);
         board.increaseViewCount();
         return new SightingDetailResponse(board);
+    }
+
+    // 게시글 삭제
+    @Transactional
+    public void deleteBoard(Long boardId, Long memberId, BoardType boardType) {
+        Board board = getBoardWithMemberValidation(boardId, memberId, boardType);
+        board.changeStatus(BoardStatus.HIDDEN);
     }
 
     // 카테고리별 커뮤니티 게시글 목록 조회
@@ -163,22 +165,6 @@ public class BoardService {
     public Page<SightingListResponse> getMemberSightingBoards(Long memberId, Pageable pageable) {
         return boardRepository.findByMemberId(memberId, pageable)
                 .map(SightingListResponse::new);
-    }
-
-    // 좋아요 증가
-    @Transactional
-    public void increaseLike(Long boardId) {
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new MallangsCustomException(ErrorCode.BOARD_NOT_FOUND));
-        board.increaseLikeCount();
-    }
-
-    // 좋아요 감소
-    @Transactional
-    public void decreaseLike(Long boardId) {
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new MallangsCustomException(ErrorCode.BOARD_NOT_FOUND));
-        board.decreaseLikeCount();
     }
 
     // 관리자용 - 상태별 게시글 조회

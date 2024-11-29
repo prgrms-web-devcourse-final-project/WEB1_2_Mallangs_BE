@@ -28,7 +28,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "article_type") // db 에 존재
+//@DiscriminatorColumn(name = "article_type") // db 에 존재
 @Getter
 @NoArgsConstructor
 @SuperBuilder
