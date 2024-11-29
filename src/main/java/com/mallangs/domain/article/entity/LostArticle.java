@@ -1,7 +1,7 @@
 package com.mallangs.domain.article.entity;
 
 import com.mallangs.domain.article.dto.request.LostCreateRequest;
-import com.mallangs.domain.member.Member;
+import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.pet.entity.PetGender;
 import com.mallangs.domain.pet.entity.PetType;
 import jakarta.persistence.Column;
