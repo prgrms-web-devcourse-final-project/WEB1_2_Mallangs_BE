@@ -17,14 +17,14 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class PlaceArticle extends Article {
 
-  @Column(length = 255)
-  private String businessHours;
+    @Column(length = 255)
+    private String businessHours;
 
     @Column(length = 500)
     private String closeDays;
 
-  @Column(nullable = true, columnDefinition = "TEXT")
-  private String website; //웹사이트링크
+    @Column(nullable = true, columnDefinition = "TEXT")
+    private String website; //웹사이트링크
 
     // 추가 필드 (CSV 파일 기반)
     @Column(length = 20)
@@ -44,10 +44,10 @@ public class PlaceArticle extends Article {
 
 
   @Override
-  public void applyChanges(Article updatedArticle) {
-    super.applyChanges(updatedArticle);
+    public void applyChanges(Article updatedArticle) {
+      super.applyChanges(updatedArticle);
 
-    PlaceArticle updatedPlaceArticle = (PlaceArticle) updatedArticle;
+      PlaceArticle updatedPlaceArticle = (PlaceArticle) updatedArticle;
 
         if (updatedPlaceArticle.getBusinessHours() != null) {
             this.businessHours = updatedPlaceArticle.getBusinessHours();
