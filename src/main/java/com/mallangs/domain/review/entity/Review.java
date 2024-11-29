@@ -2,7 +2,6 @@ package com.mallangs.domain.review.entity;
 
 import com.mallangs.domain.article.entity.PlaceArticle;
 import com.mallangs.domain.member.entity.Member;
-import com.mallangs.domain.place.entity.Place;
 import jakarta.persistence.*;
 import lombok.*;
 
