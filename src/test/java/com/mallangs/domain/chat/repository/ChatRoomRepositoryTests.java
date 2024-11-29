@@ -36,6 +36,8 @@ public class ChatRoomRepositoryTests {
     private ChatMessageRepository chatMessageRepository;
     @Autowired
     private AddressRepository addressRepository;
+    @Autowired
+    IsReadRepository isReadRepository;
 
     @Test
     //회원, 주소, 채팅룸, 채팅방, 참여 채팅, 데이터 입력 1개씩
@@ -81,14 +83,12 @@ public class ChatRoomRepositoryTests {
                 .participatedRoom(participatedRoom)
                 .sender(member)
                 .message("TestMessage")
-                .isRead(false)
                 .type(MessageType.ENTER)
                 .build();
         ChatMessage chatMessage2 = ChatMessage.builder()
                 .participatedRoom(participatedRoom2)
                 .sender(member2)
                 .message("TestMessage")
-                .isRead(false)
                 .type(MessageType.ENTER)
                 .build();
         chatMessageRepository.save(chatMessage);
@@ -137,6 +137,16 @@ public class ChatRoomRepositoryTests {
         addressRepository.save(address2);
         member.addAddress(address);
         member2.addAddress(address2);
+
+        IsRead isRead = IsRead.builder()
+                .chatMessage(chatMessage)
+                .sender(member.getNickname().getValue()).build();
+        isReadRepository.save(isRead);
+        IsRead isRead2 = IsRead.builder()
+                .chatMessage(chatMessage2)
+                .sender(member2.getNickname().getValue()).build();
+        isReadRepository.save(isRead2);
+
         System.out.println("member.getAddresses().get(0).getAddressName() = " + member.getAddresses().get(0).getAddressName());
     }
 }
