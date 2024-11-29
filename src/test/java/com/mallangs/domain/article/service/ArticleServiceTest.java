@@ -383,6 +383,11 @@ public class ArticleServiceTest {
         .businessHours("09:00~20:00")
         .closeDays("월,수")
         .website("http://www.saranganimalhospital.com")
+        .category("testCategory")
+        .address("testAddress")
+        .roadAddress("testRoadAddress")
+        .hasParking(true)
+        .isPetFriendly(true)
         .build();
   }
 
