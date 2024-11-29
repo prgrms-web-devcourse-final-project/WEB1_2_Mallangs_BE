@@ -18,4 +18,7 @@ public interface ParticipatedRoomRepository extends JpaRepository<ParticipatedRo
 
     @Query("SELECT DISTINCT p FROM ParticipatedRoom p join fetch p.participant m join fetch p.chatRoom c WHERE p.participatedRoomId = :participatedRoomId")
     Optional<ParticipatedRoom> findByParticipatedRoomId(@Param("participatedRoomId") Long participatedRoomId);
+
+    @Query("SELECT DISTINCT p FROM ParticipatedRoom p join fetch p.participant m  WHERE p.participatedRoomId = :participatedRoomId")
+    Optional<ParticipatedRoom> findByPRoomId(@Param("participatedRoomId") Long participatedRoomId);
 }

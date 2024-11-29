@@ -28,6 +28,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -90,9 +91,14 @@ public class JWTFilter extends OncePerRequestFilter {
                                     String newAccessToken = jwtUtil.createAccessToken(payloadMap, accessTokenValidity);
 
                                     //Refresh Token 새로 만들기
-                                    payloadMap.put("category", TokenCategory.REFRESH_TOKEN.name());
-                                    String newRefreshToken = jwtUtil.createRefreshToken(payloadMap, accessRefreshTokenValidity);
-                                    refreshTokenService.insertInRedis(payloadMap, newRefreshToken);
+                                    Map<String, Object> refreshPayloadMap = new HashMap<>();
+                                    refreshPayloadMap.put("userId", foundMember.getUserId().getValue());
+
+                                    //식별 위한 UserID 입력
+                                    String randomUUID = UUID.randomUUID().toString();
+                                    refreshPayloadMap.put("randomUUID", randomUUID);
+                                    String newRefreshToken = jwtUtil.createRefreshToken(refreshPayloadMap, accessRefreshTokenValidity);
+                                    refreshTokenService.insertInRedis(refreshPayloadMap, newRefreshToken);
 
                                     //토큰 전송
                                     response.setContentType("application/json");
@@ -124,7 +130,7 @@ public class JWTFilter extends OncePerRequestFilter {
                     }
                     filterChain.doFilter(request, response);
                 } else {
-
+                    log.info("Claims: {}", claims);
                     if (claims.get("category") == null || !(claims.get("category")).equals(TokenCategory.ACCESS_TOKEN.name())) {
                         handleException(response, new Exception("INVALID TOKEN CATEGORY"));
                         return;

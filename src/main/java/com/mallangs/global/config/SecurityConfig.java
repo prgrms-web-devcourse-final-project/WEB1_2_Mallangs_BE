@@ -103,13 +103,14 @@ public class SecurityConfig {
                         auth
                         .requestMatchers("/api/member/register", "/api/member/login",
                                 "/api/member/logout","/api/member/find-user-id",
-                                "/api/member/find-password").permitAll()
-                        .requestMatchers("/api/member/oauth2/**").permitAll()
-                        .requestMatchers("/api/member/admin").hasRole("ADMIN")
-                        .requestMatchers("/api/chat/websocket-test").permitAll()
-                        .requestMatchers("/api/member/**").hasAnyRole("USER","ADMIN")
-                        .requestMatchers("/api/address/**").permitAll()
-                        .requestMatchers("/api/member-file-test").permitAll()
+                                "/api/member/find-password").permitAll() //회원가입,로그인,로그아웃,비번찾기,아이디찾기
+                        .requestMatchers("/api/member/oauth2/**").permitAll() //소셜로그인
+                        .requestMatchers("/api/member/admin/**").hasRole("ADMIN") //관리자
+                        .requestMatchers("/api/chat/websocket-test").permitAll() //웹소켓 테스터
+                        .requestMatchers("/api/member/**").hasAnyRole("USER","ADMIN") //회원
+                        .requestMatchers("/api/chat-room/**").hasAnyRole("USER","ADMIN") //채팅방
+                        .requestMatchers("/api/address/**").permitAll() //주소
+                        .requestMatchers("/api/member-file-test").permitAll() //파일,이미지업로드
                         // Swagger UI 관련 경로 허용
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()

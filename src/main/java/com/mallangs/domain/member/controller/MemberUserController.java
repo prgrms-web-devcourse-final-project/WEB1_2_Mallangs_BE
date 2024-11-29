@@ -147,7 +147,6 @@ public class MemberUserController {
         AccessPayloadMap.put("role", role);
         AccessPayloadMap.put("category", TokenCategory.ACCESS_TOKEN.name());
         String accessToken = jwtUtil.createAccessToken(AccessPayloadMap, accessTokenValidity);
-        AccessPayloadMap.put("category", TokenCategory.REFRESH_TOKEN.name());
 
         //리프레시 토큰 생성 ( 난수를 입력, 의미없는 토큰 생성 )
         Map<String, Object> refreshPayloadMap = new HashMap<>();
