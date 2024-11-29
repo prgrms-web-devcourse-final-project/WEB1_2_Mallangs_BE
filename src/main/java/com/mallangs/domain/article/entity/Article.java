@@ -3,7 +3,6 @@ package com.mallangs.domain.article.entity;
 import com.mallangs.domain.board.entity.BoardStatus;
 import com.mallangs.domain.member.entity.Member;
 import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
@@ -17,6 +16,7 @@ import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -43,9 +43,11 @@ public abstract class Article {
   @Column(name = "type", nullable = false)
   private String type;
 
+  @Builder.Default
   @Column(name = "isDeleted", nullable = false)
   private Boolean isDeleted = false;
 
+  @Builder.Default
   @Enumerated(EnumType.STRING)
   @Column(name = "map_visibility", nullable = false)
   private MapVisibility mapVisibility = MapVisibility.VISIBLE; // 지도 표시 여부
