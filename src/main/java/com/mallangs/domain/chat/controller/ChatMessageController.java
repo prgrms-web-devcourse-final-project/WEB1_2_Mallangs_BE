@@ -74,7 +74,7 @@ public class ChatMessageController {
             @ApiResponse(responseCode = "200", description = "삭제 성공"),
             @ApiResponse(responseCode = "404", description = "채팅메세지가 존재하지 않습니다.")
     })
-    public ResponseEntity<?> delete(@PathVariable("chatMessageId") Long chatMessageId){
+    public ResponseEntity<?> delete(@PathVariable("chatMessageId") Long chatMessageId) {
         chatMessageService.delete(chatMessageId);
         return ResponseEntity.ok().build();
     }
