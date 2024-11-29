@@ -1,5 +1,6 @@
 package com.mallangs.domain.chat.entity;
 
+import com.mallangs.domain.member.entity.Member;
 import com.mallangs.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,10 +19,15 @@ public class ChatMessage extends BaseTimeEntity {
     @JoinColumn(name = "participated_room_id", nullable = false)
     private ParticipatedRoom participatedRoom;
 
-    private String sender;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member sender;
 
     @JoinColumn(name = "message")
     private String message;
+
+    @Column(name = "image_url")
+    private String imageUrl;
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
@@ -30,8 +36,8 @@ public class ChatMessage extends BaseTimeEntity {
     @Builder.Default
     private Boolean isRead = false;
 
-    public void changeParticipatedRoom(ParticipatedRoom participatedRoom){
-        this.participatedRoom = participatedRoom;
+    public void changeMessage(String message) {
+        this.message = message;
     }
 
 }
