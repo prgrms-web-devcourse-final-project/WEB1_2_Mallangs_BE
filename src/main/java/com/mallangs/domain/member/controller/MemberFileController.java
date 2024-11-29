@@ -26,6 +26,7 @@ public class MemberFileController {
     private final UploadUtil uploadUtil;
 
     @DeleteMapping("/{profileImage}")
+    @Operation(summary = "프로필 사진 삭제", description = "프로필 사진을 삭제때 사용하는 API")
     public ResponseEntity<?> fileDelete(@PathVariable String profileImage) {
         log.info("--- fileDelete() : " + profileImage);
         uploadUtil.deleteFile(profileImage);

@@ -37,6 +37,7 @@ public class StompHandler implements ChannelInterceptor {
         //websocket 연결시
         if (StompCommand.CONNECT == accessor.getCommand()) {
             String jwtToken = accessor.getFirstNativeHeader("Authorization");
+            log.info(" 검증 시작 {}",jwtToken);
             if (!jwtUtil.isExpired(jwtToken)){
                 Map<String, Object> payload = jwtUtil.validateToken(jwtToken);
                 String userId = (String)payload.get("userId");
@@ -49,7 +50,7 @@ public class StompHandler implements ChannelInterceptor {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
 
                 Object payload1 = message.getPayload();
-                log.info(" {}",payload1.toString());
+                log.info(" 검증 성공 {}",payload1.toString());
             }
         }
         return message;

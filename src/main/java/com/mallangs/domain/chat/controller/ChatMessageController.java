@@ -31,7 +31,7 @@ public class ChatMessageController {
     private final MemberUserService memberUserService;
 
     //클라이언트로 부터 오는 메세지 수신 -> Redis로 송신
-    @MessageMapping("/send-message")
+    @MessageMapping("/api/chat/send-message")
     public void sendMessage(ChatMessageRequest message) {
         chatMessageService.sendMessage(message);
     }
@@ -74,7 +74,7 @@ public class ChatMessageController {
             @ApiResponse(responseCode = "200", description = "삭제 성공"),
             @ApiResponse(responseCode = "404", description = "채팅메세지가 존재하지 않습니다.")
     })
-    public ResponseEntity<?> delete(@PathVariable("chatMessageId") Long chatMessageId){
+    public ResponseEntity<?> delete(@PathVariable("chatMessageId") Long chatMessageId) {
         chatMessageService.delete(chatMessageId);
         return ResponseEntity.ok().build();
     }

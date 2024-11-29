@@ -112,6 +112,7 @@ public class MemberUserController {
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/check-password")
+    @Operation(summary = "비밀번호 확인", description = "비밀번호 확인 요청 API")
     public ResponseEntity<?> checkPassword(@Validated @RequestBody PasswordDTO passwordDTO
             , Authentication authentication) {
         String userId = authentication.getName();
