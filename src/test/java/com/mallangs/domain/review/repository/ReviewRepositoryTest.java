@@ -16,8 +16,15 @@ import com.mallangs.domain.review.entity.Review;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,16 +48,22 @@ class ReviewRepositoryTest {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private AddressRepository addressRepository;
+    GeometryFactory geometryFactory = new GeometryFactory();
+
     private PlaceArticle placeArticle;
     private PlaceArticle placeArticle2;
     private Review review1;
     private Review review2;
+    private Review review3;
     private Member member;
 
     @BeforeEach
     void setUp(){
         passwordEncoder = new BCryptPasswordEncoder();
-
+        Point seoul = geometryFactory.createPoint(new Coordinate(126.97, 37.57)); // 경도, 위도 순서
+        Point ulsan = geometryFactory.createPoint(new Coordinate(129.31, 35.53)); // 경도, 위도 순서
+        seoul.setSRID(4326);
+        ulsan.setSRID(4326);
         member = Member.builder()
                 .userId(new UserId("TestUser1"))
                 .nickname(new Nickname("테스트"))
@@ -86,8 +99,7 @@ class ReviewRepositoryTest {
         placeArticle = PlaceArticle.builder()
                 .title(" 서울")
                 .address("서울주소")
-                .latitude(37.57)
-                .longitude(126.97)
+                .geography(seoul)
                 .mapVisibility(MapVisibility.VISIBLE)
                 .build();
         placeArticleRepository.save(placeArticle);
@@ -96,8 +108,7 @@ class ReviewRepositoryTest {
         placeArticle2 = PlaceArticle.builder()
                 .title("울산")
                 .address("울산주소")
-                .latitude(35.53)
-                .longitude(129.31)
+                .geography(ulsan)
                 .mapVisibility(MapVisibility.VISIBLE)
                 .build();
         placeArticleRepository.save(placeArticle2);
@@ -118,6 +129,14 @@ class ReviewRepositoryTest {
                 .content("최고예요!")
                 .build();
         reviewRepository.save(review2);
+
+        review3 = Review.builder()
+                .placeArticle(placeArticle2)
+                .member(member)
+                .score(5)
+                .content("최고예요!")
+                .build();
+        reviewRepository.save(review3);
     }
 
     @Test
@@ -133,18 +152,60 @@ class ReviewRepositoryTest {
     }
 
     @Test
+    @DisplayName("장소 ID로 리뷰 목록 조회")
     void findByPlaceArticleId() {
+        // given
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("reviewId").descending());
+
+        // when
+        Page<Review> reviewPage = reviewRepository.findByPlaceArticleId(placeArticle.getId(), pageable);
+        Page<Review> reviewPage2 = reviewRepository.findByPlaceArticleId(placeArticle2.getId(), pageable);
+
+        // then
+        assertThat(reviewPage).isNotEmpty();
+        assertThat(reviewPage.getTotalElements()).isEqualTo(2);
+        assertThat(reviewPage2.getTotalElements()).isEqualTo(1);
+        assertThat(reviewPage.getContent().get(0).getReviewId()).isEqualTo(review2.getReviewId());
+        assertThat(reviewPage2.getContent().get(0).getReviewId()).isEqualTo(review3.getReviewId());
     }
 
+
     @Test
+    @DisplayName("장소 ID와 멤버 ID로 리뷰 조회")
     void findByPlaceArticleIdAndMemberId() {
+        //given
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("reviewId").descending());
+        // when
+        Page<Review> findReview = reviewRepository.findByPlaceArticleIdAndMemberId(placeArticle.getId(), member.getMemberId(),pageable);
+
+        // then
+        assertThat(findReview).isNotEmpty();
+        assertThat(findReview.getContent().get(0).getReviewId()).isEqualTo(review2.getReviewId());
+        assertThat(findReview.getContent().get(0).getMember().getMemberId()).isEqualTo(member.getMemberId());
     }
 
     @Test
+    @DisplayName("멤버 ID로 리뷰목록 조회")
     void findByMemberId() {
+        //given
+        Pageable pageable = PageRequest.of(0,10);
+        //when
+        Page<Review> reviewPage = reviewRepository.findByMemberId(member.getMemberId(), pageable);
+        //then
+        assertThat(reviewPage).isNotEmpty();
+        assertThat(reviewPage.getTotalElements()).isEqualTo(3);
+        assertThat(reviewPage.getContent().get(0).getReviewId()).isEqualTo(review1.getReviewId());
     }
 
     @Test
+    @DisplayName("장소 ID로 평균 점수 계산")
     void getAverageScoreByPlaceArticleId() {
+        // when
+        Double averageScore = reviewRepository.getAverageScoreByPlaceArticleId(placeArticle.getId());
+        Double averageScore2 = reviewRepository.getAverageScoreByPlaceArticleId(placeArticle2.getId());
+
+        // then
+        assertThat(averageScore).isEqualTo(4.5);
+        assertThat(averageScore2).isEqualTo(5);
     }
 }

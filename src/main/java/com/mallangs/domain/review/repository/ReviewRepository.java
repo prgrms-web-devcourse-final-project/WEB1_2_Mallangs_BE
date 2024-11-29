@@ -25,7 +25,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     // 장소에 달려있는 리뷰 중에 내 리뷰 보기 (PlaceArticle ID와 Member ID로 조회)
     @Query("select r from Review r where r.placeArticle.id = :placeArticleId and r.member.memberId = :memberId")
-    Optional<Review> findByPlaceArticleIdAndMemberId(@Param("placeArticleId") Long placeArticleId, @Param("memberId") Long memberId);
+    Page<Review> findByPlaceArticleIdAndMemberId(@Param("placeArticleId") Long placeArticleId, @Param("memberId") Long memberId, Pageable pageable);
 
     // 내 리뷰 목록 보기 (Member ID로 조회)
     @Query("select r from Review r where r.member.memberId = :memberId")
