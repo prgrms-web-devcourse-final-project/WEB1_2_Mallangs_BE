@@ -1,6 +1,6 @@
 package com.mallangs.domain.article.dto.request;
 
-import com.mallangs.domain.article.entity.MapVisibility;
+import com.mallangs.domain.board.entity.BoardStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -16,10 +16,10 @@ import lombok.experimental.SuperBuilder;
 public class ArticleCreateRequest {
 
   @NotNull
-  private String articleType;
+  private String type; // 글타래 종류
 
   @NotNull
-  private MapVisibility mapVisibility;
+  private BoardStatus articleStatus;
 
   @NotNull
   private String title; // 장소인 경우 장소이름
