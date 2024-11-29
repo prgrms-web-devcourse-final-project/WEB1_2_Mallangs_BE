@@ -1,7 +1,7 @@
 package com.mallangs.domain.article.entity;
 
 import com.mallangs.domain.article.dto.request.RescueCreateRequest;
-import com.mallangs.domain.member.Member;
+import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.pet.entity.PetType;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
@@ -11,6 +11,9 @@ import jakarta.persistence.Enumerated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 
 @Entity
 @Getter
@@ -37,14 +40,25 @@ public class RescueArticle extends Article {
 
   public static RescueArticle createRescueArticle(Member member,
       RescueCreateRequest createRequest) {
-    return RescueArticle.builder()g
+    // GeometryFactory 객체 생성
+    GeometryFactory geometryFactory = new GeometryFactory();
+
+    // 위도와 경도를 기반으로 Coordinate 객체 생성
+    Coordinate coordinate = new Coordinate(createRequest.getLongitude(),
+        createRequest.getLatitude());
+
+    // Point 객체 생성
+    Point geography = geometryFactory.createPoint(coordinate);
+    geography.setSRID(4326);  // SRID 4326 (WGS 84) 설정
+
+    return RescueArticle.builder()
         .petType(createRequest.getPetType())
         .member(member)
+        .type(createRequest.getArticleType())
         .mapVisibility(createRequest.getMapVisibility())
         .title(createRequest.getTitle())
-        .geography(createRequest.getGeography())
+        .geography(geography)
         .description(createRequest.getDescription())
-        .contact(createRequest.getContact())
         .image(createRequest.getImage())
         .build();
   }
