@@ -1,9 +1,6 @@
 package com.mallangs.domain.chat.repository;
 
-import com.mallangs.domain.chat.entity.ChatMessage;
-import com.mallangs.domain.chat.entity.ChatRoom;
-import com.mallangs.domain.chat.entity.MessageType;
-import com.mallangs.domain.chat.entity.ParticipatedRoom;
+import com.mallangs.domain.chat.entity.*;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.embadded.Email;
 import com.mallangs.domain.member.entity.embadded.Nickname;
@@ -34,6 +31,8 @@ public class ChatRoomRepositoryTest {
     private ChatMessageRepository chatMessageRepository;
     @Autowired
     AddressRepository addressRepository;
+    @Autowired
+    IsReadRepository isReadRepository;
 
     @Test
     @Transactional
@@ -80,7 +79,6 @@ public class ChatRoomRepositoryTest {
                 .participatedRoom(participatedRoom)
                 .sender(member)
                 .message("TestMessage")
-                .isRead(true)
                 .type(MessageType.ENTER)
                 .build();
         chatMessageRepository.save(chatMessage);
@@ -88,13 +86,21 @@ public class ChatRoomRepositoryTest {
                 .participatedRoom(participatedRoom2)
                 .sender(member2)
                 .message("TestMessage")
-                .isRead(true)
                 .type(MessageType.ENTER)
                 .build();
         chatMessageRepository.save(chatMessage2);
         participatedRoom.addChatMessage(chatMessage);
         participatedRoom2.addChatMessage(chatMessage2);
         participatedRoomRepository.save(participatedRoom);
+
+        IsRead isRead = IsRead.builder()
+                .chatMessage(chatMessage)
+                .sender(member.getNickname().getValue()).build();
+        isReadRepository.save(isRead);
+        IsRead isRead2 = IsRead.builder()
+                .chatMessage(chatMessage2)
+                .sender(member2.getNickname().getValue()).build();
+        isReadRepository.save(isRead2);
 
         //when
         ChatRoom results = chatRoomRepository.findById(chatRoom.getChatRoomId()).get();
