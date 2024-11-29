@@ -9,6 +9,7 @@ import com.mallangs.domain.member.entity.embadded.Email;
 import com.mallangs.domain.member.entity.embadded.Nickname;
 import com.mallangs.domain.member.entity.embadded.Password;
 import com.mallangs.domain.member.entity.embadded.UserId;
+import com.mallangs.domain.member.repository.AddressRepository;
 import com.mallangs.domain.member.repository.MemberRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,8 @@ public class ChatRoomRepositoryTest {
     ParticipatedRoomRepository participatedRoomRepository;
     @Autowired
     private ChatMessageRepository chatMessageRepository;
+    @Autowired
+    AddressRepository addressRepository;
 
     @Test
     @Transactional
@@ -75,7 +78,7 @@ public class ChatRoomRepositoryTest {
 
         ChatMessage chatMessage = ChatMessage.builder()
                 .participatedRoom(participatedRoom)
-                .sender(member.getNickname().getValue())
+                .sender(member)
                 .message("TestMessage")
                 .isRead(true)
                 .type(MessageType.ENTER)
@@ -83,7 +86,7 @@ public class ChatRoomRepositoryTest {
         chatMessageRepository.save(chatMessage);
         ChatMessage chatMessage2 = ChatMessage.builder()
                 .participatedRoom(participatedRoom2)
-                .sender(member2.getNickname().getValue())
+                .sender(member2)
                 .message("TestMessage")
                 .isRead(true)
                 .type(MessageType.ENTER)
@@ -92,6 +95,7 @@ public class ChatRoomRepositoryTest {
         participatedRoom.addChatMessage(chatMessage);
         participatedRoom2.addChatMessage(chatMessage2);
         participatedRoomRepository.save(participatedRoom);
+
         //when
         ChatRoom results = chatRoomRepository.findById(chatRoom.getChatRoomId()).get();
 
