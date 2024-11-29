@@ -9,8 +9,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+
+/*
+Service Key 사용시 인코딩된 Key를 사용하여야 에러가 안납니다!!
+ */
 
 @Log4j2 // Lombok을 사용한 로깅 기능 활성화
 @RestController // REST API 컨트롤러로 지정
@@ -20,7 +26,6 @@ public class TourApiController {
 
     @Value("${tourapi.serviceKey}") // application.properties(또는 yml) 파일에서 설정 값 주입
     private String serviceKey;
-    private final String encodedServiceKey;;
     @Value("${tourapi.mobileOS}")
     private String mobileOS;
     @Value("${tourapi.mobileApp}")
@@ -29,10 +34,11 @@ public class TourApiController {
     private final String TYPE = "json"; // 응답 데이터 타입 (JSON)
     private final RestTemplate restTemplate; // REST API 호출을 위한 객체
 
+
+
     // 생성자에서 serviceKey 인코딩 및 RestTemplate 의존성 주입
-    public TourApiController(@Autowired RestTemplate restTemplate, @Value("${tourapi.serviceKey}") String serviceKey) {
+    public TourApiController(@Autowired RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
-        this.encodedServiceKey = URLEncoder.encode(serviceKey, StandardCharsets.UTF_8); // serviceKey 미리 인코딩
     }
 
     /**
@@ -53,7 +59,7 @@ public class TourApiController {
     ){
         // API 요청 URL 생성
         String url = BASE_URL + "/areaCode"
-                + "?serviceKey=" + encodedServiceKey
+                + "?serviceKey=" + serviceKey
                 + "&numOfRows=" + numOfRows
                 + "&pageNo=" + pageNo
                 + "&MobileOS=" + mobileOS
@@ -69,9 +75,13 @@ public class TourApiController {
             url += "&areaCode=" + areaCode;
         }
 
-        // REST API 호출 및 결과 반환
-        String response = restTemplate.getForObject(url, String.class);
-        return ResponseEntity.ok(response); // HTTP 응답으로 결과 반환 (상태 코드: 200 OK)
+
+            URI uri = URI.create(url);
+
+            // REST API 호출 및 결과 반환
+            String response = restTemplate.getForObject(uri, String.class);
+            return ResponseEntity.ok(response); // HTTP 응답으로 결과 반환 (상태 코드: 200 OK)
+
     }
 
     /**
@@ -109,6 +119,10 @@ public class TourApiController {
             @RequestParam(required = false) String modifiedtime,
             @RequestParam(required = false) String _type
     ) {
+
+        // 서비스 키를 URL 인코딩, 인코딩된 키를 사용하므로 주석처리
+        //String encodedServiceKey = URLEncoder.encode(serviceKey, StandardCharsets.UTF_8);
+
         // API 요청 URL 생성
         log.info("Used Service Key in getAreaBasedList: {}", serviceKey); // serviceKey 값 로깅
         String url = BASE_URL + "/areaBasedList"
@@ -129,10 +143,12 @@ public class TourApiController {
         if (cat3 != null) url += "&cat3=" + cat3;
         if (modifiedtime != null) url += "&modifiedtime=" + modifiedtime;
         if (_type != null) url += "&_type=" + _type;
-        log.info("Used Service Key in getAreaBasedList: {}", serviceKey); // serviceKey 값 로깅
+
+        URI uri = URI.create(url);
+        log.info("Service Key: {}", serviceKey); // serviceKey 값 로깅
         // REST API 호출 및 결과 반환
-        String response = restTemplate.getForObject(url, String.class);
-        log.info("Used Service Key in getAreaBasedList: {}", url); // serviceKey 값 로깅
+        String response = restTemplate.getForObject(uri, String.class);
+        log.info("uri: {}", uri); // serviceKey 값 로깅
         return ResponseEntity.ok(response); // HTTP 응답으로 결과 반환 (상태 코드: 200 OK)
     }
 
@@ -186,8 +202,10 @@ public class TourApiController {
         if (_type != null) url += "&_type=" + _type;
         else url+= "&_type="+TYPE;
 
+        URI uri = URI.create(url);
+
         // REST API 호출 및 결과 반환
-        String response = restTemplate.getForObject(url, String.class);
+        String response = restTemplate.getForObject(uri, String.class);
         return ResponseEntity.ok(response);
     }
 
@@ -229,6 +247,7 @@ public class TourApiController {
             @RequestParam(required = true) String keyword,
             @RequestParam(required = false) String _type
     ) {
+
         // API 요청 URL 생성
         String url = BASE_URL + "/searchKeyword"
                 + "?serviceKey=" + serviceKey
@@ -239,6 +258,7 @@ public class TourApiController {
                 + "&listYN=" + listYN
                 + "&arrange=" + arrange;
         log.info("Used Service Key in getAreaBasedList: {}", url); // serviceKey 값 로깅
+
         // 각 파라미터가 있는 경우 URL에 추가
         if (contentTypeId != null) url += "&contentTypeId=" + contentTypeId;
         if (areaCode != null) url += "&areaCode=" + areaCode;
@@ -254,8 +274,9 @@ public class TourApiController {
         if (_type != null) url += "&_type=" + _type;
         else url += "&_type="+TYPE;
 
+        URI uri = URI.create(url);
         // REST API 호출 및 결과 반환
-        String response = restTemplate.getForObject(url, String.class);
+        String response = restTemplate.getForObject(uri, String.class);
         log.info("Used Service Key in getAreaBasedList: {}", url); // serviceKey 값 로깅
         return ResponseEntity.ok(response);
     }
@@ -282,7 +303,7 @@ public class TourApiController {
         try {
             // API 요청 URL 생성
             String url = BASE_URL + "/detailImage"
-                    + "?serviceKey=" + URLEncoder.encode(serviceKey, StandardCharsets.UTF_8)
+                    + "?serviceKey=" + serviceKey
                     + "&numOfRows=" + numOfRows
                     + "&pageNo=" + pageNo
                     + "&MobileOS=" + mobileOS
@@ -297,8 +318,10 @@ public class TourApiController {
                 url += "&_type=" + TYPE; // 기본값으로 json 설정
             }
 
+            URI uri = URI.create(url);
+
             // REST API 호출 및 결과 반환
-            String response = restTemplate.getForObject(url, String.class);
+            String response = restTemplate.getForObject(uri, String.class);
             return ResponseEntity.ok(response); // HTTP 응답으로 결과 반환 (상태 코드: 200 OK)
 
         } catch (Exception e) {
@@ -327,7 +350,7 @@ public class TourApiController {
         try {
             // API 요청 URL 생성
             String url = BASE_URL + "/detailPetTour"
-                    + "?serviceKey=" + URLEncoder.encode(serviceKey, StandardCharsets.UTF_8)
+                    + "?serviceKey=" + serviceKey
                     + "&numOfRows=" + numOfRows
                     + "&pageNo=" + pageNo
                     + "&MobileOS=" + mobileOS
@@ -341,8 +364,10 @@ public class TourApiController {
                 url += "&_type=" + TYPE; // 기본값으로 json 설정
             }
 
+            URI uri = URI.create(url);
+
             // REST API 호출 및 결과 반환
-            String response = restTemplate.getForObject(url, String.class);
+            String response = restTemplate.getForObject(uri, String.class);
             return ResponseEntity.ok(response); // HTTP 응답으로 결과 반환 (상태 코드: 200 OK)
 
         } catch (Exception e) {
@@ -350,7 +375,4 @@ public class TourApiController {
             return ResponseEntity.badRequest().body("API 호출 중 오류가 발생했습니다."); // 오류 발생 시 HTTP 응답 (상태 코드: 400 Bad Request)
         }
     }
-
-
-
 }
