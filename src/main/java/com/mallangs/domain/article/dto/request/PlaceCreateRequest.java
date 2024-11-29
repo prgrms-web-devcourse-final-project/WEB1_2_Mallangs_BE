@@ -19,6 +19,16 @@ public class PlaceCreateRequest extends ArticleCreateRequest {
 
   private String website;
 
+  private String category;
+
+  private String address; // 주소
+
+  private String roadAddress; // 주소
+
+  private Boolean hasParking; // 주차 가능 여부
+
+  private Boolean isPetFriendly; // 반려동물 동반 가능 여부
+
   private String contact;
 
 
