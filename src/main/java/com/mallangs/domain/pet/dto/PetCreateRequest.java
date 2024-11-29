@@ -17,7 +17,7 @@ public class PetCreateRequest {
     @NotBlank(message = "이름을 입력하세요.")
     private String name;
 
-    @NotNull(message = "성별을 입력하세요")
+    @NotNull(message = "종류를 입력하세요")
     private PetType petType;
 
     private String image;
