@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Log4j2
 @RequiredArgsConstructor
 @Service
-public class RedisSubscriber /*implements MessageListener*/ {
+public class RedisSubscriber implements MessageListener {
 
     private final ObjectMapper objectMapper;
     private final SimpMessageSendingOperations messagingTemplate;
@@ -22,23 +22,24 @@ public class RedisSubscriber /*implements MessageListener*/ {
     //메세지를 구독자들에게 송신
     public void sendMessage(ChatMessageResponse publishMessage) {
         try {
+            log.info("레디스 펍섭의 publishMessage: {}", publishMessage);
             messagingTemplate.convertAndSend("/sub/chat/room/" + publishMessage.getChatRoomId(), publishMessage);
         } catch (Exception e) {
             log.error("Exception {}", e.getMessage());
         }
     }
-//    //stomp이용해서 구독자들에게 송신
-//    @Override
-//    public void onMessage(Message message, byte[] pattern) {
-//        try {
-//            String publishMessage = (String) redisTemplate.getStringSerializer().deserialize(message.getBody());
-//
-//            ChatMessageResponse chatMessage = objectMapper.readValue(publishMessage, ChatMessageResponse.class);
-//
-//            messagingTemplate.convertAndSend("/sub/chat/room/" + chatMessage.getChatRoomId(), chatMessage);
-//        } catch (Exception e) {
-//            log.error(e.getMessage());
-//        }
-//    }
+    //stomp이용해서 구독자들에게 송신
+    @Override
+    public void onMessage(Message message, byte[] pattern) {
+        try {
+            String publishMessage = (String) redisTemplate.getStringSerializer().deserialize(message.getBody());
+
+            ChatMessageResponse chatMessage = objectMapper.readValue(publishMessage, ChatMessageResponse.class);
+
+            messagingTemplate.convertAndSend("/sub/chat/room/" + chatMessage.getChatRoomId(), chatMessage);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+    }
 }
 

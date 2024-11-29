@@ -2,6 +2,7 @@ package com.mallangs.domain.review.entity;
 
 import com.mallangs.domain.article.entity.PlaceArticle;
 import com.mallangs.domain.member.entity.Member;
+import com.mallangs.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,7 +11,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Review {
+public class Review extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,10 +28,22 @@ public class Review {
     @Column(nullable = false)
     private Integer score;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false, length = 200)
     private String content;
 
     @Column(nullable = true, columnDefinition = "TEXT")
     private String image;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private ReviewStatus status= ReviewStatus.PUBLISHED;
+
+    public void change(Integer score, String content, String image, ReviewStatus status) {
+        this.score = score;
+        this.content = content;
+        this.image = image;
+        this.status = status;
+    }
 
 }

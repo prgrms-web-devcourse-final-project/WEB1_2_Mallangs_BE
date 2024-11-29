@@ -5,6 +5,10 @@ import com.mallangs.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 @Entity
 @Getter
 @Builder
@@ -34,7 +38,8 @@ public class ChatMessage extends BaseTimeEntity {
     private MessageType type = MessageType.ENTER;
 
     @Builder.Default
-    private Boolean isRead = false;
+    @OneToMany(mappedBy = "chatMessage", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
+    private Set<IsRead> isRead = new HashSet<>();
 
     public void changeMessage(String message) {
         this.message = message;

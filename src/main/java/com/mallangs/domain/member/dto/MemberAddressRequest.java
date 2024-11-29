@@ -5,7 +5,10 @@ import com.mallangs.domain.member.util.GeometryUtil;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.ToString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+
 
 @Getter
 @ToString
@@ -39,10 +42,11 @@ public class MemberAddressRequest {
     private String zoneNo;
     @NotNull(message = "산악지역은 필수입력 값 입니다.")
     private String mountainYn;
-    @NotNull(message = "위도는 필수입니다.")
-    private Double longitude;
     @NotNull(message = "경도는 필수입니다.")
-    private Double latitude;
+    private Double longitude;
+    @NotNull(message = "위도는 필수입니다.")
+    private Double latitude; //y
+
 
     public Address toEntity() {
         Point point = GeometryUtil.createPoint(latitude, longitude);

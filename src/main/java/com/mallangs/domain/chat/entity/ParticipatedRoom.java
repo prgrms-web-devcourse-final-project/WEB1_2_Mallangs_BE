@@ -33,6 +33,8 @@ public class ParticipatedRoom {
     @Builder.Default
     private List<ChatMessage> messages = new ArrayList<>();
 
+    private Long lastReadMessageId;
+
     public void addChatMessage(ChatMessage chatMessage) {
         messages.add(chatMessage);
     }

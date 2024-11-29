@@ -12,7 +12,11 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.springframework.data.geo.Point;
+
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+
 
 @Getter
 @ToString
@@ -65,6 +69,7 @@ public class MemberCreateRequest {
     @NotNull(message = "경도는 필수입니다.")
     private Double longitude;
 
+
     public Member toEntityMember() {
         return Member.builder()
                 .userId(new UserId(userId))
@@ -73,7 +78,7 @@ public class MemberCreateRequest {
                 .hasPet(hasPet).build();
     }
     public Address toEntityAddress() {
-        org.locationtech.jts.geom.Point point = GeometryUtil.createPoint(latitude, longitude);
+        Point point = GeometryUtil.createPoint(latitude, longitude);
         return Address.builder()
                 .addressName(addressName)
                 .addressType(addressType)

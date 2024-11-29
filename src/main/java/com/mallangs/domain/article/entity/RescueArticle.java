@@ -11,6 +11,9 @@ import jakarta.persistence.Enumerated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 
 @Entity
 @Getter
@@ -36,15 +39,26 @@ public class RescueArticle extends Article {
   }
 
   public static RescueArticle createRescueArticle(Member member,
-                                                  RescueCreateRequest createRequest) {
+      RescueCreateRequest createRequest) {
+    // GeometryFactory 객체 생성
+    GeometryFactory geometryFactory = new GeometryFactory();
+
+    // 위도와 경도를 기반으로 Coordinate 객체 생성
+    Coordinate coordinate = new Coordinate(createRequest.getLongitude(),
+        createRequest.getLatitude());
+
+    // Point 객체 생성
+    Point geography = geometryFactory.createPoint(coordinate);
+    geography.setSRID(4326);  // SRID 4326 (WGS 84) 설정
+
     return RescueArticle.builder()
         .petType(createRequest.getPetType())
         .member(member)
-        .mapVisibility(createRequest.getMapVisibility())
+        .type(createRequest.getType())
+        .articleStatus(createRequest.getArticleStatus())
         .title(createRequest.getTitle())
-        .geography(createRequest.getGeography())
+        .geography(geography)
         .description(createRequest.getDescription())
-        .contact(createRequest.getContact())
         .image(createRequest.getImage())
         .build();
   }

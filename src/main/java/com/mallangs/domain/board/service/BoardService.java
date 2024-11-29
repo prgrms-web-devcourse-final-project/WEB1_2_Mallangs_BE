@@ -168,30 +168,38 @@ public class BoardService {
     }
 
     // 관리자용 - 상태별 게시글 조회
-    public Page<AdminBoardResponse> getBoardsByStatus(BoardStatus status, BoardType boardType, Pageable pageable) {
-        return boardRepository.findByStatus(status, pageable)
-                .map(AdminBoardResponse::from);
+    public AdminBoardsResponse getBoardsByStatus(BoardStatus status, Pageable pageable) {
+        Page<AdminBoardResponse> boards = boardRepository.findByStatus(status, pageable).map(AdminBoardResponse::from);
+        BoardStatusCount statusCount = boardRepository.countByStatus();
+        return new AdminBoardsResponse(boards, statusCount);
     }
 
     // 관리자용 - 카테고리와 제목으로 게시글 검색
-    public Page<AdminBoardResponse> searchBoardsForAdmin(Long categoryId, String keyword, BoardType boardType, Pageable pageable) {
-        return boardRepository.searchForAdmin(categoryId, keyword, pageable)
+    public AdminBoardsResponse searchBoardsForAdmin(Long categoryId, String keyword, Pageable pageable) {
+        Page<AdminBoardResponse> boards = boardRepository.searchForAdmin(categoryId, keyword, pageable)
                 .map(AdminBoardResponse::from);
+        BoardStatusCount statusCount = boardRepository.countByStatus();
+        return new AdminBoardsResponse(boards, statusCount);
     }
 
     // 관리자용 - 카테고리, 상태, 제목으로 게시글 검색
-    public Page<AdminBoardResponse> searchBoardsForAdminWithStatus(
-            Long categoryId, BoardStatus status, String keyword, BoardType boardType, Pageable pageable) {
-        return boardRepository.searchForAdminWithStatus(categoryId, status, keyword, pageable)
+    public AdminBoardsResponse searchBoardsForAdminWithStatus(
+            Long categoryId, BoardStatus status, String keyword, Pageable pageable) {
+        Page<AdminBoardResponse> boards = boardRepository.searchForAdminWithStatus(categoryId, status, keyword, pageable)
                 .map(AdminBoardResponse::from);
+        BoardStatusCount statusCount = boardRepository.countByStatus();
+        return new AdminBoardsResponse(boards, statusCount);
     }
 
     // 관리자용 - 게시글 상태 변경 (다중 선택 가능)
     @Transactional
     public void changeBoardStatus(List<Long> boardIds, BoardStatus status) {
         List<Board> boards = boardRepository.findAllById(boardIds);
-        boards.forEach(board -> board.changeStatus(status));
-    }
+        boards.forEach(board -> {
+            log.info("Changing board status - ID: {}, Title: {}, From: {} To: {}",
+                    board.getBoardId(), board.getTitle(), board.getBoardStatus(), status);
+            board.changeStatus(status);
+        });    }
 
     // 게시글 작성자 및 타입 검증
     private Board getBoardWithMemberValidation(Long boardId, Long memberId, BoardType boardType) {
