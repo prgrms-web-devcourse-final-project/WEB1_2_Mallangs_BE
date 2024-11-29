@@ -23,6 +23,11 @@ public class IsRead {
     private String sender;
 
     @Builder.Default
-    private boolean read = false;
+    @Column(name = "read_check", nullable = false)
+    private Boolean readCheck = false;
+
+    public void changeReadCheck(boolean readCheck) {
+        this.readCheck = readCheck;
+    }
 
 }
