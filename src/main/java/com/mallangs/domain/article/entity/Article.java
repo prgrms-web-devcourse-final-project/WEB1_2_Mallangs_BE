@@ -42,9 +42,12 @@ public abstract class Article {
   @Column(name = "type", nullable = false)
   private String type;
 
+  @Column(name = "isDeleted", nullable = false)
+  private Boolean isDeleted = false;
+
   @Enumerated(EnumType.STRING)
   @Column(name = "map_visibility", nullable = false)
-  private MapVisibility mapVisibility;
+  private MapVisibility mapVisibility = MapVisibility.VISIBLE;
 
   @Column(nullable = false, length = 100)
   private String title; // 장소인 경우 장소 이름
@@ -70,6 +73,10 @@ public abstract class Article {
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
+  // 논리 삭제를 위한 메서드
+  public void deactivate() {
+    this.isDeleted = true;
+  }
 
   public void applyChanges(Article updatedArticle) {
     if (updatedArticle.getType() != null) {
