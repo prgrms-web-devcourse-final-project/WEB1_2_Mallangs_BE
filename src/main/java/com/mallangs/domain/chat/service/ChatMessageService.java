@@ -4,9 +4,11 @@ import com.mallangs.domain.chat.dto.request.ChatMessageRequest;
 import com.mallangs.domain.chat.dto.response.ChatMessageResponse;
 import com.mallangs.domain.chat.dto.request.UpdateChatMessageRequest;
 import com.mallangs.domain.chat.entity.ChatMessage;
+import com.mallangs.domain.chat.entity.IsRead;
 import com.mallangs.domain.chat.entity.ParticipatedRoom;
 import com.mallangs.domain.chat.redis.RedisSubscriber;
 import com.mallangs.domain.chat.repository.ChatMessageRepository;
+import com.mallangs.domain.chat.repository.IsReadRepository;
 import com.mallangs.domain.chat.repository.ParticipatedRoomRepository;
 import com.mallangs.domain.member.dto.PageRequestDTO;
 import com.mallangs.global.exception.ErrorCode;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Log4j2
 @Service
@@ -32,50 +35,68 @@ public class ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
     private final ParticipatedRoomRepository participatedRoomRepository;
     private final RedisSubscriber redisSubscriber;
+    private final IsReadRepository isReadRepository;
 
     //채팅 메세지 생성/송신
     public void sendMessage(ChatMessageRequest chatMessageRequest) {
         try {
             log.info("보내진 채팅 정보: {}", chatMessageRequest.toString());
-        //참여 채팅 정보 추출
-        ParticipatedRoom foundPartRoom = participatedRoomRepository.findByParticipatedRoomId(chatMessageRequest.getParticipatedRoomId())
-                .orElseThrow(() -> new MallangsCustomException(ErrorCode.PARTICIPATED_ROOM_NOT_FOUND));
+            //참여 채팅 정보 추출
+            ParticipatedRoom foundPartRoom = participatedRoomRepository.findByParticipatedRoomId(chatMessageRequest.getParticipatedRoomId())
+                    .orElseThrow(() -> new MallangsCustomException(ErrorCode.PARTICIPATED_ROOM_NOT_FOUND));
 
-        ChatMessage chatMessage = ChatMessage.builder()
-                .participatedRoom(foundPartRoom)
-                .message(chatMessageRequest.getMessage())
-                .sender(foundPartRoom.getParticipant())
-                .imageUrl(chatMessageRequest.getImageUrl()).build();
-        chatMessageRepository.save(chatMessage);
+            ChatMessage chatMessage = ChatMessage.builder()
+                    .participatedRoom(foundPartRoom)
+                    .message(chatMessageRequest.getMessage())
+                    .sender(foundPartRoom.getParticipant())
+                    .imageUrl(chatMessageRequest.getImageUrl()).build();
+            chatMessageRepository.save(chatMessage);
 
             log.info("저장된 보낸 채팅 정보: {}", chatMessage.toString());
+
+            //isRead 값 찾기
+            IsRead isRead = null;
+            for (IsRead isReadValue : chatMessage.getIsRead()) {
+                if (isReadValue.getSender().equals(chatMessage.getSender().getNickname().getValue())) {
+                    isRead = isReadValue;
+                }
+            }
+
             // 채팅에 보여지는 값
-        ChatMessageResponse chatMessageResponse = ChatMessageResponse.builder()
-                .chatMessageId(chatMessage.getChatMessageId())
-                .chatRoomId(foundPartRoom.getChatRoom().getChatRoomId())
-                .message(chatMessage.getMessage())
-                .imageUrl(chatMessage.getImageUrl())
-                .sender(chatMessage.getSender().getNickname().getValue())
-                .profileImage(chatMessage.getSender().getProfileImage())
-                .type(chatMessage.getType())
-                .isRead(chatMessage.getIsRead()).build();
+            ChatMessageResponse chatMessageResponse = ChatMessageResponse.builder()
+                    .chatMessageId(chatMessage.getChatMessageId())
+                    .chatRoomId(foundPartRoom.getChatRoom().getChatRoomId())
+                    .message(chatMessage.getMessage())
+                    .imageUrl(chatMessage.getImageUrl())
+                    .sender(chatMessage.getSender().getNickname().getValue())
+                    .profileImage(chatMessage.getSender().getProfileImage())
+                    .type(chatMessage.getType())
+                    .isRead(isRead.getReadCheck()).build();
 
             log.info("마지막 메세지 보낼 채팅 정보: {}", chatMessageResponse.toString());
-        //채팅 보내기
-        redisSubscriber.sendMessage(chatMessageResponse);
-        }catch (Exception e){
+            //채팅 보내기
+            redisSubscriber.sendMessage(chatMessageResponse);
+        } catch (Exception e) {
             throw new MallangsCustomException(ErrorCode.FAILED_CREATE_CHAT_MESSAGE);
         }
     }
 
     //채팅 수정
-
     public ChatMessageResponse update(UpdateChatMessageRequest chatMessageRequest) {
 
         ChatMessage foundChatMessage = chatMessageRepository.findByChatMessageId(chatMessageRequest.getChatMessageId())
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.CHAT_MESSAGE_NOT_FOUND));
 
         foundChatMessage.changeMessage(chatMessageRequest.getMessage());
+
+        //isRead 값 찾기
+        IsRead isRead = null;
+        for (IsRead isReadValue : foundChatMessage.getIsRead()) {
+            if (isReadValue.getSender().equals(foundChatMessage.getSender().getNickname().getValue())) {
+                isRead = isReadValue;
+            }
+        }
+
         return ChatMessageResponse.builder()
                 .chatMessageId(foundChatMessage.getChatMessageId())
                 .chatRoomId(foundChatMessage.getParticipatedRoom().getChatRoom().getChatRoomId())
@@ -84,15 +105,15 @@ public class ChatMessageService {
                 .profileImage(foundChatMessage.getSender().getProfileImage())
                 .imageUrl(foundChatMessage.getImageUrl())
                 .type(foundChatMessage.getType())
-                .isRead(foundChatMessage.getIsRead()).build();
+                .isRead(isRead.getReadCheck()).build();
     }
 
     //채팅 삭제
     public void delete(Long chatMessageId) {
         boolean isExist = chatMessageRepository.existsById(chatMessageId);
-        if (isExist){
+        if (isExist) {
             chatMessageRepository.deleteById(chatMessageId);
-        }else throw new MallangsCustomException(ErrorCode.CHAT_MESSAGE_NOT_FOUND);
+        } else throw new MallangsCustomException(ErrorCode.CHAT_MESSAGE_NOT_FOUND);
     }
 
     //채팅목록 페이징
@@ -106,7 +127,16 @@ public class ChatMessageService {
 
             // 채팅 마다 필요 데이터 DTO 매핑
             List<ChatMessage> chatMessages = chatMessageRepository.findMessagesByChatRoomId(chatRoomId);
-            for (ChatMessage chatMessage : chatMessages ){
+            for (ChatMessage chatMessage : chatMessages) {
+
+                //isRead 값 찾기
+                IsRead isRead = null;
+                for (IsRead isReadValue : chatMessage.getIsRead()) {
+                    if (isReadValue.getSender().equals(chatMessage.getSender().getNickname().getValue())) {
+                        isRead = isReadValue;
+                    }
+                }
+
                 ChatMessageResponse chatMessageResponse = ChatMessageResponse.builder()
                         .chatMessageId(chatMessage.getChatMessageId())
                         .chatRoomId(chatMessage.getParticipatedRoom().getChatRoom().getChatRoomId())
@@ -115,7 +145,7 @@ public class ChatMessageService {
                         .profileImage(chatMessage.getSender().getProfileImage())
                         .imageUrl(chatMessage.getImageUrl())
                         .type(chatMessage.getType())
-                        .isRead(chatMessage.getIsRead()).build();
+                        .isRead(isRead.getReadCheck()).build();
 
                 chatList.add(chatMessageResponse);
             }
@@ -127,8 +157,10 @@ public class ChatMessageService {
 
             return new PageImpl<>(chatMessagePage, pageable, chatList.size());
         } catch (Exception e) {
-            log.error("쳇서비스 페이징 실패 ={}",e.getMessage());
+            log.error("쳇서비스 페이징 실패 ={}", e.getMessage());
             throw new MallangsCustomException(ErrorCode.FAILED_GET_CHAT_MESSAGE);
         }
     }
+
+    //최근
 }
