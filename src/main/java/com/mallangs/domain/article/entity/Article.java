@@ -1,5 +1,6 @@
 package com.mallangs.domain.article.entity;
 
+import com.mallangs.domain.board.entity.BoardStatus;
 import com.mallangs.domain.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
@@ -16,6 +17,7 @@ import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -27,7 +29,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-//@DiscriminatorColumn(name = "article_type") // db 에 존재
+@DiscriminatorColumn(name = "article_type") // db 에 존재
 @Getter
 @NoArgsConstructor
 @SuperBuilder
@@ -39,18 +41,24 @@ public abstract class Article {
   @Column(name = "article_id")
   private Long id;
 
+  @Column(name = "type", nullable = false)
+  private String type;
+
+  @Builder.Default
+  @Column(name = "isDeleted", nullable = false)
+  private Boolean isDeleted = false;
+
+  @Builder.Default
   @Enumerated(EnumType.STRING)
   @Column(name = "map_visibility", nullable = false)
-  private MapVisibility mapVisibility;
+  private MapVisibility mapVisibility = MapVisibility.VISIBLE; // 지도 표시 여부
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "article_status", nullable = false)
+  private BoardStatus articleStatus; // 게시 상태
 
   @Column(nullable = false, length = 100)
   private String title; // 장소인 경우 장소 이름
-
-//  @Column(nullable = false)
-//  private Double latitude;
-//
-//  @Column(nullable = false)
-//  private Double longitude;
 
   @Column(nullable = false, columnDefinition = "POINT SRID 4326")
   private Point geography;
@@ -58,13 +66,11 @@ public abstract class Article {
   @Column(length = 500)
   private String description;
 
-  private String contact;
-
   @Column(columnDefinition = "TEXT")
   private String image;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "member_id")
+  @JoinColumn(name = "member_id", nullable = true) // member 삭제 후에도 글은 남아있음
   private Member member;
 
   @CreatedDate
@@ -75,20 +81,33 @@ public abstract class Article {
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
+  // 논리 삭제를 위한 메서드
+  public void deactivate() {
+    this.mapVisibility = MapVisibility.HIDDEN;
+    this.isDeleted = true;
+  }
+
+  public void hideInMap() {
+    if (this.articleStatus != BoardStatus.PUBLISHED) {
+      this.mapVisibility = MapVisibility.HIDDEN;
+    }
+  }
 
   public void applyChanges(Article updatedArticle) {
-    if (updatedArticle.getMapVisibility() != null) {
-      this.mapVisibility = updatedArticle.getMapVisibility();
+    if (updatedArticle.getType() != null) {
+      this.type = updatedArticle.getType();
+    }
+    if (updatedArticle.getArticleStatus() != null) {
+      this.articleStatus = updatedArticle.getArticleStatus();
     }
     if (updatedArticle.getTitle() != null) {
       this.title = updatedArticle.getTitle();
     }
-    // 위도 경도 수정
+    if (updatedArticle.getGeography() != null) {
+      this.geography = updatedArticle.getGeography();
+    }
     if (updatedArticle.getDescription() != null) {
       this.description = updatedArticle.getDescription();
-    }
-    if (updatedArticle.getContact() != null) {
-      this.contact = updatedArticle.getContact();
     }
     if (updatedArticle.getImage() != null) {
       this.image = updatedArticle.getImage();
