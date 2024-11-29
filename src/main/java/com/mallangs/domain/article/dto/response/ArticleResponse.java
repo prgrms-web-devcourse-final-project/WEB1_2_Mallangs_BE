@@ -5,7 +5,6 @@ import com.mallangs.domain.article.entity.MapVisibility;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import org.locationtech.jts.geom.Point;
 
 @Getter
 @ToString
@@ -14,7 +13,7 @@ public class ArticleResponse {
 
   private Long articleId;
 
-//  private String articleType;
+  private String articleType;
 
   private Long memberId;
 
@@ -22,22 +21,23 @@ public class ArticleResponse {
 
   private String title; // 장소인 경우 장소이름
 
-  private Point geography;
+  private double latitude;
+
+  private double longitude;
 
   private String description;
-
-  private String contact;
 
   private String image;
 
   public ArticleResponse(Article article) {
     this.articleId = article.getId();
+    this.articleType = article.getType();
     this.memberId = article.getMember().getMemberId();
     this.mapVisibility = article.getMapVisibility();
     this.title = article.getTitle();
-    this.geography = article.getGeography();
+    this.latitude = article.getGeography().getY();
+    this.longitude = article.getGeography().getX();
     this.description = article.getDescription();
-    this.contact = article.getContact();
     this.image = article.getImage();
   }
 
