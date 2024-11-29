@@ -66,7 +66,7 @@ public class ChatMessageService {
     }
 
     //채팅 수정
-    public ChatMessageResponse updateChatMessage(UpdateChatMessageRequest chatMessageRequest) {
+    public ChatMessageResponse update(UpdateChatMessageRequest chatMessageRequest) {
         ChatMessage foundChatMessage = chatMessageRepository.findByChatMessageId(chatMessageRequest.getChatMessageId())
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.CHAT_MESSAGE_NOT_FOUND));
 
@@ -83,10 +83,11 @@ public class ChatMessageService {
     }
 
     //채팅 삭제
-    public void deleteChatMessage(Long chatMessageId) {
-        ChatMessage chatMessage = chatMessageRepository.findById(chatMessageId)
-                .orElseThrow(() -> new MallangsCustomException(ErrorCode.CHAT_MESSAGE_NOT_FOUND));
-        chatMessageRepository.deleteById(chatMessageId);
+    public void delete(Long chatMessageId) {
+        boolean isExist = chatMessageRepository.existsById(chatMessageId);
+        if (isExist){
+            chatMessageRepository.deleteById(chatMessageId);
+        }else throw new MallangsCustomException(ErrorCode.CHAT_MESSAGE_NOT_FOUND);
     }
 
     //채팅목록 페이징
@@ -110,6 +111,7 @@ public class ChatMessageService {
                         .imageUrl(chatMessage.getImageUrl())
                         .type(chatMessage.getType())
                         .isRead(chatMessage.getIsRead()).build();
+
                 chatList.add(chatMessageResponse);
             }
 
