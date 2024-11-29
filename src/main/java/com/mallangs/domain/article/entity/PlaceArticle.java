@@ -1,5 +1,6 @@
 package com.mallangs.domain.article.entity;
 
+import com.mallangs.domain.article.dto.request.PlaceCreateRequest;
 import com.mallangs.domain.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
@@ -16,14 +17,14 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class PlaceArticle extends Article {
 
-    @Column(length = 255)
-    private String businessHours;
+  @Column(length = 255)
+  private String businessHours;
 
     @Column(length = 500)
     private String closeDays;
 
-    @Column(nullable = true, columnDefinition = "TEXT")
-    private String website; //웹사이트링크
+  @Column(nullable = true, columnDefinition = "TEXT")
+  private String website; //웹사이트링크
 
     // 추가 필드 (CSV 파일 기반)
     @Column(length = 20)
@@ -42,11 +43,11 @@ public class PlaceArticle extends Article {
     private Boolean isPetFriendly; // 반려동물 동반 가능 여부
 
 
-    @Override
-    public void applyChanges(Article updatedArticle) {
-        super.applyChanges(updatedArticle);
+  @Override
+  public void applyChanges(Article updatedArticle) {
+    super.applyChanges(updatedArticle);
 
-        PlaceArticle updatedPlaceArticle = (PlaceArticle) updatedArticle;
+    PlaceArticle updatedPlaceArticle = (PlaceArticle) updatedArticle;
 
         if (updatedPlaceArticle.getBusinessHours() != null) {
             this.businessHours = updatedPlaceArticle.getBusinessHours();
@@ -70,12 +71,12 @@ public class PlaceArticle extends Article {
             this.isPetFriendly = updatedPlaceArticle.getIsPetFriendly();
         }
     }
-}
 
-//    public static PlaceArticle createPlaceArticle(Member member, PlaceCreateRequest createRequest) {
-//        return PlaceArticle.builder()
-//                .businessHours(createRequest.getBusinessHours())
-//                .closeDays(createRequest.getCloseDays())
-//                .website(createRequest.getWebsite())
-//                .build();
-//    }
+  public static PlaceArticle createPlaceArticle(Member member, PlaceCreateRequest createRequest) {
+    return PlaceArticle.builder()
+        .businessHours(createRequest.getBusinessHours())
+        .closeDays(createRequest.getCloseDays())
+        .website(createRequest.getWebsite())
+        .build();
+  }
+}
