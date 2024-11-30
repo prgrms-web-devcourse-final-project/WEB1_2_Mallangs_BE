@@ -20,15 +20,15 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     // 키워드로 통합 검색 (제목 + 내용)
     @Query("""
-            SELECT b FROM Board b WHERE b.boardStatus = 'PUBLISHED' AND b.boardType = :boardType AND (b.title LIKE %:keyword% OR b.content LIKE %:keyword%) ORDER BY b.createdAt DESC
+            SELECT b FROM Board b WHERE (b.title LIKE %:keyword% OR b.content LIKE %:keyword%) AND b.boardStatus = 'PUBLISHED' AND b.boardType = :boardType ORDER BY b.createdAt DESC
             """)
-    Page<Board> searchByTitleOrContent(@Param("keyword") String keyword, Pageable pageable);
+    Page<Board> searchByTitleOrContent(@Param("keyword") String keyword, @Param("boardType") BoardType boardType, Pageable pageable);
 
     // 특정 회원이 작성한 게시글 목록 조회
     @Query("""
             SELECT b FROM Board b WHERE b.member.memberId = :memberId AND b.boardStatus = 'PUBLISHED' AND b.boardType = :boardType ORDER BY b.createdAt DESC
             """)
-    Page<Board> findByMemberId(@Param("memberId") Long memberId, Pageable pageable);
+    Page<Board> findByMemberId(@Param("memberId") Long memberId, @Param("boardType") BoardType boardType, Pageable pageable);
 
     // 관리자용 - 상태별 게시글 조회
     @Query("""

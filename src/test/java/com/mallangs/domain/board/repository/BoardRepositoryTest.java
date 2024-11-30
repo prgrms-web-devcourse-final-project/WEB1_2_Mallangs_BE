@@ -144,7 +144,7 @@ class BoardRepositoryTest {
         boardRepository.save(draftBoard);
 
         // when
-        Page<Board> result = boardRepository.searchByTitleOrContent("테스트", PageRequest.of(0, 10));
+        Page<Board> result = boardRepository.searchByTitleOrContent("테스트", BoardType.COMMUNITY,PageRequest.of(0, 10));
 
         // then
         assertThat(result.getContent()).hasSize(1);  // PUBLISHED 상태의 게시글만 조회
@@ -164,6 +164,7 @@ class BoardRepositoryTest {
         // when
         Page<Board> result = boardRepository.findByMemberId(
                 testMember.getMemberId(),
+                BoardType.COMMUNITY,
                 PageRequest.of(0, 10)
         );
 

@@ -37,6 +37,6 @@ public class SightingCreateRequest {
 
     private LocalDateTime sightedAt;
 
-    private String imgUrl;
+    private Long imageId;
 
 }
