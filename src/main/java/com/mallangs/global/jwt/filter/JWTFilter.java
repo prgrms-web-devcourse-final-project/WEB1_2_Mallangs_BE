@@ -1,5 +1,6 @@
 package com.mallangs.global.jwt.filter;
 
+import com.mallangs.domain.member.entity.embadded.Nickname;
 import com.mallangs.global.jwt.entity.CustomMemberDetails;
 import com.mallangs.global.jwt.entity.TokenCategory;
 import com.mallangs.global.jwt.service.AccessTokenBlackList;
@@ -82,6 +83,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
                                 Map<String, Object> payloadMap = new HashMap<>();
                                 payloadMap.put("userId", foundMember.getUserId().getValue());
+                                payloadMap.put("nickname", foundMember.getNickname().getValue());
                                 payloadMap.put("email", foundMember.getEmail().getValue());
                                 payloadMap.put("role", foundMember.getMemberRole().name());
                                 payloadMap.put("category", TokenCategory.ACCESS_TOKEN.name());
@@ -142,11 +144,13 @@ public class JWTFilter extends OncePerRequestFilter {
                     log.info("맴버아이디 토큰 필터 {}",claims.get("memberId"));
                     Long memberId = ((Integer)claims.get("memberId")).longValue();
                     String userId = claims.get("userId").toString();
+                    String nickname = claims.get("nickname").toString();
                     String email = claims.get("email").toString();
                     String role = claims.get("role").toString();
                     Member member = Member.builder()
                             .memberId(memberId)
                             .userId(new UserId(userId))
+                            .nickname(new Nickname(nickname))
                             .email(new Email(email))
                             .memberRole(MemberRole.valueOf(role))
                             .build();

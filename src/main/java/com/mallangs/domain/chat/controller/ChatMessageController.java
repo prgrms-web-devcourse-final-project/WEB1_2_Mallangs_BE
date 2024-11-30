@@ -2,10 +2,12 @@ package com.mallangs.domain.chat.controller;
 
 import com.mallangs.domain.chat.dto.request.ChatMessageRequest;
 import com.mallangs.domain.chat.dto.request.UpdateChatMessageRequest;
+import com.mallangs.domain.chat.dto.response.ChatMessageListResponse;
 import com.mallangs.domain.chat.dto.response.ChatMessageResponse;
 import com.mallangs.domain.chat.service.ChatMessageService;
 import com.mallangs.domain.member.dto.PageRequestDTO;
 import com.mallangs.domain.member.service.MemberUserService;
+import com.mallangs.global.jwt.entity.CustomMemberDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -15,6 +17,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
@@ -44,9 +48,9 @@ public class ChatMessageController {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "채팅방이 존재하지 않습니다.")
     })
-    public ResponseEntity<Page<ChatMessageResponse>> get(@RequestParam("chatRoomId") Long chatRoomId,
-                                                         @RequestParam(value = "page", defaultValue = "1") int page,
-                                                         @RequestParam(value = "size", defaultValue = "10") int size) {
+    public ResponseEntity<Page<ChatMessageListResponse>> get(@RequestParam("chatRoomId") Long chatRoomId,
+                                                             @RequestParam(value = "page", defaultValue = "1") int page,
+                                                             @RequestParam(value = "size", defaultValue = "10") int size) {
 
         PageRequestDTO pageRequestDTO = PageRequestDTO.builder().page(page).size(size).build();
         return ResponseEntity.ok(chatMessageService.getPage(pageRequestDTO, chatRoomId));
@@ -60,10 +64,10 @@ public class ChatMessageController {
             @ApiResponse(responseCode = "200", description = "수정 성공"),
             @ApiResponse(responseCode = "404", description = "채팅메세지가 존재하지 않습니다.")
     })
-    public ResponseEntity<ChatMessageResponse> update(
+    public ResponseEntity<?> update(
             @Validated @RequestBody UpdateChatMessageRequest updateChatMessageRequest) {
-
-        return ResponseEntity.ok(chatMessageService.update(updateChatMessageRequest));
+        chatMessageService.update(updateChatMessageRequest);
+        return ResponseEntity.ok().build();
     }
 
     //채팅메세지 삭제
@@ -77,6 +81,10 @@ public class ChatMessageController {
     public ResponseEntity<?> delete(@PathVariable("chatMessageId") Long chatMessageId) {
         chatMessageService.delete(chatMessageId);
         return ResponseEntity.ok().build();
+    }
+    @GetMapping("/{chatMessageId}")
+    public void changeStatus(Long chatMessageId){
+        chatMessageService.changeUnReadToRead(chatMessageId);
     }
 
 }

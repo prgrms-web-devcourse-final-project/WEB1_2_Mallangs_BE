@@ -1,5 +1,6 @@
 package com.mallangs.domain.chat.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +18,8 @@ public class IsRead {
     private Long isReadId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chat_message_id", nullable = false)
+    @JoinColumn(name = "chat_message_id")
+    @JsonIgnore
     private ChatMessage chatMessage;
 
     private String sender;
@@ -26,8 +28,8 @@ public class IsRead {
     @Column(name = "read_check", nullable = false)
     private Boolean readCheck = false;
 
-    public void changeReadCheck(boolean readCheck) {
-        this.readCheck = readCheck;
+    public void changeChatMessage(ChatMessage chatMessage) {
+        this.chatMessage = chatMessage;
     }
 
 }

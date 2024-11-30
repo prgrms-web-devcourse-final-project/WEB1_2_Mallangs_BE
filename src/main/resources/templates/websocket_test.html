@@ -49,7 +49,7 @@
     // 버튼 클릭 이벤트
     sendButton.addEventListener("click", function () {
         //토큰 하드 코딩
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cGUiOiJKV1QifQ.eyJyb2xlIjoiUk9MRV9VU0VSIiwiY2F0ZWdvcnkiOiJBQ0NFU1NfVE9LRU4iLCJ1c2VySWQiOiJ0ZXN0SWQzMiIsImVtYWlsIjoicmtya3duajEwNDIxMUBnbTJhaWwuY29tIiwibWVtYmVySWQiOjQsImlhdCI6MTczMjg2MDI0NywiZXhwIjoxNzMyODc4MjQ3fQ.TbRzSvtk352sqwWD3d0SadYitRv0e7hG3y_bP-UP75E";
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cGUiOiJKV1QifQ.eyJyb2xlIjoiUk9MRV9VU0VSIiwiY2F0ZWdvcnkiOiJBQ0NFU1NfVE9LRU4iLCJ1c2VySWQiOiJ0ZXN0SWQxMTMiLCJlbWFpbCI6InJrcmt3MTAxNDIxQGdtMmFpbC5jb20iLCJtZW1iZXJJZCI6MTcsImlhdCI6MTczMjkzODE0MCwiZXhwIjoxNzMyOTU2MTQwfQ.-i_Zvt_PVFGuxYAxvR1CIfdphxfKo_5vNJnEtS_O-B0";
         var message = messageInput.value.trim();
 
         if (!token) {
@@ -77,10 +77,12 @@
         if (message) {
             //하드코딩
             const chatMessageRequest = {
-                participatedRoomId: 6, // 채팅방 ID
+                participatedRoomId: 4, // 채팅방 ID
                 memberId: 4, // 사용자 ID
                 message: message, // 전송 메시지
-                imageUrl: 'asdfasdfasdf' // 이미지 URL (필요 시 동적으로 설정)
+                imageUrl: 'asdfasdasfasdfㄴㅇ', // 이미지 URL (필요 시 동적으로 설정)
+                height: 1234,
+                width: 1234
             };
             ws.send("/pub/api/chat/send-message", {}, JSON.stringify(chatMessageRequest));
             console.log("Sent:", chatMessageRequest);
