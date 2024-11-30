@@ -77,12 +77,6 @@ public class SecurityConfig {
 
                 }));
 
-        // 서버 접근 설정
-        AuthenticationManager authManager = authenticationManager(authenticationConfiguration);
-
-        //로그아웃 필터 생성
-        LogoutFilter logoutFilter = new LogoutFilter(accessTokenBlackList, jwtUtil, refreshTokenService);
-
         // 다른 기능 정지
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -101,31 +95,32 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth) ->
                         auth
-                        .requestMatchers("/api/member/register", "/api/member/login",
-                                "/api/member/logout","/api/member/find-user-id",
-                                "/api/member/find-password").permitAll() //회원가입,로그인,로그아웃,비번찾기,아이디찾기
-                        .requestMatchers("/api/member/oauth2/**").permitAll() //소셜로그인
-                        .requestMatchers("/api/member/admin/**").hasRole("ADMIN") //관리자
-                        .requestMatchers("/api/chat/websocket-test").permitAll() //웹소켓 테스터
-                        .requestMatchers("/webjars/**").permitAll() //웹소켓 테스터
-                        .requestMatchers("/ws-stomp/**").permitAll() //웹소켓 테스터
-                        .requestMatchers("/chat-rooms/**").permitAll() // 웹소켓 테스터2
-                        .requestMatchers("/api/member/**").hasAnyRole("USER","ADMIN") //회원
-                        .requestMatchers("/api/chat-room/**").hasAnyRole("USER","ADMIN") //채팅방
-                        .requestMatchers("/api/address/**").permitAll() //주소
-                        .requestMatchers("/api/member-file-test").permitAll() //파일,이미지업로드
-                        // Swagger UI 관련 경로 허용
-                        .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers("/v3/api-docs/**").permitAll()
-                        .requestMatchers("/swagger-resources/**").permitAll()
-                        .requestMatchers("/swagger-ui.html").permitAll()
-                        .anyRequest().authenticated());
+                                .requestMatchers("/api/member/register", "/api/member/login",
+                                        "/api/member/logout", "/api/member/find-user-id",
+                                        "/api/member/find-password").permitAll() //회원가입,로그인,로그아웃,비번찾기,아이디찾기
+                                .requestMatchers("/api/member/oauth2/**").permitAll() //소셜로그인
+                                .requestMatchers("/api/member/admin/**").hasRole("ADMIN") //관리자
+                                .requestMatchers("/api/chat/websocket-test").permitAll() //웹소켓 테스터
+                                .requestMatchers("/webjars/**").permitAll() //웹소켓 테스터
+                                .requestMatchers("/ws-stomp/**").permitAll() //웹소켓 테스터
+                                .requestMatchers("/chat-rooms/**").permitAll() // 웹소켓 테스터2
+                                .requestMatchers("/api/member/**").hasAnyRole("USER", "ADMIN") //회원
+                                .requestMatchers("/api/chat-room/**").hasAnyRole("USER", "ADMIN") //채팅방
+                                .requestMatchers("/api/address/**").permitAll() //주소
+                                .requestMatchers("/api/member-file-test").permitAll() //파일,이미지업로드
+                                // Swagger UI 관련 경로 허용
+                                .requestMatchers("/swagger-ui/**").permitAll()
+                                .requestMatchers("/v3/api-docs/**").permitAll()
+                                .requestMatchers("/swagger-resources/**").permitAll()
+                                .requestMatchers("/swagger-ui.html").permitAll()
+                                .anyRequest().authenticated());
         // 필터
         http
                 .sessionManagement((session) -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(new JWTFilter(jwtUtil, refreshTokenService, accessTokenValidity, accessRefreshTokenValidity, accessTokenBlackList, memberRepository), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(logoutFilter, JWTFilter.class);
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(new JWTFilter(jwtUtil, refreshTokenService, accessTokenValidity
+                                ,accessRefreshTokenValidity, accessTokenBlackList, memberRepository)
+                                ,UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }
