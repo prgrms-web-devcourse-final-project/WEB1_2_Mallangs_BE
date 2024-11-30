@@ -16,18 +16,27 @@ public class CustomFailureHandler extends SimpleUrlAuthenticationFailureHandler 
      CustomOAuth2MemberService OAuth2인증 실패 시
              오류 메세지 보내기
      */
+
+    public CustomFailureHandler() {
+        // 로그인 실패 시 이동할 URL 설정
+        setDefaultFailureUrl("/api/member/login");
+    }
+
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        //배포 환경시에는 아래 메세지로 바꿔주기 (자세한 내용 클라로 전송 X)
-        String errorMessage = "Authentication failed. Please check your credentials or try again.";
+        String errorMessage = "소셜로그인 인증에 실패했습니다. 로그인 정보를 확인해주세요.";
         try {
-            response.getWriter().write("{\"error\": \"" + exception.getMessage() + "\"}");
+            response.getWriter().write("{\"error\": \"" + errorMessage + "\"}");
         } catch (IOException e) {
-            log.error("Oauth2 로그인 인증 실패 :{}", e.getMessage());
+            log.error("Oauth2 로그인 인증 실패 :{}", errorMessage);
+        }finally {
+            request.getSession().setAttribute("errorMessage", "소셜로그인 인증에 실패했습니다. 로그인 정보를 확인해주세요.");
+            super.onAuthenticationFailure(request, response, exception);
         }
     }
+
 }

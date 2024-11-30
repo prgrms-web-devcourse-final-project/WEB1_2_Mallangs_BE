@@ -4,12 +4,16 @@ import lombok.Getter;
 
 @Getter
 public class MemberOAuth2DTO {
+    private Long memberId;
     private String userId;
     private String password;
     private String nickname;
     private String email;
     private String role;
 
+    public void changeMemberId(Long memberId) {
+        this.memberId = memberId;
+    }
     public void changeUserId(String userId) {
         this.userId = userId;
     }
