@@ -21,4 +21,10 @@ public interface IsReadRepository extends JpaRepository<IsRead, Long> {
                          @Param("participatedRoomId") Long participatedRoomId,
                          @Param("reader") String reader);
 
+    // 읽지 않은 채팅 메세지 갯수
+    @Query("SELECT COUNT(i) FROM IsRead i " +
+            "WHERE i.readCheck = false " +
+            "AND i.chatMessage.participatedRoom.participatedRoomId = :participatedRoomId")
+    Long countUnreadMessages(@Param("participatedRoomId") Long participatedRoomId);
+
 }

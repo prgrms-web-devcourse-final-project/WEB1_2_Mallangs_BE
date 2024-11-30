@@ -2,11 +2,16 @@ package com.mallangs.domain.chat.service;
 
 import com.mallangs.domain.chat.dto.request.ChatRoomChangeNameRequest;
 import com.mallangs.domain.chat.dto.response.ParticipatedRoomListResponse;
+import com.mallangs.domain.chat.entity.ChatMessage;
 import com.mallangs.domain.chat.entity.ChatRoom;
+import com.mallangs.domain.chat.entity.IsRead;
 import com.mallangs.domain.chat.entity.ParticipatedRoom;
+import com.mallangs.domain.chat.repository.ChatMessageRepository;
 import com.mallangs.domain.chat.repository.ChatRoomRepository;
+import com.mallangs.domain.chat.repository.IsReadRepository;
 import com.mallangs.domain.chat.repository.ParticipatedRoomRepository;
 import com.mallangs.domain.member.entity.Member;
+import com.mallangs.domain.member.entity.embadded.Nickname;
 import com.mallangs.domain.member.entity.embadded.UserId;
 import com.mallangs.domain.member.repository.MemberRepository;
 import com.mallangs.global.exception.ErrorCode;
@@ -16,9 +21,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Log4j2
 @Service
@@ -28,6 +32,8 @@ public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final MemberRepository memberRepository;
     private final ParticipatedRoomRepository participatedRoomRepository;
+    private final IsReadRepository isReadRepository;
+    private final ChatMessageRepository chatMessageRepository;
 
     // 채팅방 생성
     public Long create(Long myId,Long partnerId) {
@@ -65,25 +71,34 @@ public class ChatRoomService {
         //참여 채팅에서 정보 추출 & 조합 -> DTO 입력
         List<ParticipatedRoom> rooms = participatedRoomRepository.findByMemberId(memberId);
         for (ParticipatedRoom room : rooms) {
-            //메세지 0번째 -> 가장 최근 메세지
+
+            List<ChatMessage> messages = chatMessageRepository.findMessageByChatRoomId(room.getChatRoom().getChatRoomId());
+
+            List<ChatMessage> unreadMessages = new ArrayList<>();
+            for (ChatMessage message : messages) {
+                if (message.getIsRead() != null) {
+                    for (IsRead isRead : message.getIsRead()) {
+                        if (!isRead.getReadCheck()) {
+                            unreadMessages.add(message);
+                            break;
+                        }
+                    }
+                }
+            }
+
             Collections.reverse(room.getMessages());
             ParticipatedRoomListResponse info = ParticipatedRoomListResponse.builder()
                     .participatedRoomId(room.getParticipatedRoomId())
                     .chatRoomId(room.getChatRoom().getChatRoomId())
-                    .nickname(room.getParticipant().getNickname())
-                    .message(room.getMessages().isEmpty() ? null:room.getMessages().get(0).getMessage())
-                    .createdAt(room.getMessages().isEmpty()? null:room.getMessages().get(0).getCreatedAt())
+                    .nickname(room.getParticipant().getNickname().getValue())
+                    .message(messages.get(0).getMessage())
+                    .chatRoomName(room.getChatRoom().getOccupiedRooms().get(1).getParticipant().getNickname().getValue())
+                    .lastChatTime(messages.get(0).getCreatedAt())
+                    .notReadCnt(unreadMessages.size())
                     .build();
             log.info("room정보1 :{}", room.getParticipatedRoomId());
             log.info("room정보2 :{}", room.getChatRoom().getChatRoomId());
             log.info("room정보3 :{}", room.getParticipant().getNickname());
-            if (!room.getMessages().isEmpty()) {
-                log.info("room정보4 :{}", room.getMessages().get(0).getMessage());
-                log.info("room정보5 :{}", room.getMessages().get(0).getCreatedAt());
-            } else {
-                log.info("room정보4 : 메시지가 없습니다.");
-                log.info("room정보5 : 메시지가 없습니다.");
-            }
 
             chatRooms.add(info);
         }
@@ -108,4 +123,5 @@ public class ChatRoomService {
             participatedRoomRepository.deleteById(participatedRoomId);
         } else throw new MallangsCustomException(ErrorCode.FAILED_DELETE_CHATROOM);
     }
+
 }

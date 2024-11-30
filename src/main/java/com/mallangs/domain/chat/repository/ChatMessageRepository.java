@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,4 +37,12 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
             "WHERE r.chatRoomId = :chatRoomId")
     Page<ChatMessage> findMessagesByChatRoomId(@Param("chatRoomId") Long chatRoomId, Pageable pageable);
 
+    //채팅 조회 시간 순
+    @Query("SELECT c FROM ChatMessage c " +
+            "JOIN FETCH c.participatedRoom p " +
+            "JOIN FETCH p.chatRoom r " +
+            "JOIN FETCH c.isRead d " +
+            "WHERE r.chatRoomId = :chatRoomId " +
+            "ORDER BY c.createdAt DESC")
+    List<ChatMessage> findMessageByChatRoomId(@Param("chatRoomId") Long chatRoomId);
 }
