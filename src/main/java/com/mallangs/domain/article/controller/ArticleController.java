@@ -3,7 +3,7 @@ package com.mallangs.domain.article.controller;
 import com.mallangs.domain.article.dto.request.ArticleCreateRequest;
 import com.mallangs.domain.article.dto.response.ArticleResponse;
 import com.mallangs.domain.article.service.ArticleService;
-import com.mallangs.global.security.auth.CustomUserPrincipal;
+import com.mallangs.global.jwt.entity.CustomMemberDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,7 +38,7 @@ public class ArticleController {
   public ResponseEntity<ArticleResponse> createArticle(
       @RequestBody ArticleCreateRequest articleCreateRequest,
       @Parameter(description = "현재 인증된 사용자 정보", required = true)
-      @AuthenticationPrincipal CustomUserPrincipal principal) {
+      @AuthenticationPrincipal CustomMemberDetails principal) {
     Long memberId = principal.getMemberId();
     ArticleResponse articleResponse = articleService.createArticle(articleCreateRequest,
         memberId);
@@ -82,7 +82,7 @@ public class ArticleController {
   public ResponseEntity<Page<ArticleResponse>> getArticlesByMemberId(
       @Parameter(description = "페이지 요청 정보", required = true) Pageable pageable,
       @Parameter(description = "현재 인증된 사용자 정보", required = true)
-      @AuthenticationPrincipal CustomUserPrincipal principal) {
+      @AuthenticationPrincipal CustomMemberDetails principal) {
     Page<ArticleResponse> articles = articleService.findArticlesByMemberId(pageable,
         principal.getMemberId());
 
@@ -100,7 +100,7 @@ public class ArticleController {
       @PathVariable("articleId") Long articleId,
       @RequestBody ArticleCreateRequest articleCreateRequest,
       @Parameter(description = "현재 인증된 사용자 정보", required = true)
-      @AuthenticationPrincipal CustomUserPrincipal principal
+      @AuthenticationPrincipal CustomMemberDetails principal
   ) {
     ArticleResponse articleResponse = articleService.updateArticle(
         articleId,
@@ -120,7 +120,7 @@ public class ArticleController {
   @PatchMapping("/{articleId}/deactivate")
   public ResponseEntity<Void> deactivateArticle(
       @PathVariable("articleId") Long articleId,
-      @AuthenticationPrincipal CustomUserPrincipal principal) {
+      @AuthenticationPrincipal CustomMemberDetails principal) {
     Long memberId = principal.getMemberId();
     articleService.deactivateArticle(articleId, memberId);
 

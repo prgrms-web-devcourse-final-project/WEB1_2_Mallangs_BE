@@ -5,9 +5,11 @@ import com.mallangs.global.exception.MallangsCustomException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class ArticleFactoryManager {
 
@@ -15,13 +17,22 @@ public class ArticleFactoryManager {
 
   @Autowired
   public ArticleFactoryManager(List<ArticleFactory> articleFactories) {
+    articleFactories.forEach(factory ->
+        log.info("Factory created: {}", factory.getClass().getSimpleName())
+    );
+
     articleFactoryMap = articleFactories.stream()
         .collect(
             Collectors.toMap(
                 factory -> factory.getClass().getSimpleName().replace("ArticleFactory", "")
                     .toLowerCase(),
                 factory -> factory));
-    System.out.println("articleFactoryMap size: " + articleFactoryMap.size());
+
+    log.info("articleFactoryMap size: {}", articleFactoryMap.size());
+
+    articleFactoryMap.forEach((key, value) ->
+        log.info("Key: {}, Value: {}", key, value.getClass().getSimpleName())
+    );
   }
 
   public ArticleFactory getFactory(String articleType) {
