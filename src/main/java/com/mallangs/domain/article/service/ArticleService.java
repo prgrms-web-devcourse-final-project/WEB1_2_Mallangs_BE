@@ -15,10 +15,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ArticleService {
@@ -32,7 +34,8 @@ public class ArticleService {
         .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
 
     // 팩토리 매니저를 통해 적절한 팩토리 선택
-    System.out.println(articleCreateRequest.getType());
+    log.info(articleCreateRequest.toString());
+    log.info(articleCreateRequest.getType());
     ArticleFactory factory = factoryManager.getFactory(articleCreateRequest.getType());
 
     // 팩토리에서 article 생성
