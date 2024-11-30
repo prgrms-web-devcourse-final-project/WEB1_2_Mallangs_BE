@@ -1,10 +1,10 @@
 package com.mallangs.domain.pet.controller;
 
-import com.mallangs.domain.jwt.entity.CustomMemberDetails;
-import com.mallangs.domain.jwt.service.CustomerMemberDetailService;
-import com.mallangs.domain.member.entity.Member;
+
+
 import com.mallangs.domain.pet.dto.*;
 import com.mallangs.domain.pet.service.PetService;
+import com.mallangs.global.jwt.entity.CustomMemberDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
