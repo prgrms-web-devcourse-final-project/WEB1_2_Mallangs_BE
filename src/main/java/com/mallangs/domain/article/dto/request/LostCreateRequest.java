@@ -12,7 +12,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Getter
-@ToString
+@ToString(callSuper = true)
 @RequiredArgsConstructor
 @SuperBuilder
 @Schema(description = "자식 클래스 DTO", allOf = ArticleCreateRequest.class)
