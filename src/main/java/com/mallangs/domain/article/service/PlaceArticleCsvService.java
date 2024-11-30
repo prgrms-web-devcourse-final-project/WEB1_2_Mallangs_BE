@@ -2,6 +2,7 @@
 //import com.mallangs.domain.article.entity.MapVisibility;
 //import com.mallangs.domain.article.entity.PlaceArticle;
 //import com.mallangs.domain.article.repository.PlaceArticleRepository;
+//import com.mallangs.domain.board.entity.BoardStatus;
 //import com.mallangs.domain.member.entity.Member;
 //import com.mallangs.domain.member.repository.MemberRepository;
 //import com.opencsv.CSVReader;
@@ -111,6 +112,8 @@
 //                .closeDays(closeDays)
 //                .createdAt(LocalDateTime.now())
 //                .website(webSite)
+//                .articleStatus(BoardStatus.PUBLISHED)
+//                .type("Place")
 //                .build();
 //    }
 //}

@@ -44,6 +44,7 @@ public class ChatRoomRepositoryTests {
     @Autowired
     private IsReadRepository isReadRepository;
 
+
     //회원, 주소, 채팅룸, 채팅방, 참여 채팅, 데이터 입력 1개씩
     @Test
     @Transactional
@@ -116,11 +117,11 @@ public class ChatRoomRepositoryTests {
         // IsRead 저장
         IsRead isRead1 = isReadRepository.save(IsRead.builder()
                         .chatMessage(chatMessage)
-                .sender(chatRoom.getOccupiedRooms().get(0).getParticipant().getNickname().getValue())
+                .reader(chatRoom.getOccupiedRooms().get(0).getParticipant().getNickname().getValue())
                 .build());
         IsRead isRead2 = isReadRepository.save(IsRead.builder()
                         .chatMessage(chatMessage2)
-                .sender(chatRoom.getOccupiedRooms().get(1).getParticipant().getNickname().getValue())
+                .reader(chatRoom.getOccupiedRooms().get(1).getParticipant().getNickname().getValue())
                 .build());
 
         chatMessage.addIsRead(isRead1);

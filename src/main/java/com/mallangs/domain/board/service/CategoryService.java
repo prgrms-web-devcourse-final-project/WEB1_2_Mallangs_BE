@@ -71,6 +71,7 @@ public class CategoryService {
         category.changeCategory(
                 request.getName(),
                 request.getDescription(),
+                request.getCategoryLevel(),
                 request.getCategoryOrder(),
                 CategoryStatus.valueOf(request.getCategoryStatus())
         );
@@ -94,10 +95,15 @@ public class CategoryService {
     }
 
     // 카테고리 이름으로 검색
-    public List<CategoryResponse> searchCategoriesByName(String name) {
-        List<Category> categories = categoryRepository.findByNameContaining(name);
-        return categories.stream()
-                .map(CategoryResponse::new)
-                .collect(Collectors.toList());
+    public List<CategoryResponse> searchCategoriesByName(String name, boolean isAdmin) {
+        List<Category> categories;
+        if (isAdmin) {
+            // 관리자는 모든 카테고리 조회
+            categories = categoryRepository.findByNameContaining(name);
+        } else {
+            // 사용자는 활성화된 카테고리만 조회
+            categories = categoryRepository.findByNameContainingAndCategoryStatus(name, CategoryStatus.ACTIVE);
+        }
+        return categories.stream().map(CategoryResponse::new).collect(Collectors.toList());
     }
 }

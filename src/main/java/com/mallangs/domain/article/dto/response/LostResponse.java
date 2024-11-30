@@ -18,13 +18,13 @@ public class LostResponse extends ArticleResponse {
 
   private String breed;
 
-  private String petName;
+  private String name;
 
   private Integer petAge;
 
   private PetGender petGender;
 
-  private Boolean neutered;
+  private Boolean isNeutering;
 
   private String chipNumber;
 
@@ -32,19 +32,22 @@ public class LostResponse extends ArticleResponse {
 
   private String lastSeenLocation;
 
+  private String contact;
+
   private LostStatus lostStatus;
 
   public LostResponse(LostArticle article) {
     super(article);
     this.petType = article.getPetType();
     this.breed = article.getBreed();
-    this.petName = article.getPetName();
+    this.name = article.getName();
     this.petAge = article.getPetAge();
     this.petGender = article.getPetGender();
-    this.neutered = article.getNeutered();
+    this.isNeutering = article.getIsNeutering();
     this.chipNumber = article.getChipNumber();
     this.lostDate = article.getLostDate();
     this.lastSeenLocation = article.getLastSeenLocation();
+    this.contact = article.getContact();
     this.lostStatus = article.getLostStatus();
   }
 
