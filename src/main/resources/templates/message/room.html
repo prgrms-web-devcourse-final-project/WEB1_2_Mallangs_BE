@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <title>채팅방 목록</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        #app {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .header, .input-group {
+            margin-bottom: 20px;
+        }
+
+        .chatroom-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .chatroom-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatroom-header h6 {
+            margin: 0;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .chatroom-body {
+            margin-top: 10px;
+            color: #666;
+        }
+
+        .chatroom-footer {
+            margin-top: 10px;
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .chatroom-card:hover {
+            background-color: #f1f1f1;
+            transform: scale(1.01);
+        }
+
+        .chatroom-card:active {
+            transform: scale(0.99);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="app" v-cloak>
+    <div class="header d-flex justify-content-between align-items-center">
+        <h3>채팅방 목록</h3>
+        <a class="btn btn-primary btn-sm" href="/">홈으로</a>
+    </div>
+
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <label class="input-group-text">대화 상대 회원 ID</label>
+        </div>
+        <input type="number" class="form-control" v-model="targetMemberId" placeholder="상대방의 회원 ID를 입력하세요" v-on:keyup.enter="createRoom">
+        <div class="input-group-append">
+            <button class="btn btn-primary" type="button" @click="createRoom">채팅방 개설</button>
+        </div>
+    </div>
+
+    <div v-for="item in chatrooms" v-bind:key="item.participatedRoomId" class="chatroom-card"
+         @click="enterRoom(item.participatedRoomId)">
+        <div class="chatroom-header">
+            <h6>{{ item.nickname }} 님과의 채팅</h6>
+        </div>
+        <div class="chatroom-body">
+            <p>최근 메시지: {{ item.message || '최근 메시지가 없습니다.' }}</p>
+        </div>
+        <div class="chatroom-footer">
+            <small>최근 활동: {{ item.createdAt ? formatDate(item.createdAt) : 'N/A' }}</small>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            targetMemberId: '',
+            chatrooms: [],
+            token: 'eyJhbGciOiJIUzI1NiIsInR5cGUiOiJKV1QifQ.eyJyb2xlIjoiUk9MRV9VU0VSIiwiY2F0ZWdvcnkiOiJBQ0NFU1NfVE9LRU4iLCJ1c2VySWQiOiJ0ZXN0SWQzMiIsImVtYWlsIjoicmtya3duajEwNDIxMUBnbTJhaWwuY29tIiwibWVtYmVySWQiOjQsImlhdCI6MTczMjg1ODk3NCwiZXhwIjoxNzMyODc2OTc0fQ.RU9_XfggGKLMpFCmjIEYJgEyHlCXyNHVhg81f2ZPwgo',
+            memberId: '4'
+        },
+        created() {
+            this.findAllRoom();
+            localStorage.setItem('wschat.token', this.token);
+            localStorage.setItem('wschat.memberId', this.memberId);
+        },
+        methods: {
+            findAllRoom: function () {
+                axios.get('/api/chat-room', {
+                    headers: { 'Authorization': 'Bearer ' + this.token }
+                }).then(response => {
+                    if (Array.isArray(response.data)) {
+                        this.chatrooms = response.data;
+                    } else {
+                        console.error('Unexpected response format:', response);
+                    }
+                }).catch(error => {
+                    console.error('Error fetching chatrooms:', error.response || error.message);
+                });
+            },
+            createRoom: function () {
+                if (!this.targetMemberId) {
+                    alert("대화 상대의 회원 ID를 입력하세요.");
+                    return;
+                }
+                axios.post(`/api/chat-room/${this.targetMemberId}`, null, {
+                    headers: { 'Authorization': 'Bearer ' + this.token }
+                }).then(response => {
+                    alert("채팅방이 생성되었습니다.");
+                    this.findAllRoom();
+                }).catch(error => {
+                    console.error('Error creating room:', error.response || error.message);
+                });
+            },
+            enterRoom: function (participatedRoomId) {
+                localStorage.setItem('wschat.participatedRoomId', participatedRoomId);
+                location.href = `/api/chat-room/${participatedRoomId}`;
+            },
+            formatDate: function (dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleString();
+            }
+        }
+    });
+</script>
+</body>
+</html>

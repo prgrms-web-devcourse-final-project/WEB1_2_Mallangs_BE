@@ -29,5 +29,8 @@ public class ChatRoom {
         occupiedRooms.add(participatedRoom);
         participatedRoom.changeChatRoom(this);
     }
+    public void changeChatRoomName(String chatRoomName) {
+        this.chatRoomName = chatRoomName;
+    }
 
 }
