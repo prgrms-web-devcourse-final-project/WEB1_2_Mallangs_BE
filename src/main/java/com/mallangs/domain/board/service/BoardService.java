@@ -180,12 +180,12 @@ public class BoardService {
     }
 
     // 관리자용 - 카테고리와 제목으로 게시글 검색
-    public AdminBoardsResponse searchBoardsForAdmin(Long categoryId, String keyword, Pageable pageable) {
+    public AdminBoardsResponse searchBoardsForAdmin(Long categoryId, BoardType boardType, String keyword, Pageable pageable) {
         if (isNotAdminRole()) {
             throw new MallangsCustomException(ErrorCode.UNAUTHORIZED_ACCESS);
         }
 
-        Page<AdminBoardResponse> boards = boardRepository.searchForAdmin(categoryId, keyword, pageable)
+        Page<AdminBoardResponse> boards = boardRepository.searchForAdmin(categoryId, boardType, keyword, pageable)
                 .map(AdminBoardResponse::from);
         BoardStatusCount statusCount = boardRepository.countByStatus();
         return new AdminBoardsResponse(boards, statusCount);
@@ -193,12 +193,12 @@ public class BoardService {
 
     // 관리자용 - 카테고리, 상태, 제목으로 게시글 검색
     public AdminBoardsResponse searchBoardsForAdminWithStatus(
-            Long categoryId, BoardStatus status, String keyword, Pageable pageable) {
+            Long categoryId, BoardType boardType, BoardStatus boardStatus, String keyword, Pageable pageable) {
         if (isNotAdminRole()) {
             throw new MallangsCustomException(ErrorCode.UNAUTHORIZED_ACCESS);
         }
 
-        Page<AdminBoardResponse> boards = boardRepository.searchForAdminWithStatus(categoryId, status, keyword, pageable)
+        Page<AdminBoardResponse> boards = boardRepository.searchForAdminWithStatus(categoryId, boardType, boardStatus, keyword, pageable)
                 .map(AdminBoardResponse::from);
         BoardStatusCount statusCount = boardRepository.countByStatus();
         return new AdminBoardsResponse(boards, statusCount);

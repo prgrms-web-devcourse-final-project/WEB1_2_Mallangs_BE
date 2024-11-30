@@ -16,7 +16,7 @@ public class SightingListResponse {
     private final LocalDateTime createdAt;
     private final LocalDateTime sightedAt;
     private final String address;
-    private final String imgUrl;
+    private final Long imageId;
     private final int viewCount;
     private final int commentCount;
 
@@ -28,7 +28,7 @@ public class SightingListResponse {
         this.createdAt = board.getCreatedAt();
         this.sightedAt = board.getSightedAt();
         this.address = board.getAddress();
-        this.imgUrl = board.getImgUrl();
+        this.imageId = board.getImageId();
         this.viewCount = board.getViewCnt();
         this.commentCount = board.getCommentCnt();
     }

@@ -17,6 +17,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -26,6 +27,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.Set;
 
 @Tag(name = "커뮤니티 & 실종신고-목격제보 API", description = "커뮤니티/실종신고-목격제보 관련 API")
 @RestController
@@ -48,25 +50,32 @@ public class BoardController {
     @Operation(summary = "커뮤니티 게시글 검색", description = "키워드로 커뮤니티 게시글을 검색합니다.")
     @GetMapping("/community/search")
     public ResponseEntity<Page<CommunityListResponse>> searchCommunityPosts(
-            @RequestParam String keyword, @PageableDefault(size = 10) Pageable pageable
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page
     ) {
-        return ResponseEntity.ok(boardService.searchCommunityBoards(keyword, pageable));
+
+        PageRequest pageRequest = PageRequest.of(page, 10);
+        return ResponseEntity.ok(boardService.searchCommunityBoards(keyword, pageRequest));
     }
 
     @Operation(summary = "커뮤니티 게시글 회원으로 조회", description = "특정 회원이 작성한 커뮤니티 게시글 목록을 조회합니다.")
     @GetMapping("/community/member/{memberId}")
     public ResponseEntity<Page<CommunityListResponse>> getMemberCommunityPosts(
-            @PathVariable Long memberId,@PageableDefault(size = 10) Pageable pageable
+            @PathVariable Long memberId,
+            @RequestParam(defaultValue = "0") int page
     ) {
-        return ResponseEntity.ok(boardService.getMemberCommunityBoards(memberId, pageable));
+        PageRequest pageRequest = PageRequest.of(page, 10);
+        return ResponseEntity.ok(boardService.getMemberCommunityBoards(memberId, pageRequest));
     }
 
     @Operation(summary = "커뮤니티 카테고리별 게시글 목록 조회", description = "특정 카테고리의 커뮤니티 게시글 목록을 조회합니다.")
     @GetMapping("/community/category/{categoryId}")
     public ResponseEntity<Page<CommunityListResponse>> getCommunityPostByCategory(
-            @PathVariable Long categoryId, @PageableDefault(size = 10) Pageable pageable
+            @PathVariable Long categoryId,
+            @RequestParam(defaultValue = "0") int page
     ) {
-        return ResponseEntity.ok(boardService.getCommunityBoardsByCategory(categoryId, pageable));
+        PageRequest pageRequest = PageRequest.of(page, 10);
+        return ResponseEntity.ok(boardService.getCommunityBoardsByCategory(categoryId, pageRequest));
     }
 
     @Operation(summary = "커뮤니티 게시글 상세 조회", description = "특정 커뮤니티 게시글의 상세 내용을 조회합니다.")
@@ -102,25 +111,31 @@ public class BoardController {
     @Operation(summary = "실종신고-목격제보 게시글 검색", description = "키워드로 실종신고-목격제보 게시글을 검색합니다.")
     @GetMapping("/sighting/search")
     public ResponseEntity<Page<SightingListResponse>> searchSightingPosts(
-            @RequestParam String keyword, @PageableDefault(size = 10) Pageable pageable
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page
     ) {
-        return ResponseEntity.ok(boardService.searchSightingBoards(keyword, pageable));
+        PageRequest pageRequest = PageRequest.of(page, 10);
+        return ResponseEntity.ok(boardService.searchSightingBoards(keyword, pageRequest));
     }
 
     @Operation(summary = "실종신고-목격제보 게시글 회원으로 조회", description = "특정 회원이 작성한 실종신고-목격제보 게시글 목록을 조회합니다.")
     @GetMapping("/sighting/member/{memberId}")
     public ResponseEntity<Page<SightingListResponse>> getMemberSightingPosts(
-            @PathVariable Long memberId, @PageableDefault(size = 10) Pageable pageable
+            @PathVariable Long memberId,
+            @RequestParam(defaultValue = "0") int page
     ) {
-        return ResponseEntity.ok(boardService.getMemberSightingBoards(memberId, pageable));
+        PageRequest pageRequest = PageRequest.of(page, 10);
+        return ResponseEntity.ok(boardService.getMemberSightingBoards(memberId, pageRequest));
     }
 
     @Operation(summary = "실종신고-목격제보 카테고리별 목격 게시글 목록 조회", description = "특정 카테고리의 실종신고-목격제보 게시글 목록을 조회합니다.")
     @GetMapping("/sighting/category/{categoryId}")
     public ResponseEntity<Page<SightingListResponse>> getSightingPostsByCategory(
-            @PathVariable Long categoryId, @PageableDefault(size = 10) Pageable pageable
+            @PathVariable Long categoryId,
+            @RequestParam(defaultValue = "0") int page
     ) {
-        return ResponseEntity.ok(boardService.getSightingBoardsByCategory(categoryId, pageable));
+        PageRequest pageRequest = PageRequest.of(page, 10);
+        return ResponseEntity.ok(boardService.getSightingBoardsByCategory(categoryId, pageRequest));
     }
 
     @Operation(summary = "실종신고-목격제보 게시글 상세 조회", description = "특정 실종신고-목격제보 게시글의 상세 내용을 조회합니다.")
@@ -156,17 +171,20 @@ public class BoardController {
     @Operation(summary = "게시글 검색 - 관리자 권한", description = "관리자가 게시글을 검색하고 필터링합니다.")
     @GetMapping("/admin/search")
     public ResponseEntity<AdminBoardsResponse> searchPosts(
-            @RequestParam(required = false) BoardStatus status,
+            @RequestParam(required = false) BoardType boardType,
+            @RequestParam(required = false) BoardStatus boardStatus,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) String keyword,
-            @PageableDefault(size = 10) Pageable pageable
+            @RequestParam(defaultValue = "0") int page
     ) {
-        if (status != null && categoryId != null) {
-            return ResponseEntity.ok(boardService.searchBoardsForAdminWithStatus(categoryId, status, keyword, pageable));
+        PageRequest pageRequest = PageRequest.of(page, 10);
+
+        if (boardStatus != null && categoryId != null) {
+            return ResponseEntity.ok(boardService.searchBoardsForAdminWithStatus(categoryId, boardType, boardStatus, keyword, pageRequest));
         } else if (categoryId != null) {
-            return ResponseEntity.ok(boardService.searchBoardsForAdmin(categoryId, keyword, pageable));
+            return ResponseEntity.ok(boardService.searchBoardsForAdmin(categoryId, boardType, keyword, pageRequest));
         }
-        return ResponseEntity.ok(boardService.getBoardsByStatus(status, pageable));
+        return ResponseEntity.ok(boardService.getBoardsByStatus(boardStatus, pageRequest));
     }
 
     @Operation(summary = "게시글 상태 변경 - 관리자 권한", description = "관리자가 게시글의 상태를 변경합니다. 다중 선택 가능")

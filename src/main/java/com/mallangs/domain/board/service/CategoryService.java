@@ -29,7 +29,6 @@ public class CategoryService {
     public List<CategoryResponse> getAllActiveCategories() {
         List<Category> categories = categoryRepository.findAllActiveCategories();
         return categories.stream()
-                .filter(category -> category.getCategoryLevel() == 0)
                 .map(CategoryResponse::new)
                 .collect(Collectors.toList());
     }
@@ -47,7 +46,7 @@ public class CategoryService {
         if (isNotAdminRole()) {
             throw new MallangsCustomException(ErrorCode.UNAUTHORIZED_ACCESS);
         }
-        log.info("=== Service creating category: {}", request);
+
         Category parentCategory = null;
         if (request.getParentCategoryId() != null) {
             parentCategory = categoryRepository.findById(request.getParentCategoryId())
@@ -76,7 +75,14 @@ public class CategoryService {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.CATEGORY_NOT_FOUND));
 
+        Category parentCategory = null;
+        if (request.getParentCategory() != null) {
+            parentCategory = categoryRepository.findById(request.getParentCategory())
+                    .orElseThrow(() -> new MallangsCustomException(ErrorCode.PARENT_CATEGORY_NOT_FOUND));
+        }
+
         category.changeCategory(
+                parentCategory,
                 request.getName(),
                 request.getDescription(),
                 request.getCategoryLevel(),

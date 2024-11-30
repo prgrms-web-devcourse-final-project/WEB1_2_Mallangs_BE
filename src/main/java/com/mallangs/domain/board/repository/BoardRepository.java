@@ -32,13 +32,14 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     // 관리자용 - 상태별 게시글 조회
     @Query("""
-            SELECT b FROM Board b WHERE (:status IS NULL OR b.boardStatus = :status) ORDER BY b.createdAt DESC
+            SELECT b FROM Board b WHERE (:boardStatus IS NULL OR b.boardStatus = :boardStatus
+            ) ORDER BY b.createdAt DESC
             """)
-    Page<Board> findByStatus(@Param("status") BoardStatus status, Pageable pageable);
+    Page<Board> findByStatus(@Param("boardStatus") BoardStatus boardStatus, Pageable pageable);
 
     @Query("""
             SELECT new com.mallangs.domain.board.dto.response.BoardStatusCount(
-                COUNT(b), 
+                COUNT(b),
                 COUNT(CASE WHEN b.boardStatus = 'PUBLIC' THEN 1 END),
                 COUNT(CASE WHEN b.boardStatus = 'HIDDEN' THEN 1 END),
                 COUNT(CASE WHEN b.boardStatus = 'DRAFT' THEN 1 END)
@@ -51,11 +52,12 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     @Query("""
             SELECT b FROM Board b WHERE b.category.categoryId = :categoryId AND b.boardType = :boardType AND b.title LIKE %:keyword% ORDER BY b.createdAt DESC
             """)
-    Page<Board> searchForAdmin(@Param("categoryId") Long categoryId, @Param("keyword") String keyword, Pageable pageable);
+    Page<Board> searchForAdmin(@Param("categoryId") Long categoryId, @Param("boardType") BoardType boardType,
+                               @Param("keyword") String keyword, Pageable pageable);
 
     // 관리자용 - 카테고리, 상태, 제목으로 게시글 검색
     @Query("""
-            SELECT b FROM Board b WHERE b.category.categoryId = :categoryId AND b.boardType = :boardType AND b.boardStatus = :status AND b.title LIKE %:keyword% ORDER BY b.createdAt DESC
+            SELECT b FROM Board b WHERE b.category.categoryId = :categoryId AND b.boardType = :boardType AND b.boardStatus = :boardStatus AND b.title LIKE %:keyword% ORDER BY b.createdAt DESC
             """)
-    Page<Board> searchForAdminWithStatus(@Param("categoryId") Long categoryId, @Param("status") BoardStatus status, @Param("keyword") String keyword, Pageable pageable);
+    Page<Board> searchForAdminWithStatus(@Param("categoryId") Long categoryId, @Param("boardType") BoardType boardType, @Param("boardStatus") BoardStatus boardStatus, @Param("keyword") String keyword, Pageable pageable);
 }

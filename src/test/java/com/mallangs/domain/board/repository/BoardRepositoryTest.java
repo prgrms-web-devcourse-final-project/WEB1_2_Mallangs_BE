@@ -100,7 +100,7 @@ class BoardRepositoryTest {
                 .longitude(new BigDecimal("126.9780"))  // 서울시청 경도
                 .address("서울특별시 중구 세종대로 110")
                 .sightedAt(LocalDateTime.now())
-                .imgUrl("test-image.jpg")
+                .imageId(1L)
                 .boardType(BoardType.COMMUNITY)
                 .build();
         return boardRepository.save(board);

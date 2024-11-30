@@ -50,7 +50,7 @@ public class CategoryController {
 
     @Operation(summary = "카테고리 상태 변경 - 관리자 권한", description = "요청 형태: PATCH /api/categories/{카테고리ID}/status?status={상태}")
     @PatchMapping("/{categoryId}/status")
-    public ResponseEntity<Void> changeCategoryStatus(@PathVariable Long categoryId, @RequestParam CategoryStatus status) {
+    public ResponseEntity<Void> changeCategoryStatus(@PathVariable Long categoryId, @RequestBody CategoryStatus status) {
         categoryService.changeCategoryStatus(categoryId, status);
         return ResponseEntity.noContent().build();
     }
