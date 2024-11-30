@@ -35,9 +35,4 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
             "WHERE r.chatRoomId = :chatRoomId")
     Page<ChatMessage> findMessagesByChatRoomId(@Param("chatRoomId") Long chatRoomId, Pageable pageable);
 
-    //기준 아이디 이후의 아이디만 읽기로 바꾸기
-    @Modifying
-    @Transactional
-    @Query("UPDATE IsRead i SET i.readCheck = true WHERE i.chatMessage.chatMessageId > :chatMessageId AND i.readCheck = false ")
-    int turnUnReadToRead(Long chatMessageId);
 }

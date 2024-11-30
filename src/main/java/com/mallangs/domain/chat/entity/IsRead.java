@@ -22,7 +22,7 @@ public class IsRead {
     @JsonIgnore
     private ChatMessage chatMessage;
 
-    private String sender;
+    private String reader;
 
     @Builder.Default
     @Column(name = "read_check", nullable = false)

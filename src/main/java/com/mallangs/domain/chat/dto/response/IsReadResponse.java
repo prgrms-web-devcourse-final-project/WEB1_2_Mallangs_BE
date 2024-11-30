@@ -12,7 +12,7 @@ public class IsReadResponse {
     private Boolean readCheck;
 
     public IsReadResponse(IsRead isRead) {
-        this.sender = isRead.getSender();
+        this.sender = isRead.getReader();
         this.readCheck = isRead.getReadCheck();
     }
 }

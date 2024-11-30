@@ -17,6 +17,7 @@ import com.mallangs.domain.image.dto.ImageResponse;
 import com.mallangs.domain.image.entity.Image;
 import com.mallangs.domain.image.repository.ImageRepository;
 import com.mallangs.domain.member.dto.PageRequestDTO;
+import com.mallangs.domain.member.entity.embadded.UserId;
 import com.mallangs.global.exception.ErrorCode;
 import com.mallangs.global.exception.MallangsCustomException;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,17 +78,18 @@ public class ChatMessageService {
             // 읽음 표시 저장
             List<IsRead> isReadList = new ArrayList<>();
             for (ParticipatedRoom participatedRoom : chatRoom.getOccupiedRooms()) {
-                String senderName = participatedRoom.getParticipant().getNickname().getValue();
-                String ownerName = foundPartRoom.getParticipant().getNickname().getValue();
+                String ownerName = participatedRoom.getParticipant().getNickname().getValue();
+                String senderName = foundPartRoom.getParticipant().getNickname().getValue();
                 IsRead isRead;
 
                 //보낸사람의 메세지만 읽음 처리
                 if (senderName.equals(ownerName)) {
-                    isRead = IsRead.builder().chatMessage(savedChatMessage).sender(senderName).readCheck(true).build();
+                    isRead = IsRead.builder().chatMessage(savedChatMessage).reader(senderName).readCheck(true).build();
                 } else {
-                    isRead = IsRead.builder().chatMessage(savedChatMessage).sender(senderName).build();
+                    isRead = IsRead.builder().chatMessage(savedChatMessage).reader(ownerName).build();
                 }
                 IsRead savedIsRead = isReadRepository.save(isRead);
+                log.info("savedIsRead는 : {}, 참여 방은:{}",savedIsRead.getReadCheck(), participatedRoom.getParticipatedRoomId());
                 isReadList.add(savedIsRead);
             }
             log.info(" 읽음 처리 완료 저장된 보낸 채팅 정보: {}", isReadList.toString());
@@ -166,8 +169,8 @@ public class ChatMessageService {
     }
 
     //가장 최근 읽음 처리된 메세지 부터, 찾아 읽음 처리하는 메서드
-    public void changeUnReadToRead(Long chatMessageId) {
-        if (chatMessageRepository.turnUnReadToRead(chatMessageId) < 0) {
+    public void changeUnReadToRead(Long chatMessageId, Long participatedRoomId, String nickname) {
+        if (isReadRepository.turnUnReadToRead(chatMessageId, participatedRoomId, nickname) < 0) {
             throw new MallangsCustomException(ErrorCode.CHAT_MESSAGE_NOT_FOUND);
         }
     }

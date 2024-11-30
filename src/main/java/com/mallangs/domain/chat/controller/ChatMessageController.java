@@ -43,7 +43,7 @@ public class ChatMessageController {
     //채팅메세지 조회
     @GetMapping
     @ResponseBody
-    @Operation(summary = "채팅메세지 조회", description = "채팅 이력을 불러옵니다.")
+    @Operation(summary = "채팅메세지 조회", description = "채팅 이력을 불러오는 API")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "채팅방이 존재하지 않습니다.")
@@ -59,7 +59,7 @@ public class ChatMessageController {
     //채팅메세지 수정
     @PutMapping
     @ResponseBody
-    @Operation(summary = "채팅메세지 수정", description = "채팅내용을 수정합니다.")
+    @Operation(summary = "채팅메세지 수정", description = "채팅내용을 수정하는 API")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "수정 성공"),
             @ApiResponse(responseCode = "404", description = "채팅메세지가 존재하지 않습니다.")
@@ -73,7 +73,7 @@ public class ChatMessageController {
     //채팅메세지 삭제
     @DeleteMapping("/{chatMessageId}")
     @ResponseBody
-    @Operation(summary = "채팅메세지 삭제", description = "채팅내용을 삭제합니다.")
+    @Operation(summary = "채팅메세지 삭제", description = "채팅내용을 삭제하는 API.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "삭제 성공"),
             @ApiResponse(responseCode = "404", description = "채팅메세지가 존재하지 않습니다.")
@@ -82,9 +82,16 @@ public class ChatMessageController {
         chatMessageService.delete(chatMessageId);
         return ResponseEntity.ok().build();
     }
-    @GetMapping("/{chatMessageId}")
-    public void changeStatus(Long chatMessageId){
-        chatMessageService.changeUnReadToRead(chatMessageId);
+
+    //채팅 메세지 읽음으로 변경
+    @ResponseBody
+    @PutMapping("/{chatMessageId}/{participatedRoomId}")
+    @Operation(summary = "채팅메세지 읽음으로 변경", description = "채팅메세지를 읽음으로 변경하는 API.")
+    public void changeStatus(@PathVariable Long chatMessageId,
+                             @PathVariable Long participatedRoomId,
+                             @AuthenticationPrincipal CustomMemberDetails customMemberDetails){
+        String nickname = customMemberDetails.getNickname();
+        chatMessageService.changeUnReadToRead(chatMessageId, participatedRoomId, nickname);
     }
 
 }

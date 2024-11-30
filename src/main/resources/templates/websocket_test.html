@@ -77,12 +77,12 @@
         if (message) {
             //하드코딩
             const chatMessageRequest = {
-                participatedRoomId: 4, // 채팅방 ID
-                memberId: 4, // 사용자 ID
+                participatedRoomId: 3, // 채팅방 ID
+                memberId: 3, // 사용자 ID
                 message: message, // 전송 메시지
-                imageUrl: 'asdfasdasfasdfㄴㅇ', // 이미지 URL (필요 시 동적으로 설정)
-                height: 1234,
-                width: 1234
+                // imageUrl: 'asdfasdasfasdfㄴㅇ', // 이미지 URL (필요 시 동적으로 설정)
+                // height: 1234,
+                // width: 1234
             };
             ws.send("/pub/api/chat/send-message", {}, JSON.stringify(chatMessageRequest));
             console.log("Sent:", chatMessageRequest);
