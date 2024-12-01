@@ -1,6 +1,7 @@
 package com.mallangs.domain.board.dto.response;
 
 import com.mallangs.domain.board.entity.Category;
+import com.mallangs.domain.board.entity.CategoryLevel;
 import com.mallangs.domain.board.entity.CategoryStatus;
 import lombok.Getter;
 
@@ -9,7 +10,7 @@ public class AdminCategoryResponse {
     private final Long categoryId;
     private final String name;
     private final String description;
-    private final int categoryLevel;
+    private final CategoryLevel categoryLevel;
     private final int categoryOrder;
     private final CategoryStatus categoryStatus;
     private final String parentCategoryName;

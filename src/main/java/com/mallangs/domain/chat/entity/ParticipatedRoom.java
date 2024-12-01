@@ -19,14 +19,14 @@ public class ParticipatedRoom {
     @Column(name = "participated_room_id")
     private Long participatedRoomId;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    @JsonIgnore
     private Member participant;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_room_id", nullable = false)
-    @JsonIgnore
     private ChatRoom chatRoom;
 
     @OneToMany(mappedBy = "participatedRoom", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)

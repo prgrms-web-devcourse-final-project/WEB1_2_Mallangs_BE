@@ -21,7 +21,7 @@ public class SightingDetailResponse {
     private final BigDecimal latitude;
     private final BigDecimal longitude;
     private final String address;
-    private final String imgUrl;
+    private final Long imageId;
     private final int viewCount;
     private final int commentCount;
     private final BoardStatus boardStatus;
@@ -38,7 +38,7 @@ public class SightingDetailResponse {
         this.latitude = board.getLatitude();
         this.longitude = board.getLongitude();
         this.address = board.getAddress();
-        this.imgUrl = board.getImgUrl();
+        this.imageId = board.getImageId();
         this.viewCount = board.getViewCnt();
         this.commentCount = board.getCommentCnt();
         this.boardStatus = board.getBoardStatus();

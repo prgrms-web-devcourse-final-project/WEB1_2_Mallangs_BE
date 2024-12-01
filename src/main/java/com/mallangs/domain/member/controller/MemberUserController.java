@@ -11,11 +11,13 @@ import com.mallangs.global.exception.MallangsCustomException;
 import com.mallangs.global.jwt.entity.CustomMemberDetails;
 import com.mallangs.global.jwt.entity.TokenCategory;
 import com.mallangs.global.jwt.filter.LoginFilter;
+import com.mallangs.global.jwt.service.AccessTokenBlackList;
 import com.mallangs.global.jwt.service.RefreshTokenService;
 import com.mallangs.global.jwt.util.JWTUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -54,6 +57,7 @@ public class MemberUserController {
     private final AuthenticationManager authenticationManager;
     private final MemberUserService memberUserService;
     private final RefreshTokenService refreshTokenService;
+    private final AccessTokenBlackList accessTokenBlackList;
     private final JWTUtil jwtUtil;
 
 
@@ -134,6 +138,7 @@ public class MemberUserController {
         CustomMemberDetails customMemberDetails = (CustomMemberDetails) authentication.getPrincipal();
         Long memberId = customMemberDetails.getMemberId();
         String userId = customMemberDetails.getUsername();
+        String nickname = customMemberDetails.getNickname();
         String email = customMemberDetails.getEmail();
         String role = authentication.getAuthorities().stream()
                 .findFirst()
@@ -144,6 +149,7 @@ public class MemberUserController {
         Map<String, Object> AccessPayloadMap = new HashMap<>();
         AccessPayloadMap.put("memberId", memberId);
         AccessPayloadMap.put("userId", userId);
+        AccessPayloadMap.put("nickname", nickname);
         AccessPayloadMap.put("email", email);
         AccessPayloadMap.put("role", role);
         AccessPayloadMap.put("category", TokenCategory.ACCESS_TOKEN.name());
@@ -166,5 +172,79 @@ public class MemberUserController {
                 "AccessToken", accessToken,
                 "RefreshToken", refreshToken
         ));
+    }
+
+    @PostMapping("/logout")
+    @Operation(summary = "로그아웃", description = "로그아웃 요청 API")
+    public ResponseEntity<?> loginOut(HttpServletRequest request, HttpServletResponse response) {
+        log.info("커스텀 로그아웃 실행");
+
+        // Refresh Token 없다면 오류
+        String refreshTokenFromCookies = getRefreshTokenFromCookies(request);
+        log.info("refreshTokenFromCookies : {}", refreshTokenFromCookies);
+        if (refreshTokenFromCookies == null || refreshTokenFromCookies.trim().isEmpty()) {
+            log.warn("No refresh token found");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Refresh token is missing"));
+        }
+
+        // Access Token 없다면 오류
+        String authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            log.warn("No access token found");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Access token is missing"));
+        }
+
+        String accessToken = authorizationHeader.substring(7);
+        // 블랙리스트 등록
+        try {
+            if (!jwtUtil.isExpired(accessToken)) {
+                if (!jwtUtil.isExpired(refreshTokenFromCookies)) {
+                    accessTokenBlackList.registerBlackList(accessToken, refreshTokenFromCookies);
+                    log.info("Tokens are registered to BlackList");
+                } else {
+                    log.info("RefreshToken is expired");
+                }
+            } else {
+                log.info("AccessToken is expired");
+
+            }
+            // 리프레시 토큰 삭제
+            Map<String, Object> payloadMap = jwtUtil.validateRefreshToken(refreshTokenFromCookies);
+            refreshTokenService.deleteRefreshTokenInRedis(payloadMap);
+
+        } catch (Exception e) {
+            log.error("토큰 블랙리스트 처리에 실패하였습니다 : {}", e.getMessage());
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error","Token processing failed"));
+        }
+
+        // 쿠키 비우기
+        Cookie cookie = new Cookie("refreshToken", null);
+//        cookie.setSecure(true); // HTTPS 환경에서만 전송
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json");
+
+        return ResponseEntity.ok("LOGOUT SUCCESSFUL");
+    }
+
+    // 리프레시 토큰 꺼내기
+    private String getRefreshTokenFromCookies(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("RefreshToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+
     }
 }

@@ -25,7 +25,7 @@ public class CommunityCreateRequest {
     @NotBlank(message = "내용을 입력하세요.")
     private String content;
 
-    private String imgUrl;
+    private Long imageId;
 
     public Board toEntity(Member member, Category category) {
         return Board.builder()
@@ -33,7 +33,7 @@ public class CommunityCreateRequest {
                 .category(category)
                 .title(this.title)
                 .content(this.content)
-                .imgUrl(this.imgUrl)
+                .imageId(this.imageId)
                 .boardType(BoardType.COMMUNITY)
                 .build();
     }

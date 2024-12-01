@@ -18,6 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 public class ChatRoomRepositoryTest {
+<<<<<<< HEAD
+}
+=======
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -112,3 +115,4 @@ public class ChatRoomRepositoryTest {
 
     }
 }
+>>>>>>> 3579dd746bc2bb818ef6786e0e9330f2c28f3f2c

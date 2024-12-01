@@ -100,7 +100,7 @@ class BoardRepositoryTest {
                 .longitude(new BigDecimal("126.9780"))  // 서울시청 경도
                 .address("서울특별시 중구 세종대로 110")
                 .sightedAt(LocalDateTime.now())
-                .imgUrl("test-image.jpg")
+                .imageId(1L)
                 .boardType(BoardType.COMMUNITY)
                 .build();
         return boardRepository.save(board);
@@ -144,7 +144,7 @@ class BoardRepositoryTest {
         boardRepository.save(draftBoard);
 
         // when
-        Page<Board> result = boardRepository.searchByTitleOrContent("테스트", PageRequest.of(0, 10));
+        Page<Board> result = boardRepository.searchByTitleOrContent("테스트", BoardType.COMMUNITY,PageRequest.of(0, 10));
 
         // then
         assertThat(result.getContent()).hasSize(1);  // PUBLISHED 상태의 게시글만 조회
@@ -164,6 +164,7 @@ class BoardRepositoryTest {
         // when
         Page<Board> result = boardRepository.findByMemberId(
                 testMember.getMemberId(),
+                BoardType.COMMUNITY,
                 PageRequest.of(0, 10)
         );
 
