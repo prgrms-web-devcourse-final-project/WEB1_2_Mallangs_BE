@@ -14,15 +14,21 @@ public class ParticipatedRoomListResponse {
     private Long chatRoomId;
     private String nickname;
     private String message;
+    private String chatRoomName;
     private LocalDateTime lastChatTime;
+    private Integer notReadCnt;
 
     @Builder
-    public ParticipatedRoomListResponse(String message, Nickname nickname, LocalDateTime createdAt, Long chatRoomId, Long participatedRoomId) {
-        this.message = message;
-        this.nickname = nickname.getValue();
-        this.lastChatTime = createdAt;
-        this.chatRoomId = chatRoomId;
+    public ParticipatedRoomListResponse(Long participatedRoomId, Long chatRoomId,
+                                        String nickname, String message,
+                                        String chatRoomName, LocalDateTime lastChatTime,
+                                        Integer notReadCnt) {
         this.participatedRoomId = participatedRoomId;
+        this.chatRoomId = chatRoomId;
+        this.nickname = nickname;
+        this.message = message;
+        this.chatRoomName = chatRoomName;
+        this.lastChatTime = lastChatTime;
+        this.notReadCnt = notReadCnt;
     }
-
 }

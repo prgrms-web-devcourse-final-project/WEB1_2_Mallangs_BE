@@ -134,6 +134,7 @@ public class MemberUserController {
         CustomMemberDetails customMemberDetails = (CustomMemberDetails) authentication.getPrincipal();
         Long memberId = customMemberDetails.getMemberId();
         String userId = customMemberDetails.getUsername();
+        String nickname = customMemberDetails.getNickname();
         String email = customMemberDetails.getEmail();
         String role = authentication.getAuthorities().stream()
                 .findFirst()
@@ -144,6 +145,7 @@ public class MemberUserController {
         Map<String, Object> AccessPayloadMap = new HashMap<>();
         AccessPayloadMap.put("memberId", memberId);
         AccessPayloadMap.put("userId", userId);
+        AccessPayloadMap.put("nickname", nickname);
         AccessPayloadMap.put("email", email);
         AccessPayloadMap.put("role", role);
         AccessPayloadMap.put("category", TokenCategory.ACCESS_TOKEN.name());
