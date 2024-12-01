@@ -2,6 +2,8 @@ package com.mallangs.domain.member.controller;
 
 import com.mallangs.global.jwt.util.JWTUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -32,6 +34,10 @@ public class AuthController {
      */
     @GetMapping("/get-access-token")
     @Operation(summary = "세션으로 토큰 받아가는 API", description = "AccessToken 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "전달 성공"),
+            @ApiResponse(responseCode = "404", description = "토큰 전달 실패.")
+    })
     public ResponseEntity<?> getAccessToken(HttpServletRequest request, HttpServletResponse response) {
         // AccessToken을 세션에서 가져오기
         String accessToken = (String) request.getSession().getAttribute("AccessToken");

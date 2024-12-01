@@ -4,6 +4,7 @@ import com.mallangs.domain.chat.dto.request.ChatMessageRequest;
 import com.mallangs.domain.chat.dto.request.UpdateChatMessageRequest;
 import com.mallangs.domain.chat.dto.response.ChatMessageListResponse;
 import com.mallangs.domain.chat.dto.response.ChatMessageResponse;
+import com.mallangs.domain.chat.dto.response.ChatMessageToDTOResponse;
 import com.mallangs.domain.chat.service.ChatMessageService;
 import com.mallangs.domain.member.dto.PageRequestDTO;
 import com.mallangs.domain.member.service.MemberUserService;
@@ -64,10 +65,9 @@ public class ChatMessageController {
             @ApiResponse(responseCode = "200", description = "수정 성공"),
             @ApiResponse(responseCode = "404", description = "채팅메세지가 존재하지 않습니다.")
     })
-    public ResponseEntity<?> update(
+    public ResponseEntity<ChatMessageToDTOResponse> update(
             @Validated @RequestBody UpdateChatMessageRequest updateChatMessageRequest) {
-        chatMessageService.update(updateChatMessageRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(chatMessageService.update(updateChatMessageRequest));
     }
 
     //채팅메세지 삭제
@@ -79,19 +79,21 @@ public class ChatMessageController {
             @ApiResponse(responseCode = "404", description = "채팅메세지가 존재하지 않습니다.")
     })
     public ResponseEntity<?> delete(@PathVariable("chatMessageId") Long chatMessageId) {
-        chatMessageService.delete(chatMessageId);
-        return ResponseEntity.ok().build();
+        if (chatMessageService.delete(chatMessageId)){
+            return ResponseEntity.ok("삭제성공");
+        };
+        return ResponseEntity.noContent().build();
     }
 
     //채팅 메세지 읽음으로 변경
     @ResponseBody
     @PutMapping("/{chatMessageId}/{participatedRoomId}")
     @Operation(summary = "채팅메세지 읽음으로 변경", description = "채팅메세지를 읽음으로 변경하는 API.")
-    public void changeStatus(@PathVariable Long chatMessageId,
+    public ResponseEntity<?> changeStatus(@PathVariable Long chatMessageId,
                              @PathVariable Long participatedRoomId,
                              @AuthenticationPrincipal CustomMemberDetails customMemberDetails){
         String nickname = customMemberDetails.getNickname();
         chatMessageService.changeUnReadToRead(chatMessageId, participatedRoomId, nickname);
+        return ResponseEntity.ok("변경 성공");
     }
-
 }
