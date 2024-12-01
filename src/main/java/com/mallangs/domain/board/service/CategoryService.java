@@ -10,6 +10,7 @@ import com.mallangs.global.exception.ErrorCode;
 import com.mallangs.global.exception.MallangsCustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +29,6 @@ public class CategoryService {
     public List<CategoryResponse> getAllActiveCategories() {
         List<Category> categories = categoryRepository.findAllActiveCategories();
         return categories.stream()
-                .filter(category -> category.getCategoryLevel() == 0)
                 .map(CategoryResponse::new)
                 .collect(Collectors.toList());
     }
@@ -43,7 +43,10 @@ public class CategoryService {
     // 카테고리 생성
     @Transactional
     public CategoryResponse createCategory(CategoryCreateRequest request) {
-        log.info("=== Service creating category: {}", request);
+        if (isNotAdminRole()) {
+            throw new MallangsCustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
         Category parentCategory = null;
         if (request.getParentCategoryId() != null) {
             parentCategory = categoryRepository.findById(request.getParentCategoryId())
@@ -65,10 +68,21 @@ public class CategoryService {
     // 카테고리 수정
     @Transactional
     public CategoryResponse updateCategory(Long categoryId, CategoryUpdateRequest request) {
+        if (isNotAdminRole()) {
+            throw new MallangsCustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.CATEGORY_NOT_FOUND));
 
+        Category parentCategory = null;
+        if (request.getParentCategory() != null) {
+            parentCategory = categoryRepository.findById(request.getParentCategory())
+                    .orElseThrow(() -> new MallangsCustomException(ErrorCode.PARENT_CATEGORY_NOT_FOUND));
+        }
+
         category.changeCategory(
+                parentCategory,
                 request.getName(),
                 request.getDescription(),
                 request.getCategoryLevel(),
@@ -81,6 +95,10 @@ public class CategoryService {
     // 카테고리 상태 변경
     @Transactional
     public void changeCategoryStatus(Long categoryId, CategoryStatus status) {
+        if (isNotAdminRole()) {
+            throw new MallangsCustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.CATEGORY_NOT_FOUND));
         category.changeStatus(status);
@@ -89,6 +107,10 @@ public class CategoryService {
     // 카테고리 순서 변경
     @Transactional
     public void changeCategoryOrder(Long categoryId, int newOrder) {
+        if (isNotAdminRole()) {
+            throw new MallangsCustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.CATEGORY_NOT_FOUND));
         category.changeOrder(newOrder);
@@ -105,5 +127,11 @@ public class CategoryService {
             categories = categoryRepository.findByNameContainingAndCategoryStatus(name, CategoryStatus.ACTIVE);
         }
         return categories.stream().map(CategoryResponse::new).collect(Collectors.toList());
+    }
+
+    // 헬퍼 메서드: 권한 확인용
+    public boolean isNotAdminRole() {
+        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .noneMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 }

@@ -49,7 +49,8 @@ public class Board extends BaseTimeEntity {
 
     private LocalDateTime sightedAt;
 
-    private String imgUrl;
+    @Column(name = "id")
+    private Long imageId;
 
     private int viewCnt;
 
@@ -64,7 +65,7 @@ public class Board extends BaseTimeEntity {
     @Builder
 
     public Board(Member member, Category category, String title, String content, BigDecimal latitude,
-                 BigDecimal longitude, String address, LocalDateTime sightedAt, String imgUrl, BoardType boardType) {
+                 BigDecimal longitude, String address, LocalDateTime sightedAt, Long imageId, BoardType boardType) {
         this.member = member;
         this.category = category;
         this.title = title;
@@ -73,7 +74,7 @@ public class Board extends BaseTimeEntity {
         this.longitude = longitude;
         this.address = address;
         this.sightedAt = sightedAt;
-        this.imgUrl = imgUrl;
+        this.imageId = imageId;
         this.boardType = boardType;
         this.boardStatus = BoardStatus.PUBLISHED;
         this.viewCnt = 0;
@@ -82,14 +83,14 @@ public class Board extends BaseTimeEntity {
     }
 
     // 커뮤니티 게시글용 생성 메서드
-    public static Board createCommunityBoard(Member member, Category category,
-                                             String title, String content, String imgUrl) {
+    public static Board createCommunityBoard(Member member, Category category, String title,
+                                             String content, Long imageId) {
         return Board.builder()
                 .member(member)
                 .category(category)
                 .title(title)
                 .content(content)
-                .imgUrl(imgUrl)
+                .imageId(imageId)
                 .boardType(BoardType.COMMUNITY)
                 .build();
     }
@@ -97,7 +98,7 @@ public class Board extends BaseTimeEntity {
     // 실종신고-목격제보용 생성 메서드
     public static Board createSightingBoard(Member member, Category category,
                                             String title, String content, BigDecimal latitude, BigDecimal longitude,
-                                            String address, LocalDateTime sightedAt, String imgUrl) {
+                                            String address, LocalDateTime sightedAt, Long imageId) {
         return Board.builder()
                 .member(member)
                 .category(category)
@@ -107,21 +108,21 @@ public class Board extends BaseTimeEntity {
                 .longitude(longitude)
                 .address(address)
                 .sightedAt(sightedAt)
-                .imgUrl(imgUrl)
+                .imageId(imageId)
                 .boardType(BoardType.SIGHTING)
                 .build();
     }
 
     // 게시글 정보 수정
     public void change(String title, String content, BigDecimal latitude, BigDecimal longitude,
-                       String address, LocalDateTime sightedAt, String imgUrl) {
+                       String address, LocalDateTime sightedAt, Long imageId) {
         this.title = title;
         this.content = content;
         this.latitude = latitude;
         this.longitude = longitude;
         this.address = address;
         this.sightedAt = sightedAt;
-        this.imgUrl = imgUrl;
+        this.imageId = imageId;
     }
 
     // 게시글 상태 변경
