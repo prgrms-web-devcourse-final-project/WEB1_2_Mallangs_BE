@@ -4,6 +4,7 @@ import com.mallangs.global.jwt.entity.TokenCategory;
 import com.mallangs.global.jwt.service.RefreshTokenService;
 import com.mallangs.global.jwt.util.JWTUtil;
 import com.mallangs.global.oauth2.dto.CustomOAuth2Member;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -34,12 +35,13 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final RefreshTokenService refreshTokenService;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
         //OAuth2User 에서 사용자 정보 추출
         CustomOAuth2Member customUserDetails = (CustomOAuth2Member) authentication.getPrincipal();
 
         //userId, email 추출
+        Long memberId = customUserDetails.getMemberId();
         String userId = customUserDetails.getName();
         String email = customUserDetails.getEmail();
 
@@ -51,6 +53,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         //Access 토큰 생성
         Map<String, Object> payloadMap = new HashMap<>();
+        payloadMap.put("memberId", memberId);
         payloadMap.put("userId", userId);
         payloadMap.put("email", email);
         payloadMap.put("role", role);
@@ -70,18 +73,18 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         refreshTokenService.insertInRedis(payloadMap, refreshToken);
 
         //토큰 전송
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(
-                "{\"AccessToken\": \"" + accessToken + "\"," +
-                        " \"RefreshToken\": \"" + refreshToken + "\",");
-
-        response.addHeader("Authorization", "Bearer " + accessToken);
         response.addCookie(createCookie(refreshToken));
         response.setStatus(HttpStatus.OK.value());
 
+        //세션으로 전송
+        request.getSession().setAttribute("accessToken", accessToken);
+        request.getSession().setAttribute("refreshToken", refreshToken);
+
         // 로그인 후 리다이렉트 -> 어떤 페이지로 이동할 서버에서 선택!
-        response.sendRedirect("http://localhost:3000/");
+        // 성공 페이지 URL 설정
+        setDefaultTargetUrl("/success");
+        super.onAuthenticationSuccess(request, response, authentication);
+//        response.sendRedirect("http://localhost:3000/");
     }
 
     //쿠키 만들기

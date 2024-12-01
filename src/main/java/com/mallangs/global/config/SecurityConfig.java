@@ -83,13 +83,14 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable);
         // oauth2
-//        http
-//                .oauth2Login((oauth2) -> oauth2
-//                        .userInfoEndpoint((userInfo) -> userInfo
-//                                .userService(customOAuth2MemberService))
-//                        .successHandler(customSuccessHandler)
-//                        .failureHandler(customFailureHandler)
-//                );
+        http
+                .oauth2Login((oauth2) -> oauth2
+                        .loginPage("/login")
+                        .userInfoEndpoint((userInfo) -> userInfo
+                                .userService(customOAuth2MemberService))
+                        .successHandler(customSuccessHandler)
+                        .failureHandler(customFailureHandler)
+                );
 
         // 경로별 인가 작업
         http
@@ -98,6 +99,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/member/register", "/api/member/login",
                                         "/api/member/logout", "/api/member/find-user-id",
                                         "/api/member/find-password").permitAll() //회원가입,로그인,로그아웃,비번찾기,아이디찾기
+                                .requestMatchers("/login","/error","/success","/api/auth/**").permitAll()
                                 .requestMatchers("/api/member/oauth2/**").permitAll() //소셜로그인
                                 .requestMatchers("/api/member/admin/**").hasRole("ADMIN") //관리자
                                 .requestMatchers("/api/chat/websocket-test").permitAll() //웹소켓 테스터
