@@ -6,14 +6,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 public interface ArticleRepository extends JpaRepository<Article, Long> {
 
   // 글타래 타입 별 조회
-  @Query("SELECT a FROM Article a WHERE TYPE(a) = :articleType")
+  @Query("SELECT a FROM Article a WHERE a.type = :articleType")
   List<Article> findByArticleType(String articleType);
-
 
   // 글타래 종류 별 조회
 //  List<Article> findArticleListByArticleType();
