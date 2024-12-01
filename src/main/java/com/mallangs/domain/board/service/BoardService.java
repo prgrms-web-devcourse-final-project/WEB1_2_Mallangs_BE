@@ -55,7 +55,7 @@ public class BoardService {
         return boardRepository.save(board).getBoardId();
     }
 
-    // 실종신고 - 목격제보 게시글 작성
+    // 실종신고-목격제보 게시글 작성
     @Transactional
     public Long createSightingBoard(SightingCreateRequest request, Long memberId) {
         Member member = memberRepository.findById(memberId)
@@ -95,7 +95,7 @@ public class BoardService {
         );
     }
 
-    // 실종신고 - 목격제보 게시글 수정
+    // 실종신고-목격제보 게시글 수정
     @Transactional
     public void updateSightingBoard(Long boardId, SightingUpdateRequest request, Long memberId) {
         Board board = getBoardWithMemberValidation(boardId, memberId, BoardType.SIGHTING);
@@ -111,6 +111,11 @@ public class BoardService {
         );
     }
 
+    // 커뮤니티 게시판 게시글 전체 조회
+    public Page<CommunityListResponse> getAllCommunitiyBoard(Pageable pageable) {
+        return boardRepository.findAllByBoardType(BoardType.COMMUNITY, pageable).map(CommunityListResponse::new);
+    }
+
     // 커뮤니티 게시글 상세 조회
     public CommunityDetailResponse getCommunityBoard(Long boardId) {
         Board board = getBoardWithTypeValidation(boardId, BoardType.COMMUNITY);
@@ -118,7 +123,12 @@ public class BoardService {
         return new CommunityDetailResponse(board);
     }
 
-    // 실종신고 - 목격제보 게시글 상세 조회
+    // 실종신고-목격제보 게시판 게시글 전체 조회
+    public Page<SightingListResponse> getAllSightingBoard(Pageable pageable) {
+        return boardRepository.findAllByBoardType(BoardType.SIGHTING, pageable).map(SightingListResponse::new);
+    }
+
+    // 실종신고-목격제보 게시글 상세 조회
     public SightingDetailResponse getSightingBoard(Long boardId) {
         Board board = getBoardWithTypeValidation(boardId, BoardType.SIGHTING);
         board.increaseViewCount();
@@ -138,7 +148,7 @@ public class BoardService {
                 .map(CommunityListResponse::new);
     }
 
-    // 카테고리별 목격 게시글 목록 조회
+    // 카테고리별 실종신고-목격제보 게시글 목록 조회
     public Page<SightingListResponse> getSightingBoardsByCategory(Long categoryId, Pageable pageable) {
         return boardRepository.findByCategoryId(categoryId, BoardType.SIGHTING, pageable)
                 .map(SightingListResponse::new);
