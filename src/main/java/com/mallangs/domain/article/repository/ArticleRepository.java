@@ -13,19 +13,17 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
   @Query("SELECT a FROM Article a WHERE a.type = :articleType")
   List<Article> findByArticleType(String articleType);
 
-  // 글타래 종류 별 조회
-//  List<Article> findArticleListByArticleType();
-
   // 멤버 개인 글타래 목록 조회
   @Query("SELECT a FROM Article a WHERE a.member.memberId = :memberId")
   Page<Article> findByMemberId(Pageable pageable, Long memberId);
-//  List<Article> findArticleListByMember(Long memberId);
-
-  // 위치 기준 검색
-  //
 
   // 제목 검색
 //  @Query("SELECT a FROM Article a WHERE a.title LIKE %:title%")
 //  List<Article> findByTitleContaining(@Param("title") String title);
+
+  // 검색
+  Page<Article> findByTitleContainingOrDescriptionContaining(
+      String title, String description, Pageable pageable);
+
 
 }
