@@ -19,7 +19,7 @@ public class CommunityDetailResponse {
     private final int viewCount;
     private final int commentCount;
     private final int likeCount;
-    private final String imgUrl;
+    private final Long imageId;
     private final BoardStatus status;
 
     public CommunityDetailResponse(Board board) {
@@ -33,7 +33,7 @@ public class CommunityDetailResponse {
         this.viewCount = board.getViewCnt();
         this.commentCount = board.getCommentCnt();
         this.likeCount = board.getLikeCnt();
-        this.imgUrl = board.getImgUrl();
+        this.imageId = board.getImageId();
         this.status = board.getBoardStatus();
     }
 }
