@@ -17,10 +17,6 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
   @Query("SELECT a FROM Article a WHERE a.member.memberId = :memberId")
   Page<Article> findByMemberId(Pageable pageable, Long memberId);
 
-  // 제목 검색
-//  @Query("SELECT a FROM Article a WHERE a.title LIKE %:title%")
-//  List<Article> findByTitleContaining(@Param("title") String title);
-
   // 검색
   Page<Article> findByTitleContainingOrDescriptionContaining(
       String title, String description, Pageable pageable);
