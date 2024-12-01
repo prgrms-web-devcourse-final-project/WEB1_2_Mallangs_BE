@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -87,19 +88,32 @@ public class ArticleController {
   public ResponseEntity<List<MapBoundsResponse>> getMarkersInBounds(
       @RequestBody MapBoundsRequest bounds) {
 
-    double northEastLat = bounds.getNorthEastLat();
-    double northEastLon = bounds.getNorthEastLon();
     double southWestLat = bounds.getSouthWestLat();
     double southWestLon = bounds.getSouthWestLon();
+    double northEastLat = bounds.getNorthEastLat();
+    double northEastLon = bounds.getNorthEastLon();
 
-    List<Article> articles = locationService.findArticlesInBounds(northEastLat, northEastLon,
-        southWestLat, southWestLon);
+    // 순서가 바뀌어야 합니다. (위도, 경도 -> 경도, 위도)
+    List<Article> articles = locationService.findArticlesInBounds(southWestLat, southWestLon,
+        northEastLat, northEastLon);
+
     List<MapBoundsResponse> articlesInBounds = articles.stream()
         .map(MapBoundsResponse::new)
         .collect(Collectors.toList());
 
     return ResponseEntity.ok(articlesInBounds);
   }
+
+  // 검색 조회
+  @Operation(summary = "글타래 검색", description = "글타래에서 검색합니다.")
+  @GetMapping("/search")
+  public ResponseEntity<Page<ArticleResponse>> searchSightingPosts(
+      @Parameter(description = "페이지 요청 정보", required = true) Pageable pageable,
+      @RequestParam String keyword) {
+    Page<ArticleResponse> articles = articleService.findArticlesByKeyword(pageable, keyword);
+    return ResponseEntity.ok(articles);
+  }
+
 
   // 회원 자신이 작성한 글타래 목록 조회
   @Operation(summary = "사용자가 작성한 전체 글타래 조회", description = "사용자가 자신이 작성한 글타래 목록을 조회합니다.")
