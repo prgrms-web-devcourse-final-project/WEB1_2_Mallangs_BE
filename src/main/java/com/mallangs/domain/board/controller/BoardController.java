@@ -47,14 +47,21 @@ public class BoardController {
         return ResponseEntity.created(URI.create("/api/board/community/" + boardId)).body(boardId);
     }
 
+    @Operation(summary = "커뮤니티 전체 게시글 조회", description = "커뮤니티 게시판의 게시글 전체를 조회합니다.")
+    @GetMapping("/community/all")
+    public ResponseEntity<Page<CommunityListResponse>> getAllCommunity(@RequestParam(defaultValue = "1") int page) {
+        PageRequest pageRequest = PageRequest.of(page - 1, 10);
+        return ResponseEntity.ok(boardService.getAllCommunitiyBoard(pageRequest));
+    }
+
     @Operation(summary = "커뮤니티 게시글 검색", description = "키워드로 커뮤니티 게시글을 검색합니다.")
     @GetMapping("/community/search")
     public ResponseEntity<Page<CommunityListResponse>> searchCommunityPosts(
             @RequestParam String keyword,
-            @RequestParam(defaultValue = "0") int page
+            @RequestParam(defaultValue = "1") int page
     ) {
 
-        PageRequest pageRequest = PageRequest.of(page, 10);
+        PageRequest pageRequest = PageRequest.of(page - 1, 10);
         return ResponseEntity.ok(boardService.searchCommunityBoards(keyword, pageRequest));
     }
 
@@ -62,9 +69,9 @@ public class BoardController {
     @GetMapping("/community/member/{memberId}")
     public ResponseEntity<Page<CommunityListResponse>> getMemberCommunityPosts(
             @PathVariable Long memberId,
-            @RequestParam(defaultValue = "0") int page
+            @RequestParam(defaultValue = "1") int page
     ) {
-        PageRequest pageRequest = PageRequest.of(page, 10);
+        PageRequest pageRequest = PageRequest.of(page - 1, 10);
         return ResponseEntity.ok(boardService.getMemberCommunityBoards(memberId, pageRequest));
     }
 
@@ -72,9 +79,9 @@ public class BoardController {
     @GetMapping("/community/category/{categoryId}")
     public ResponseEntity<Page<CommunityListResponse>> getCommunityPostByCategory(
             @PathVariable Long categoryId,
-            @RequestParam(defaultValue = "0") int page
+            @RequestParam(defaultValue = "1") int page
     ) {
-        PageRequest pageRequest = PageRequest.of(page, 10);
+        PageRequest pageRequest = PageRequest.of(page - 1, 10);
         return ResponseEntity.ok(boardService.getCommunityBoardsByCategory(categoryId, pageRequest));
     }
 
@@ -108,13 +115,20 @@ public class BoardController {
         return ResponseEntity.created(URI.create("/api/board/sighting/" + boardId)).body(boardId);
     }
 
+    @Operation(summary = "실종신고-목격제보 전체 게시글 조회", description = "실종신고-목격제보 게시판의 게시글 전체를 조회합니다.")
+    @GetMapping("/sighting/all")
+    public ResponseEntity<Page<SightingListResponse>> getAllSighting(@RequestParam(defaultValue = "1") int page) {
+        PageRequest pageRequest = PageRequest.of(page - 1, 10);
+        return ResponseEntity.ok(boardService.getAllSightingBoard(pageRequest));
+    }
+
     @Operation(summary = "실종신고-목격제보 게시글 검색", description = "키워드로 실종신고-목격제보 게시글을 검색합니다.")
     @GetMapping("/sighting/search")
     public ResponseEntity<Page<SightingListResponse>> searchSightingPosts(
             @RequestParam String keyword,
-            @RequestParam(defaultValue = "0") int page
+            @RequestParam(defaultValue = "1") int page
     ) {
-        PageRequest pageRequest = PageRequest.of(page, 10);
+        PageRequest pageRequest = PageRequest.of(page - 1, 10);
         return ResponseEntity.ok(boardService.searchSightingBoards(keyword, pageRequest));
     }
 
@@ -122,9 +136,9 @@ public class BoardController {
     @GetMapping("/sighting/member/{memberId}")
     public ResponseEntity<Page<SightingListResponse>> getMemberSightingPosts(
             @PathVariable Long memberId,
-            @RequestParam(defaultValue = "0") int page
+            @RequestParam(defaultValue = "1") int page
     ) {
-        PageRequest pageRequest = PageRequest.of(page, 10);
+        PageRequest pageRequest = PageRequest.of(page - 1, 10);
         return ResponseEntity.ok(boardService.getMemberSightingBoards(memberId, pageRequest));
     }
 
@@ -132,9 +146,9 @@ public class BoardController {
     @GetMapping("/sighting/category/{categoryId}")
     public ResponseEntity<Page<SightingListResponse>> getSightingPostsByCategory(
             @PathVariable Long categoryId,
-            @RequestParam(defaultValue = "0") int page
+            @RequestParam(defaultValue = "1") int page
     ) {
-        PageRequest pageRequest = PageRequest.of(page, 10);
+        PageRequest pageRequest = PageRequest.of(page - 1, 10);
         return ResponseEntity.ok(boardService.getSightingBoardsByCategory(categoryId, pageRequest));
     }
 
@@ -175,9 +189,9 @@ public class BoardController {
             @RequestParam(required = false) BoardStatus boardStatus,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) String keyword,
-            @RequestParam(defaultValue = "0") int page
+            @RequestParam(defaultValue = "1") int page
     ) {
-        PageRequest pageRequest = PageRequest.of(page, 10);
+        PageRequest pageRequest = PageRequest.of(page - 1, 10);
 
         if (boardStatus != null && categoryId != null) {
             return ResponseEntity.ok(boardService.searchBoardsForAdminWithStatus(categoryId, boardType, boardStatus, keyword, pageRequest));
