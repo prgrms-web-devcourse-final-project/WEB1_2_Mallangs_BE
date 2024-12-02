@@ -67,6 +67,7 @@ public class ChatMessageController {
     })
     public ResponseEntity<ChatMessageToDTOResponse> update(
             @Validated @RequestBody UpdateChatMessageRequest updateChatMessageRequest) {
+
         return ResponseEntity.ok(chatMessageService.update(updateChatMessageRequest));
     }
 
