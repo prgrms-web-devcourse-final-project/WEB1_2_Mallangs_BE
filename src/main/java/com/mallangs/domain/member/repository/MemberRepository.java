@@ -60,24 +60,24 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     //모든 회원조회 - UserId
     @Query("SELECT new com.mallangs.domain.member.dto.MemberGetResponseOnlyMember(m) " +
             "FROM Member m " +
-            "WHERE (:isActive IS NOT NULL OR m.isActive = :isActive) " +
-            "AND (:userId IS NOT NULL OR m.userId.value LIKE CONCAT('%', :userId, '%')) " +
-            "AND (:createAt IS NOT NULL OR m.createdAt >= :createAt)")
+            "WHERE (:isActive IS NULL OR m.isActive = :isActive) " +
+            "AND (:createAt IS NULL OR m.createdAt >= :createAt) " +
+            "AND m.userId = :userId")
     Page<MemberGetResponseOnlyMember> memberListByUserId(
             @Param("isActive") Boolean isActive,
-            @Param("userId") String userId,
+            @Param("userId") UserId userId,
             @Param("createAt") LocalDateTime createAt,
             Pageable pageable);
 
     //모든 회원조회 - Email
     @Query("SELECT new com.mallangs.domain.member.dto.MemberGetResponseOnlyMember(m) " +
             "FROM Member m " +
-            "WHERE (:isActive IS NOT NULL OR m.isActive = :isActive) " +
-            "AND (:email IS NOT NULL OR m.email.value LIKE CONCAT('%', :email, '%')) " +
-            "AND (:createAt IS NOT NULL OR m.createdAt >= :createAt)")
+            "WHERE (:isActive IS NULL OR m.isActive = :isActive) " +
+            "AND (:createAt IS NULL OR m.createdAt >= :createAt)" +
+            "AND m.email = :email")
     Page<MemberGetResponseOnlyMember> memberListByEmail(
             @Param("isActive") Boolean isActive,
-            @Param("email") String email,
+            @Param("email") Email email,
             @Param("createAt") LocalDateTime createAt,
             Pageable pageable);
 

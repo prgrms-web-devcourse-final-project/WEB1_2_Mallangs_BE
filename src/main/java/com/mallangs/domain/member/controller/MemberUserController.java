@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Log4j2
@@ -68,7 +69,7 @@ public class MemberUserController {
     }
 
     @GetMapping("")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "회원조회", description = "회원조회 요청 API")
     public ResponseEntity<MemberGetResponse> get(Authentication authentication) {
         String userId = authentication.getName();
@@ -76,7 +77,7 @@ public class MemberUserController {
     }
 
     @PutMapping("/{memberId}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "회원수정", description = "회원수정 요청 API")
     public ResponseEntity<?> update(@Validated @RequestBody MemberUpdateRequest memberUpdateRequest,
                                     @PathVariable("memberId") Long memberId) {
@@ -85,7 +86,7 @@ public class MemberUserController {
     }
 
     @DeleteMapping("/{memberId}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "회원탈퇴", description = "회원탈퇴 요청 API")
     public ResponseEntity<?> delete(@PathVariable("memberId") Long memberId) {
         memberUserService.delete(memberId);
@@ -93,7 +94,7 @@ public class MemberUserController {
     }
 
     @GetMapping("/list")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "회원리스트 조회", description = "회원리스트 조회 요청 API")
     public ResponseEntity<Page<MemberGetResponse>> list(@RequestParam(value = "page", defaultValue = "1") int page,
                                                         @RequestParam(value = "size", defaultValue = "10") int size) {
@@ -114,7 +115,7 @@ public class MemberUserController {
         return ResponseEntity.ok(memberUserService.mailSend(mail));
     }
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @PostMapping("/check-password")
     @Operation(summary = "비밀번호 확인", description = "비밀번호 확인 요청 API")
     public ResponseEntity<?> checkPassword(@Validated @RequestBody PasswordDTO passwordDTO
@@ -167,6 +168,19 @@ public class MemberUserController {
 
         //리프레시 토큰 레디스에 저장하기
         refreshTokenService.insertInRedis(refreshPayloadMap, refreshToken);
+
+        //로그인 시간 저장
+        Member foundMember = memberRepository.findByUserId(new UserId(userId))
+                .orElseThrow(()->new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+        foundMember.recordLoginTime();
+
+        //차단된 계정이면 차단
+        if (!foundMember.getIsActive()){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("사용자는 "+foundMember.getReasonForBan()
+                    +"문제로 인해 차단되었습니다.");
+        }
+        memberRepository.save(foundMember);
+
         // 응답 반환
         return ResponseEntity.ok(Map.of(
                 "AccessToken", accessToken,

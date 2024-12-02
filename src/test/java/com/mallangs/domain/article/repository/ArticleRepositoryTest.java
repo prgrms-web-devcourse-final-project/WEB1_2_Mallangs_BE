@@ -6,6 +6,7 @@ import com.mallangs.domain.article.entity.Article;
 import com.mallangs.domain.article.entity.LostArticle;
 import com.mallangs.domain.article.entity.LostStatus;
 import com.mallangs.domain.article.entity.MapVisibility;
+import com.mallangs.domain.board.entity.BoardStatus;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.embadded.Email;
 import com.mallangs.domain.member.entity.embadded.Nickname;
@@ -68,6 +69,7 @@ class ArticleRepositoryTest { // db 와의 crud 체크
         .lastSeenLocation("공원")
         .lostStatus(LostStatus.LOST)
         .mapVisibility(MapVisibility.VISIBLE)
+            .articleStatus(BoardStatus.DRAFT)
         .type("lost")
         .title("강아지 찾아주세요")
         .geography(changeToPoint(-73.968285, 40.785091))

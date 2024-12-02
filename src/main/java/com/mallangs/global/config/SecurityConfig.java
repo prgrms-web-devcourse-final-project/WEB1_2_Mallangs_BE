@@ -85,7 +85,7 @@ public class SecurityConfig {
         // oauth2
         http
                 .oauth2Login((oauth2) -> oauth2
-                        .loginPage("/login")
+                        .loginPage("/login").permitAll()
                         .userInfoEndpoint((userInfo) -> userInfo
                                 .userService(customOAuth2MemberService))
                         .successHandler(customSuccessHandler)

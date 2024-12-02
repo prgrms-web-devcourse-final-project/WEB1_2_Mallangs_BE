@@ -32,7 +32,6 @@ public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final MemberRepository memberRepository;
     private final ParticipatedRoomRepository participatedRoomRepository;
-    private final IsReadRepository isReadRepository;
     private final ChatMessageRepository chatMessageRepository;
 
     // 채팅방 생성
@@ -91,10 +90,10 @@ public class ChatRoomService {
                     .participatedRoomId(room.getParticipatedRoomId())
                     .chatRoomId(room.getChatRoom().getChatRoomId())
                     .nickname(room.getParticipant().getNickname().getValue())
-                    .message(messages.get(0).getMessage())
+                    .message(messages.isEmpty()? null : messages.get(0).getMessage())
                     .chatRoomName(room.getChatRoom().getOccupiedRooms().get(1).getParticipant().getNickname().getValue())
-                    .lastChatTime(messages.get(0).getCreatedAt())
-                    .notReadCnt(unreadMessages.size())
+                    .lastChatTime(messages.isEmpty()? null : messages.get(0).getCreatedAt())
+                    .notReadCnt(unreadMessages.isEmpty()? null : unreadMessages.size())
                     .build();
             log.info("room정보1 :{}", room.getParticipatedRoomId());
             log.info("room정보2 :{}", room.getChatRoom().getChatRoomId());

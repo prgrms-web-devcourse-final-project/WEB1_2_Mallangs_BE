@@ -52,17 +52,17 @@ public class ChatRoomRepositoryTests {
     public void 모든데이터값넣기() {
         // Member 저장
         Member member = memberRepository.save(Member.builder()
-                .userId(new UserId("TestUserId"))
+                .userId(new UserId("TtUser11"))
                 .nickname(new Nickname("TestNickname"))
-                .email(new Email("Test@eamil.com"))
+                .email(new Email("Tasdt@eami1s1l.com"))
                 .password(new Password("1234aA!!", passwordEncoder))
                 .hasPet(true)
                 .build());
 
         Member member2 = memberRepository.save(Member.builder()
-                .userId(new UserId("TestAdminId"))
+                .userId(new UserId("Te1dmnI1d"))
                 .nickname(new Nickname("TestNickname2"))
-                .email(new Email("Test2@eamil.com"))
+                .email(new Email("Tes2@eami1l.com"))
                 .password(new Password("1234aA!!", passwordEncoder))
                 .memberRole(MemberRole.ROLE_ADMIN)
                 .hasPet(false)
@@ -87,12 +87,12 @@ public class ChatRoomRepositoryTests {
 
         // Image 저장
         Image savedImage1 = imageRepository.save(Image.builder()
-                .url("qwerqweasd")
+                .url("qwerqaasdsd")
                 .width(1234)
                 .height(1234)
                 .build());
         Image savedImage2 = imageRepository.save(Image.builder()
-                .url("qwerqwea1sd")
+                .url("qwerea1asdsd")
                 .width(12345)
                 .height(12354)
                 .build());
