@@ -67,9 +67,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     //모든 회원조회 - UserId
     @Query("SELECT new com.mallangs.domain.member.dto.MemberGetResponseOnlyMember(m) " +
             "FROM Member m " +
-            "WHERE (:isActive IS NOT NULL OR m.isActive = :isActive) " +
-            "AND (:userId IS NOT NULL OR m.userId.value LIKE CONCAT('%', :userId, '%')) " +
-            "AND (:createAt IS NOT NULL OR m.createdAt >= :createAt)")
+            "WHERE (:isActive IS NULL OR m.isActive = :isActive) " +
+            "AND (:userId IS NULL OR m.userId.value = :userId) " +
+            "AND (:createAt IS NULL OR m.createdAt >= :createAt)")
     Page<MemberGetResponseOnlyMember> memberListByUserId(
             @Param("isActive") Boolean isActive,
             @Param("userId") String userId,
@@ -77,11 +77,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             Pageable pageable);
 
     //모든 회원조회 - Email
-    @Query("SELECT new com.mallangs.domain.member.dto.MemberGetResponseOnlyMember(m) " +
-            "FROM Member m " +
-            "WHERE (:isActive IS NOT NULL OR m.isActive = :isActive) " +
-            "AND (:email IS NOT NULL OR m.email.value LIKE CONCAT('%', :email, '%')) " +
-            "AND (:createAt IS NOT NULL OR m.createdAt >= :createAt)")
+    @Query(" SELECT new com.mallangs.domain.member.dto.MemberGetResponseOnlyMember(m) " +
+            " FROM Member m " +
+            " WHERE (:isActive IS NULL OR m.isActive = :isActive) " +
+            " AND (:email IS NULL OR m.email.value = :email)" +
+            " AND (:createAt IS NULL OR m.createdAt >= :createAt) ")
     Page<MemberGetResponseOnlyMember> memberListByEmail(
             @Param("isActive") Boolean isActive,
             @Param("email") String email,
