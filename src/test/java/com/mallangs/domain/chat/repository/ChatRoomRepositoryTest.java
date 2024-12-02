@@ -18,9 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 public class ChatRoomRepositoryTest {
-<<<<<<< HEAD
-}
-=======
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -98,11 +95,11 @@ public class ChatRoomRepositoryTest {
 
         IsRead isRead = IsRead.builder()
                 .chatMessage(chatMessage)
-                .sender(member.getNickname().getValue()).build();
+                .reader(member.getNickname().getValue()).build();
         isReadRepository.save(isRead);
         IsRead isRead2 = IsRead.builder()
                 .chatMessage(chatMessage2)
-                .sender(member2.getNickname().getValue()).build();
+                .reader(member2.getNickname().getValue()).build();
         isReadRepository.save(isRead2);
 
         //when
@@ -115,4 +112,3 @@ public class ChatRoomRepositoryTest {
 
     }
 }
->>>>>>> 3579dd746bc2bb818ef6786e0e9330f2c28f3f2c

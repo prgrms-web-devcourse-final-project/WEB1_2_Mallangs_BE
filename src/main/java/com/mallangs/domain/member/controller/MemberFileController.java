@@ -4,6 +4,8 @@ import com.mallangs.domain.member.util.UploadUtil;
 import com.mallangs.global.exception.ErrorCode;
 import com.mallangs.global.exception.MallangsCustomException;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
@@ -27,14 +29,22 @@ public class MemberFileController {
 
     @DeleteMapping("/{profileImage}")
     @Operation(summary = "프로필 사진 삭제", description = "프로필 사진을 삭제때 사용하는 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "프로필 삭제 성공"),
+            @ApiResponse(responseCode = "404", description = "삭제 실패.")
+    })
     public ResponseEntity<?> fileDelete(@PathVariable String profileImage) {
         log.info("--- fileDelete() : " + profileImage);
         uploadUtil.deleteFile(profileImage);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("프로필 삭제 성공");
     }
 
     @PostMapping("/upload")
     @Operation(summary = "프로필 사진 등록", description = "회원 가입 시 프로필 사진을 등록할 때 사용하는 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "파일 업로드 성공"),
+            @ApiResponse(responseCode = "404", description = "업로드 실패.")
+    })
     public ResponseEntity<String> uploadFile(@RequestParam("profileImage") MultipartFile profileImage) {
         log.info("--- uploadFile() : " + profileImage);
 
