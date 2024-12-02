@@ -40,8 +40,15 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByEmail(@Param("email") Email email);
 
     //단일 회원조회 - 유저아이디
-    @Query("SELECT m FROM Member m join fetch m.addresses WHERE m.userId =:userId")
+    @Query(" SELECT m FROM Member m JOIN FETCH m.addresses " +
+            " WHERE m.userId =:userId ")
     Optional<Member> findByUserId(@Param("userId") UserId userId);
+
+    //단일 회원조회 - 회원프로필 조회
+    @Query("SELECT DISTINCT m FROM Member m LEFT JOIN FETCH m.addresses" +
+            " LEFT JOIN m.pets " +
+            "WHERE m.userId =:userId")
+    Optional<Member> findByUserIdForProfile(@Param("userId") UserId userId);
 
     //단일 회원조회 - 아이디 찾기
     @Query("SELECT m FROM Member m join fetch m.addresses " +

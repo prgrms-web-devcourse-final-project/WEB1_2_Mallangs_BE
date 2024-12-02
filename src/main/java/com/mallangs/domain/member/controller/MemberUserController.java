@@ -74,7 +74,7 @@ public class MemberUserController {
     }
 
     @GetMapping("")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "회원 프로필 조회", description = "회원 프로필 조회 요청 API")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "회원 조회 성공"),
@@ -86,7 +86,7 @@ public class MemberUserController {
     }
 
     @PutMapping("/{memberId}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "회원수정", description = "회원수정 요청 API")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "회원 수정 성공"),
@@ -99,7 +99,7 @@ public class MemberUserController {
     }
 
     @GetMapping("/list")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "회원리스트 조회", description = "회원리스트 조회 요청 API")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "회원 리스트 조회 성공"),
@@ -132,7 +132,7 @@ public class MemberUserController {
         return ResponseEntity.ok(memberUserService.mailSend(mail));
     }
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @PostMapping("/check-password")
     @Operation(summary = "비밀번호 확인", description = "비밀번호 확인 요청 API")
     @ApiResponses({
