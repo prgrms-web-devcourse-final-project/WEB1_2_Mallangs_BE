@@ -4,7 +4,6 @@ import com.mallangs.domain.article.dto.request.ArticleCreateRequest;
 import com.mallangs.domain.article.dto.request.MapBoundsRequest;
 import com.mallangs.domain.article.dto.response.ArticleResponse;
 import com.mallangs.domain.article.dto.response.MapBoundsResponse;
-import com.mallangs.domain.article.entity.Article;
 import com.mallangs.domain.article.service.ArticleService;
 import com.mallangs.domain.article.service.LocationService;
 import com.mallangs.global.jwt.entity.CustomMemberDetails;
@@ -12,7 +11,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -93,13 +91,9 @@ public class ArticleController {
     double northEastLat = bounds.getNorthEastLat();
     double northEastLon = bounds.getNorthEastLon();
 
-    // 순서가 바뀌어야 합니다. (위도, 경도 -> 경도, 위도)
-    List<Article> articles = locationService.findArticlesInBounds(southWestLat, southWestLon,
+    List<MapBoundsResponse> articlesInBounds = locationService.findArticlesInBounds(southWestLat,
+        southWestLon,
         northEastLat, northEastLon);
-
-    List<MapBoundsResponse> articlesInBounds = articles.stream()
-        .map(MapBoundsResponse::new)
-        .collect(Collectors.toList());
 
     return ResponseEntity.ok(articlesInBounds);
   }
