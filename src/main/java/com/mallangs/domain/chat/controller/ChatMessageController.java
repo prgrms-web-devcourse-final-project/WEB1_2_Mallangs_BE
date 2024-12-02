@@ -85,15 +85,4 @@ public class ChatMessageController {
         return ResponseEntity.noContent().build();
     }
 
-    //채팅 메세지 읽음으로 변경
-    @ResponseBody
-    @PutMapping("/{chatMessageId}/{participatedRoomId}")
-    @Operation(summary = "채팅메세지 읽음으로 변경", description = "채팅메세지를 읽음으로 변경하는 API.")
-    public ResponseEntity<?> changeStatus(@PathVariable Long chatMessageId,
-                             @PathVariable Long participatedRoomId,
-                             @AuthenticationPrincipal CustomMemberDetails customMemberDetails){
-        String nickname = customMemberDetails.getNickname();
-        chatMessageService.changeUnReadToRead(chatMessageId, participatedRoomId, nickname);
-        return ResponseEntity.ok("변경 성공");
-    }
 }
