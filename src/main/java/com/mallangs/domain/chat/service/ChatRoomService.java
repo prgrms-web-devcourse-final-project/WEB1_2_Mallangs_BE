@@ -96,7 +96,9 @@ public class ChatRoomService {
                     .chatRoomId(room.getChatRoom().getChatRoomId())
                     .nickname(room.getParticipant().getNickname().getValue())
                     .message(messages.isEmpty() ? null : messages.get(0).getMessage())
-                    .chatRoomName(room.getChatRoom().getOccupiedRooms().get(1).getParticipant().getNickname().getValue())
+                    .chatRoomName(room.getChatRoom().getOccupiedRooms().size() > 1 ?
+                            room.getChatRoom().getOccupiedRooms().get(1).getParticipant().getNickname().getValue()
+                            : null)
                     .lastChatTime(messages.isEmpty() ? null : messages.get(0).getCreatedAt())
                     .notReadCnt(unreadMessages.size())
                     .build();
