@@ -16,6 +16,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.apache.catalina.User;
 import org.eclipse.angus.mail.util.logging.MailHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -109,29 +110,6 @@ public class MemberUserService {
             memberRepository.save(foundMember);
         } catch (Exception e) {
             log.error("회원비활성화에 실패하였습니다. {}", e.getMessage());
-            throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);
-        }
-    }
-
-    //나랑 관련된 회원 리스트 조회, 주소포함
-    public Page<MemberGetResponse> getMemberList(PageRequestDTO pageRequestDTO) {
-        try {
-            //페이저블 만들기
-            Sort sort = Sort.by("nickname").descending();
-            Pageable pageable = pageRequestDTO.getPageable(sort);
-
-            //회원 리스트 만들기
-            List<Member> members = memberRepository.memberList();
-            List<MemberGetResponse> memberList = members.stream().map(MemberGetResponse::new).toList();
-
-            //페이지 시작, 끝 만들기
-            int start = (int) pageable.getOffset();
-            int end = Math.min(start + pageable.getPageSize(), memberList.size());
-            List<MemberGetResponse> memberPage = memberList.subList(start, end);
-
-            return new PageImpl<>(memberPage, pageable, memberList.size());
-        } catch (Exception e) {
-            log.error("회원리스트 조회에 실패하였습니다. {}", e.getMessage());
             throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);
         }
     }

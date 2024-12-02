@@ -77,6 +77,7 @@ public class Member extends BaseTimeEntity {
     //Pet
     @JsonIgnore
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Pet> pets = new ArrayList<>();
 
     // 회원가입

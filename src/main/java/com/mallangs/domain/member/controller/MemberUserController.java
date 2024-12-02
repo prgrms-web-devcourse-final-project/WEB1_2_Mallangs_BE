@@ -38,6 +38,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -96,19 +97,6 @@ public class MemberUserController {
                                     @PathVariable("memberId") Long memberId) {
         memberUserService.update(memberUpdateRequest, memberId);
         return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/list")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @Operation(summary = "회원리스트 조회", description = "회원리스트 조회 요청 API")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "회원 리스트 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "조회에 실패하였습니다..")
-    })
-    public ResponseEntity<Page<MemberGetResponse>> list(@RequestParam(value = "page", defaultValue = "1") int page,
-                                                        @RequestParam(value = "size", defaultValue = "10") int size) {
-        PageRequestDTO pageRequestDTO = PageRequestDTO.builder().page(page).size(size).build();
-        return ResponseEntity.ok(memberUserService.getMemberList(pageRequestDTO));
     }
 
     @PostMapping("/find-user-id")
@@ -199,8 +187,8 @@ public class MemberUserController {
         //차단계정인지 확인
         if (!foundMember.getIsActive()){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(foundMember.getNickname().getValue()+"님은 "+foundMember.getReasonForBan()+" 이유로"
-                    + foundMember.getExpiryDate() + " 까지 웹서비스 이용 제한됩니다.");
+                    .body(foundMember.getNickname().getValue()+"님은 "+foundMember.getReasonForBan()+" 이유로 "
+                    + (foundMember.getExpiryDate().getDayOfYear() - LocalDateTime.now().getDayOfYear()) + "일간 웹서비스 이용 제한됩니다.");
         }
 
         // 응답 반환
