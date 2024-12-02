@@ -11,11 +11,15 @@ import com.mallangs.global.exception.MallangsCustomException;
 import com.mallangs.global.jwt.entity.CustomMemberDetails;
 import com.mallangs.global.jwt.entity.TokenCategory;
 import com.mallangs.global.jwt.filter.LoginFilter;
+import com.mallangs.global.jwt.service.AccessTokenBlackList;
 import com.mallangs.global.jwt.service.RefreshTokenService;
 import com.mallangs.global.jwt.util.JWTUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +37,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -54,11 +59,16 @@ public class MemberUserController {
     private final AuthenticationManager authenticationManager;
     private final MemberUserService memberUserService;
     private final RefreshTokenService refreshTokenService;
+    private final AccessTokenBlackList accessTokenBlackList;
     private final JWTUtil jwtUtil;
 
 
     @PostMapping("/register")
     @Operation(summary = "회원등록", description = "회원등록 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원 등록 성공"),
+            @ApiResponse(responseCode = "404", description = "입력값이 잘못되었습니다.")
+    })
     public ResponseEntity<String> create(@Validated @RequestBody MemberCreateRequest memberCreateRequest) {
         return ResponseEntity.ok(memberUserService.create(memberCreateRequest));
     }
@@ -66,6 +76,10 @@ public class MemberUserController {
     @GetMapping("")
     @PreAuthorize("hasRole('USER')")
     @Operation(summary = "회원조회", description = "회원조회 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "회원조회에 실패하였습니다.")
+    })
     public ResponseEntity<MemberGetResponse> get(Authentication authentication) {
         String userId = authentication.getName();
         return ResponseEntity.ok(memberUserService.get(userId));
@@ -74,23 +88,23 @@ public class MemberUserController {
     @PutMapping("/{memberId}")
     @PreAuthorize("hasRole('USER')")
     @Operation(summary = "회원수정", description = "회원수정 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원 수정 성공"),
+            @ApiResponse(responseCode = "404", description = "회원 수정 실패에 실패하였습니다.")
+    })
     public ResponseEntity<?> update(@Validated @RequestBody MemberUpdateRequest memberUpdateRequest,
                                     @PathVariable("memberId") Long memberId) {
         memberUserService.update(memberUpdateRequest, memberId);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{memberId}")
-    @PreAuthorize("hasRole('USER')")
-    @Operation(summary = "회원탈퇴", description = "회원탈퇴 요청 API")
-    public ResponseEntity<?> delete(@PathVariable("memberId") Long memberId) {
-        memberUserService.delete(memberId);
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping("/list")
     @PreAuthorize("hasRole('USER')")
     @Operation(summary = "회원리스트 조회", description = "회원리스트 조회 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원 리스트 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "조회에 실패하였습니다..")
+    })
     public ResponseEntity<Page<MemberGetResponse>> list(@RequestParam(value = "page", defaultValue = "1") int page,
                                                         @RequestParam(value = "size", defaultValue = "10") int size) {
         PageRequestDTO pageRequestDTO = PageRequestDTO.builder().page(page).size(size).build();
@@ -99,12 +113,20 @@ public class MemberUserController {
 
     @PostMapping("/find-user-id")
     @Operation(summary = "아이디찾기", description = "아이디찾기 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "아이디 찾기 요청 성공"),
+            @ApiResponse(responseCode = "404", description = "아이디 찾기 요청에 실패하였습니다.")
+    })
     public ResponseEntity<String> findUserId(@Validated @RequestBody MemberFindUserIdRequest memberFindUserIdRequest) {
         return ResponseEntity.ok(memberUserService.findUserId(memberFindUserIdRequest));
     }
 
     @PostMapping("/find-password")
     @Operation(summary = "비밀번호찾기", description = "비밀번호찾기 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "비밀번호 찾기 요청 성공"),
+            @ApiResponse(responseCode = "404", description = "비밀번호 찾기 요청에 실패하였습니다.")
+    })
     public ResponseEntity<String> findPassword(@Validated @RequestBody MemberFindPasswordRequest memberFindPasswordRequest) throws MessagingException {
         MemberSendMailResponse mail = memberUserService.findPassword(memberFindPasswordRequest);
         return ResponseEntity.ok(memberUserService.mailSend(mail));
@@ -113,6 +135,10 @@ public class MemberUserController {
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/check-password")
     @Operation(summary = "비밀번호 확인", description = "비밀번호 확인 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "비밀번호 요청 성공"),
+            @ApiResponse(responseCode = "404", description = "비밀번호 요청에 실패하였습니다.")
+    })
     public ResponseEntity<?> checkPassword(@Validated @RequestBody PasswordDTO passwordDTO
             , Authentication authentication) {
         String userId = authentication.getName();
@@ -134,6 +160,7 @@ public class MemberUserController {
         CustomMemberDetails customMemberDetails = (CustomMemberDetails) authentication.getPrincipal();
         Long memberId = customMemberDetails.getMemberId();
         String userId = customMemberDetails.getUsername();
+        String nickname = customMemberDetails.getNickname();
         String email = customMemberDetails.getEmail();
         String role = authentication.getAuthorities().stream()
                 .findFirst()
@@ -144,6 +171,7 @@ public class MemberUserController {
         Map<String, Object> AccessPayloadMap = new HashMap<>();
         AccessPayloadMap.put("memberId", memberId);
         AccessPayloadMap.put("userId", userId);
+        AccessPayloadMap.put("nickname", nickname);
         AccessPayloadMap.put("email", email);
         AccessPayloadMap.put("role", role);
         AccessPayloadMap.put("category", TokenCategory.ACCESS_TOKEN.name());
@@ -166,5 +194,79 @@ public class MemberUserController {
                 "AccessToken", accessToken,
                 "RefreshToken", refreshToken
         ));
+    }
+
+    @PostMapping("/logout")
+    @Operation(summary = "로그아웃", description = "로그아웃 요청 API")
+    public ResponseEntity<?> loginOut(HttpServletRequest request, HttpServletResponse response) {
+        log.info("커스텀 로그아웃 실행");
+
+        // Refresh Token 없다면 오류
+        String refreshTokenFromCookies = getRefreshTokenFromCookies(request);
+        log.info("refreshTokenFromCookies : {}", refreshTokenFromCookies);
+        if (refreshTokenFromCookies == null || refreshTokenFromCookies.trim().isEmpty()) {
+            log.warn("No refresh token found");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Refresh token is missing"));
+        }
+
+        // Access Token 없다면 오류
+        String authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            log.warn("No access token found");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Access token is missing"));
+        }
+
+        String accessToken = authorizationHeader.substring(7);
+        // 블랙리스트 등록
+        try {
+            if (!jwtUtil.isExpired(accessToken)) {
+                if (!jwtUtil.isExpired(refreshTokenFromCookies)) {
+                    accessTokenBlackList.registerBlackList(accessToken, refreshTokenFromCookies);
+                    log.info("Tokens are registered to BlackList");
+                } else {
+                    log.info("RefreshToken is expired");
+                }
+            } else {
+                log.info("AccessToken is expired");
+
+            }
+            // 리프레시 토큰 삭제
+            Map<String, Object> payloadMap = jwtUtil.validateRefreshToken(refreshTokenFromCookies);
+            refreshTokenService.deleteRefreshTokenInRedis(payloadMap);
+
+        } catch (Exception e) {
+            log.error("토큰 블랙리스트 처리에 실패하였습니다 : {}", e.getMessage());
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error","Token processing failed"));
+        }
+
+        // 쿠키 비우기
+        Cookie cookie = new Cookie("refreshToken", null);
+//        cookie.setSecure(true); // HTTPS 환경에서만 전송
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json");
+
+        return ResponseEntity.ok("LOGOUT SUCCESSFUL");
+    }
+
+    // 리프레시 토큰 꺼내기
+    private String getRefreshTokenFromCookies(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("RefreshToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+
     }
 }

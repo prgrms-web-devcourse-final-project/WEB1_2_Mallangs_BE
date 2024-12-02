@@ -22,6 +22,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 
 @Service
@@ -56,11 +57,12 @@ public class CustomOAuth2MemberService extends DefaultOAuth2UserService {
         }
 
         //중복많을 시 UUID 설정 + 닉네임 길이 늘이기
-        String userId = oAuth2Response.getProvider() + " " + oAuth2Response.getProviderId().substring(6,12);
-        String nickname = oAuth2Response.getNickname().trim().substring(2,15);
+        String userId = generateUserId((oAuth2Response.getProvider() + oAuth2Response.getProviderId()+" ").trim());
+        String nickname = deleteSpace(oAuth2Response.getNickname().trim());
         String email = oAuth2Response.getEmail();
         Optional<Member> existMember = memberRepository.findByUserId(new UserId(userId));
 
+        log.info("nickName {}",nickname);
         // 회원이 존재하지 않으면 자동 회원가입
         if (existMember.isEmpty()) {
             String password = PasswordGenerator.generatePassword();
@@ -74,6 +76,7 @@ public class CustomOAuth2MemberService extends DefaultOAuth2UserService {
 
             //OAuth2 인증 위한 데이터 입력
             MemberOAuth2DTO memberDTO = new MemberOAuth2DTO();
+            memberDTO.changeMemberId(member.getMemberId());
             memberDTO.changeUserId(member.getUserId().getValue());
             memberDTO.changePassword(member.getPassword().getValue());
             memberDTO.changeNickname(member.getNickname().getValue());
@@ -91,6 +94,7 @@ public class CustomOAuth2MemberService extends DefaultOAuth2UserService {
 
             //OAuth2 인증 위한 데이터 입력
             MemberOAuth2DTO memberDTO = new MemberOAuth2DTO();
+            memberDTO.changeMemberId(member.getMemberId());
             memberDTO.changeUserId(member.getUserId().getValue());
             memberDTO.changePassword(member.getPassword().getValue());
             memberDTO.changeNickname(member.getNickname().getValue());
@@ -99,5 +103,56 @@ public class CustomOAuth2MemberService extends DefaultOAuth2UserService {
 
             return new CustomOAuth2Member(memberDTO);
         }
+    }
+    //userId 만들기
+    private String generateUserId(String userId) {
+        // 1. 정규 표현식에 맞는 문자만 남기기
+        log.info("userId : {}",userId);
+        String baseUserId = userId.replaceAll("[^ㄱ-ㅎ가-힣a-zA-Z0-9-_\\s]", "");
+
+        // 3. 길이 조정: 6자 이상 12자 이하
+        if (baseUserId.length() > 12) {
+            baseUserId = baseUserId.substring(0, 12);
+        }
+
+        log.info("baseUserId : {}",baseUserId);
+        if (baseUserId.length() < 6) {
+            baseUserId = String.format("%-6s", baseUserId).replace(' ', '_');
+        }
+
+        log.info("baseUserId : {}",baseUserId);
+        // 4. 유효성 검사
+        if (!baseUserId.matches("^[ㄱ-ㅎ가-힣a-zA-Z0-9-_\\s]{6,12}$")) {
+            throw new IllegalArgumentException("Generated userId does not match the required pattern: " + baseUserId);
+        }
+
+        // 5. 유일성 확인 및 조정 (이미 존재하는 userId인 경우)
+        int suffix = 1;
+        String uniqueUserId = baseUserId;
+        while (memberRepository.existsByUserId(new UserId(uniqueUserId))) {
+            String tempSuffix = "_" + suffix;
+            if (baseUserId.length() + tempSuffix.length() > 12) {
+                uniqueUserId = baseUserId.substring(0, 12 - tempSuffix.length()) + tempSuffix;
+            } else {
+                uniqueUserId = baseUserId + tempSuffix;
+            }
+            suffix++;
+            if (suffix > 100) { // 무한 루프 방지를 위해 최대 시도 횟수 설정
+                throw new IllegalArgumentException("Unable to generate unique userId");
+            }
+        }
+        log.info("uniqueUserId : {}",uniqueUserId);
+
+        return uniqueUserId;
+    }
+    private String deleteSpace(String name){
+        if (name == null){
+            name = UUID.randomUUID().toString().substring(1,14);
+        }
+        String ChangedName = name.replaceAll("[!#%&'*-+,$^*()./:;<=>?@_`}~]", "");
+        if (ChangedName.length() > 15 || ChangedName.length() < 2){
+            return UUID.randomUUID().toString().substring(1,14);
+        }
+        return ChangedName.replaceAll(" ", "");
     }
 }

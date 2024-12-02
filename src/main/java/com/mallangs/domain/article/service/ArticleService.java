@@ -57,7 +57,7 @@ public class ArticleService {
     return factory.createResponse(foundArticle); // ArticleResponse 로 반환 통일되게 팩토리메서드 작성 필요
   }
 
-  // 글타래 전체 조회
+  // 글타래 전체 조회 // 지도가 아닌 경우
   public Page<ArticleResponse> findAllTypeArticles(Pageable pageable) {
     return articleRepository.findAll(pageable)
         .map(article -> {
@@ -86,11 +86,16 @@ public class ArticleService {
     });
   }
 
-  // 위치 기준 //////////////////
-
-  // 글타래 자신 주변 글타래 목록 조회
-
   // 검색어 기준
+  public Page<ArticleResponse> findArticlesByKeyword(Pageable pageable, String keyword) {
+    Page<Article> articles = articleRepository.findByTitleContainingOrDescriptionContaining(keyword,
+        keyword, pageable);
+    return articles.map(article -> {
+      ArticleFactory factory = factoryManager.getFactory(article.getType());
+      return factory.createResponse(article);
+    });
+  }
+
 
   // 수정 자신의 글타래 (장소는 자신의 글도 수정 삭제 불가) // 관리자는 수정 가능
   public ArticleResponse updateArticle(Long articleId, ArticleCreateRequest articleUpdateRequest,

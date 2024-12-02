@@ -2,8 +2,6 @@ package com.mallangs.domain.board.entity;
 
 import com.mallangs.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,10 +35,9 @@ public class Category extends BaseTimeEntity {
     @Column(length = 100)
     private String description;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @Min(0)
-    @Max(2)
-    private int categoryLevel; // 0: 최상위 카테고리, 1: 1차 분류, 2: 2차 분류
+    private CategoryLevel categoryLevel;
 
     @Column(nullable = false)
     private int categoryOrder;
@@ -50,7 +47,7 @@ public class Category extends BaseTimeEntity {
     private CategoryStatus categoryStatus;
 
     @Builder
-    public Category(Category parentCategory, String name, String description, int categoryLevel,
+    public Category(Category parentCategory, String name, String description, CategoryLevel categoryLevel,
                     int categoryOrder) {
         this.parentCategory = parentCategory;
         this.name = name;
@@ -61,7 +58,9 @@ public class Category extends BaseTimeEntity {
     }
 
     // 카테고리 수정
-    public void changeCategory(String name, String description, int categoryLevel, int categoryOrder, CategoryStatus categoryStatus) {
+    public void changeCategory(Category parentCategory, String name, String description, CategoryLevel categoryLevel,
+                               int categoryOrder, CategoryStatus categoryStatus) {
+        this.parentCategory = parentCategory;
         this.name = name;
         this.description = description;
         this.categoryLevel = categoryLevel;

@@ -95,11 +95,11 @@ public class ChatRoomRepositoryTest {
 
         IsRead isRead = IsRead.builder()
                 .chatMessage(chatMessage)
-                .sender(member.getNickname().getValue()).build();
+                .reader(member.getNickname().getValue()).build();
         isReadRepository.save(isRead);
         IsRead isRead2 = IsRead.builder()
                 .chatMessage(chatMessage2)
-                .sender(member2.getNickname().getValue()).build();
+                .reader(member2.getNickname().getValue()).build();
         isReadRepository.save(isRead2);
 
         //when

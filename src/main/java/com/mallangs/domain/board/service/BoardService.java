@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,13 +49,13 @@ public class BoardService {
                 category,
                 request.getTitle(),
                 request.getContent(),
-                request.getContent()
+                request.getImageId()
         );
 
         return boardRepository.save(board).getBoardId();
     }
 
-    // 실종신고 - 목격제보 게시글 작성
+    // 실종신고-목격제보 게시글 작성
     @Transactional
     public Long createSightingBoard(SightingCreateRequest request, Long memberId) {
         Member member = memberRepository.findById(memberId)
@@ -72,7 +73,7 @@ public class BoardService {
                 request.getLongitude(),
                 request.getAddress(),
                 request.getSightedAt(),
-                request.getImgUrl()
+                request.getImageId()
         );
 
         return boardRepository.save(board).getBoardId();
@@ -90,11 +91,11 @@ public class BoardService {
                 null,
                 null,
                 null,
-                request.getImgUrl()
+                request.getImageId()
         );
     }
 
-    // 실종신고 - 목격제보 게시글 수정
+    // 실종신고-목격제보 게시글 수정
     @Transactional
     public void updateSightingBoard(Long boardId, SightingUpdateRequest request, Long memberId) {
         Board board = getBoardWithMemberValidation(boardId, memberId, BoardType.SIGHTING);
@@ -106,8 +107,13 @@ public class BoardService {
                 request.getLongitude(),
                 request.getAddress(),
                 request.getSightedAt(),
-                request.getImgUrl()
+                request.getImageId()
         );
+    }
+
+    // 커뮤니티 게시판 게시글 전체 조회
+    public Page<CommunityListResponse> getAllCommunitiyBoard(Pageable pageable) {
+        return boardRepository.findAllByBoardType(BoardType.COMMUNITY, pageable).map(CommunityListResponse::new);
     }
 
     // 커뮤니티 게시글 상세 조회
@@ -117,7 +123,12 @@ public class BoardService {
         return new CommunityDetailResponse(board);
     }
 
-    // 실종신고 - 목격제보 게시글 상세 조회
+    // 실종신고-목격제보 게시판 게시글 전체 조회
+    public Page<SightingListResponse> getAllSightingBoard(Pageable pageable) {
+        return boardRepository.findAllByBoardType(BoardType.SIGHTING, pageable).map(SightingListResponse::new);
+    }
+
+    // 실종신고-목격제보 게시글 상세 조회
     public SightingDetailResponse getSightingBoard(Long boardId) {
         Board board = getBoardWithTypeValidation(boardId, BoardType.SIGHTING);
         board.increaseViewCount();
@@ -137,7 +148,7 @@ public class BoardService {
                 .map(CommunityListResponse::new);
     }
 
-    // 카테고리별 목격 게시글 목록 조회
+    // 카테고리별 실종신고-목격제보 게시글 목록 조회
     public Page<SightingListResponse> getSightingBoardsByCategory(Long categoryId, Pageable pageable) {
         return boardRepository.findByCategoryId(categoryId, BoardType.SIGHTING, pageable)
                 .map(SightingListResponse::new);
@@ -145,38 +156,46 @@ public class BoardService {
 
     // 키워드로 커뮤니티 게시글 검색
     public Page<CommunityListResponse> searchCommunityBoards(String keyword, Pageable pageable) {
-        return boardRepository.searchByTitleOrContent(keyword, pageable)
+        return boardRepository.searchByTitleOrContent(keyword, BoardType.COMMUNITY, pageable)
                 .map(CommunityListResponse::new);
     }
 
     // 키워드로 목격 게시글 검색
     public Page<SightingListResponse> searchSightingBoards(String keyword, Pageable pageable) {
-        return boardRepository.searchByTitleOrContent(keyword, pageable)
+        return boardRepository.searchByTitleOrContent(keyword, BoardType.SIGHTING, pageable)
                 .map(SightingListResponse::new);
     }
 
     // 특정 회원의 커뮤니티 게시글 목록 조회
     public Page<CommunityListResponse> getMemberCommunityBoards(Long memberId, Pageable pageable) {
-        return boardRepository.findByMemberId(memberId, pageable)
+        return boardRepository.findByMemberId(memberId, BoardType.COMMUNITY, pageable)
                 .map(CommunityListResponse::new);
     }
 
     // 특정 회원의 목격 게시글 목록 조회
     public Page<SightingListResponse> getMemberSightingBoards(Long memberId, Pageable pageable) {
-        return boardRepository.findByMemberId(memberId, pageable)
+        return boardRepository.findByMemberId(memberId, BoardType.SIGHTING, pageable)
                 .map(SightingListResponse::new);
     }
 
     // 관리자용 - 상태별 게시글 조회
     public AdminBoardsResponse getBoardsByStatus(BoardStatus status, Pageable pageable) {
+        if (isNotAdminRole()) {
+            throw new MallangsCustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
         Page<AdminBoardResponse> boards = boardRepository.findByStatus(status, pageable).map(AdminBoardResponse::from);
         BoardStatusCount statusCount = boardRepository.countByStatus();
         return new AdminBoardsResponse(boards, statusCount);
     }
 
     // 관리자용 - 카테고리와 제목으로 게시글 검색
-    public AdminBoardsResponse searchBoardsForAdmin(Long categoryId, String keyword, Pageable pageable) {
-        Page<AdminBoardResponse> boards = boardRepository.searchForAdmin(categoryId, keyword, pageable)
+    public AdminBoardsResponse searchBoardsForAdmin(Long categoryId, BoardType boardType, String keyword, Pageable pageable) {
+        if (isNotAdminRole()) {
+            throw new MallangsCustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
+        Page<AdminBoardResponse> boards = boardRepository.searchForAdmin(categoryId, boardType, keyword, pageable)
                 .map(AdminBoardResponse::from);
         BoardStatusCount statusCount = boardRepository.countByStatus();
         return new AdminBoardsResponse(boards, statusCount);
@@ -184,8 +203,12 @@ public class BoardService {
 
     // 관리자용 - 카테고리, 상태, 제목으로 게시글 검색
     public AdminBoardsResponse searchBoardsForAdminWithStatus(
-            Long categoryId, BoardStatus status, String keyword, Pageable pageable) {
-        Page<AdminBoardResponse> boards = boardRepository.searchForAdminWithStatus(categoryId, status, keyword, pageable)
+            Long categoryId, BoardType boardType, BoardStatus boardStatus, String keyword, Pageable pageable) {
+        if (isNotAdminRole()) {
+            throw new MallangsCustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
+        Page<AdminBoardResponse> boards = boardRepository.searchForAdminWithStatus(categoryId, boardType, boardStatus, keyword, pageable)
                 .map(AdminBoardResponse::from);
         BoardStatusCount statusCount = boardRepository.countByStatus();
         return new AdminBoardsResponse(boards, statusCount);
@@ -194,6 +217,10 @@ public class BoardService {
     // 관리자용 - 게시글 상태 변경 (다중 선택 가능)
     @Transactional
     public void changeBoardStatus(List<Long> boardIds, BoardStatus status) {
+        if (isNotAdminRole()) {
+            throw new MallangsCustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
         List<Board> boards = boardRepository.findAllById(boardIds);
         boards.forEach(board -> {
             log.info("Changing board status - ID: {}, Title: {}, From: {} To: {}",
@@ -207,7 +234,7 @@ public class BoardService {
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.BOARD_NOT_FOUND));
 
         if (!board.getMember().getMemberId().equals(memberId)) {
-            throw new MallangsCustomException(ErrorCode.UNAUTHORIZED_BOARD_ACCESS);
+            throw new MallangsCustomException(ErrorCode.UNAUTHORIZED_ACCESS);
         }
 
         if (board.getBoardType() != boardType) {
@@ -231,5 +258,11 @@ public class BoardService {
         }
 
         return board;
+    }
+
+    // 헬퍼 메서드: 권한 확인용
+    public boolean isNotAdminRole() {
+        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .noneMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 }

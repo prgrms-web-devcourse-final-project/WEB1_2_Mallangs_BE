@@ -1,6 +1,8 @@
 package com.mallangs.domain.chat.repository;
 
 import com.mallangs.domain.chat.entity.*;
+import com.mallangs.domain.image.entity.Image;
+import com.mallangs.domain.image.repository.ImageRepository;
 import com.mallangs.domain.member.entity.Address;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.MemberRole;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -37,67 +40,100 @@ public class ChatRoomRepositoryTests {
     @Autowired
     private AddressRepository addressRepository;
     @Autowired
-    IsReadRepository isReadRepository;
+    private ImageRepository imageRepository;
+    @Autowired
+    private IsReadRepository isReadRepository;
 
-    @Test
+
     //회원, 주소, 채팅룸, 채팅방, 참여 채팅, 데이터 입력 1개씩
+    @Test
     @Transactional
-    public void 모든데이터값넣기(){
-        Member member = Member.builder()
+    @Commit
+    public void 모든데이터값넣기() {
+        // Member 저장
+        Member member = memberRepository.save(Member.builder()
                 .userId(new UserId("TestUserId"))
                 .nickname(new Nickname("TestNickname"))
                 .email(new Email("Test@eamil.com"))
                 .password(new Password("1234aA!!", passwordEncoder))
                 .hasPet(true)
-                .build();
-        memberRepository.save(member);
+                .build());
 
-        Member member2 = Member.builder()
+        Member member2 = memberRepository.save(Member.builder()
                 .userId(new UserId("TestAdminId"))
                 .nickname(new Nickname("TestNickname2"))
                 .email(new Email("Test2@eamil.com"))
                 .password(new Password("1234aA!!", passwordEncoder))
                 .memberRole(MemberRole.ROLE_ADMIN)
                 .hasPet(false)
-                .build();
-        memberRepository.save(member2);
+                .build());
 
-        ChatRoom chatRoom = ChatRoom.builder().build();
-        chatRoomRepository.save(chatRoom);
+        // ChatRoom 저장
+        ChatRoom chatRoom = chatRoomRepository.save(ChatRoom.builder().build());
 
-        ParticipatedRoom participatedRoom = ParticipatedRoom.builder()
+        // ParticipatedRoom 저장
+        ParticipatedRoom participatedRoom = participatedRoomRepository.save(ParticipatedRoom.builder()
                 .chatRoom(chatRoom)
                 .participant(member)
-                .build();
-        ParticipatedRoom participatedRoom2 = ParticipatedRoom.builder()
+                .build());
+        ParticipatedRoom participatedRoom2 = participatedRoomRepository.save(ParticipatedRoom.builder()
                 .chatRoom(chatRoom)
                 .participant(member2)
-                .build();
-        participatedRoomRepository.save(participatedRoom);
-        participatedRoomRepository.save(participatedRoom2);
+                .build());
+
         chatRoom.addParticipatedRoom(participatedRoom);
         chatRoom.addParticipatedRoom(participatedRoom2);
         chatRoomRepository.save(chatRoom);
 
+        // Image 저장
+        Image savedImage1 = imageRepository.save(Image.builder()
+                .url("qwerqweasd")
+                .width(1234)
+                .height(1234)
+                .build());
+        Image savedImage2 = imageRepository.save(Image.builder()
+                .url("qwerqwea1sd")
+                .width(12345)
+                .height(12354)
+                .build());
+
+        // ChatMessage 저장
         ChatMessage chatMessage = ChatMessage.builder()
                 .participatedRoom(participatedRoom)
+                .message("TestMessage")
                 .sender(member)
-                .message("TestMessage")
-                .type(MessageType.ENTER)
-                .build();
-        ChatMessage chatMessage2 = ChatMessage.builder()
-                .participatedRoom(participatedRoom2)
-                .sender(member2)
-                .message("TestMessage")
-                .type(MessageType.ENTER)
+                .messageImage(savedImage1)
                 .build();
         chatMessageRepository.save(chatMessage);
-        chatMessageRepository.save(chatMessage2);
-        participatedRoom.addChatMessage(chatMessage);
-        participatedRoom2.addChatMessage(chatMessage2);
-        participatedRoomRepository.save(participatedRoom);
 
-        Address address = Address.builder()
+        ChatMessage chatMessage2 = ChatMessage.builder()
+                .participatedRoom(participatedRoom)
+                .message("TestMessage2")
+                .sender(member)
+                .messageImage(savedImage2)
+                .build();
+        chatMessageRepository.save(chatMessage2);
+
+        // IsRead 저장
+        IsRead isRead1 = isReadRepository.save(IsRead.builder()
+                        .chatMessage(chatMessage)
+                .reader(chatRoom.getOccupiedRooms().get(0).getParticipant().getNickname().getValue())
+                .build());
+        IsRead isRead2 = isReadRepository.save(IsRead.builder()
+                        .chatMessage(chatMessage2)
+                .reader(chatRoom.getOccupiedRooms().get(1).getParticipant().getNickname().getValue())
+                .build());
+
+        chatMessage.addIsRead(isRead1);
+        chatMessage.addIsRead(isRead2);
+        chatMessageRepository.save(chatMessage); // 관계 저장
+
+        chatMessage2.addIsRead(isRead1);
+        chatMessage2.addIsRead(isRead2);
+        chatMessageRepository.save(chatMessage2); // 관계 저장
+
+        // Address 저장
+        Address address = addressRepository.save(Address.builder()
                 .member(member)
                 .addressName("testAddress")
                 .addressType("testAddressType")
@@ -114,8 +150,8 @@ public class ChatRoomRepositoryTests {
                 .buildingName("testBuildingName")
                 .subAddressNo("testSubAddressNo")
                 .zoneNo("testZoneNo")
-                .build();
-        Address address2 = Address.builder()
+                .build());
+        Address address2 = addressRepository.save(Address.builder()
                 .member(member2)
                 .addressName("testAddress")
                 .addressType("testAddressType")
@@ -132,21 +168,11 @@ public class ChatRoomRepositoryTests {
                 .buildingName("testBuildingName")
                 .subAddressNo("testSubAddressNo")
                 .zoneNo("testZoneNo")
-                .build();
-        addressRepository.save(address);
-        addressRepository.save(address2);
+                .build());
         member.addAddress(address);
         member2.addAddress(address2);
 
-        IsRead isRead = IsRead.builder()
-                .chatMessage(chatMessage)
-                .sender(member.getNickname().getValue()).build();
-        isReadRepository.save(isRead);
-        IsRead isRead2 = IsRead.builder()
-                .chatMessage(chatMessage2)
-                .sender(member2.getNickname().getValue()).build();
-        isReadRepository.save(isRead2);
-
         System.out.println("member.getAddresses().get(0).getAddressName() = " + member.getAddresses().get(0).getAddressName());
     }
+
 }

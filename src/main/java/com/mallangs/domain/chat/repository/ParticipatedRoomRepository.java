@@ -13,12 +13,24 @@ import java.util.Optional;
 
 public interface ParticipatedRoomRepository extends JpaRepository<ParticipatedRoom, Long> {
 
-    @Query("SELECT DISTINCT p FROM ParticipatedRoom p join fetch p.participant m join fetch p.chatRoom c WHERE p.participant.memberId = :memberId")
+    //회원 Id로 참여 채팅방 찾기
+    @Query("SELECT p FROM ParticipatedRoom p" +
+            " JOIN FETCH p.participant m" +
+            " JOIN FETCH p.chatRoom c " +
+            "WHERE p.participant.memberId = :memberId")
     List<ParticipatedRoom> findByMemberId(@Param("memberId") Long memberId);
 
-    @Query("SELECT DISTINCT p FROM ParticipatedRoom p join fetch p.participant m join fetch p.chatRoom c WHERE p.participatedRoomId = :participatedRoomId")
+    // 참여채팅방 Id로 참여채팅방 불러오기- 회원, 채팅방 조인
+    @Query("SELECT DISTINCT p FROM ParticipatedRoom p" +
+            " LEFT JOIN FETCH p.participant m" +
+            " LEFT JOIN FETCH p.chatRoom c" +
+            " WHERE p.participatedRoomId = :participatedRoomId")
     Optional<ParticipatedRoom> findByParticipatedRoomId(@Param("participatedRoomId") Long participatedRoomId);
 
-    @Query("SELECT DISTINCT p FROM ParticipatedRoom p join fetch p.participant m  WHERE p.participatedRoomId = :participatedRoomId")
+    //참여채팅방 ID로 참여채팅방 불러오기 - 회원 join
+    @Query("SELECT DISTINCT p FROM ParticipatedRoom p" +
+            " LEFT JOIN FETCH p.participant m" +
+            "  WHERE p.participatedRoomId = :participatedRoomId")
     Optional<ParticipatedRoom> findByPRoomId(@Param("participatedRoomId") Long participatedRoomId);
+
 }

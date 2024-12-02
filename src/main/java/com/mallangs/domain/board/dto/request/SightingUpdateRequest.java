@@ -32,5 +32,5 @@ public class SightingUpdateRequest {
 
     private LocalDateTime sightedAt;
 
-    private String imgUrl;
+    private Long imageId;
 }
