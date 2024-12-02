@@ -3,6 +3,7 @@ package com.mallangs.domain.article.service;
 import com.mallangs.domain.article.dto.request.ArticleCreateRequest;
 import com.mallangs.domain.article.dto.response.ArticleResponse;
 import com.mallangs.domain.article.entity.Article;
+import com.mallangs.domain.article.entity.ArticleType;
 import com.mallangs.domain.article.factory.ArticleFactory;
 import com.mallangs.domain.article.factory.ArticleFactoryManager;
 import com.mallangs.domain.article.repository.ArticleRepository;
@@ -11,9 +12,7 @@ import com.mallangs.domain.member.entity.MemberRole;
 import com.mallangs.domain.member.repository.MemberRepository;
 import com.mallangs.global.exception.ErrorCode;
 import com.mallangs.global.exception.MallangsCustomException;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -35,14 +34,14 @@ public class ArticleService {
 
     // 팩토리 매니저를 통해 적절한 팩토리 선택
     log.info(articleCreateRequest.toString());
-    log.info(articleCreateRequest.getType());
-    ArticleFactory factory = factoryManager.getFactory(articleCreateRequest.getType());
+    log.info(articleCreateRequest.getArticleType().getDescription());
+    ArticleFactory factory = factoryManager.getFactory(
+        articleCreateRequest.getArticleType().getDescription());
 
     // 팩토리에서 article 생성
     Article article = factory.createArticle(foundMember, articleCreateRequest);
     article.hideInMap(); // published 상태 아니면 map hidden
 
-    // 생성된 article 저장
     Article savedArticle = articleRepository.save(article);
 
     // 각 타입에 맞는 Response 객체 반환
@@ -53,7 +52,8 @@ public class ArticleService {
   public ArticleResponse getArticleById(Long articleId) {
     Article foundArticle = articleRepository.findById(articleId)
         .orElseThrow(() -> new MallangsCustomException(ErrorCode.ARTICLE_NOT_FOUND));
-    ArticleFactory factory = factoryManager.getFactory(foundArticle.getType());
+    ArticleFactory factory = factoryManager.getFactory(
+        foundArticle.getArticleType().getDescription());
     return factory.createResponse(foundArticle); // ArticleResponse 로 반환 통일되게 팩토리메서드 작성 필요
   }
 
@@ -61,27 +61,27 @@ public class ArticleService {
   public Page<ArticleResponse> findAllTypeArticles(Pageable pageable) {
     return articleRepository.findAll(pageable)
         .map(article -> {
-          ArticleFactory factory = factoryManager.getFactory(article.getType());
+          ArticleFactory factory = factoryManager.getFactory(
+              article.getArticleType().getDescription());
           return factory.createResponse(article);
         });
   }
 
   // 글타래 타입 별 전체/실종/구조 조회 // 장소 카테고리도 설정 가능?
-  public List<ArticleResponse> findArticlesByArticleType(String articleType) {
-    List<Article> articles = articleRepository.findByArticleType(articleType);
-    return articles.stream()
-        .map(article -> {
-          ArticleFactory factory = factoryManager.getFactory(article.getType());
-          return factory.createResponse(article);
-        })
-        .collect(Collectors.toList());
+  public Page<ArticleResponse> findArticlesByArticleType(Pageable pageable, String articleType) {
+    ArticleType type = ArticleType.valueOf(articleType.toUpperCase());
+    Page<Article> articles = articleRepository.findByArticleType(pageable, type);
+    return articles.map(article -> {
+      ArticleFactory factory = factoryManager.getFactory(article.getArticleType().getDescription());
+      return factory.createResponse(article);
+    });
   }
 
   // 글타래 멤버 개인 글타래 목록 조회
   public Page<ArticleResponse> findArticlesByMemberId(Pageable pageable, Long memberId) {
     Page<Article> articles = articleRepository.findByMemberId(pageable, memberId);
     return articles.map(article -> {
-      ArticleFactory factory = factoryManager.getFactory(article.getType());
+      ArticleFactory factory = factoryManager.getFactory(article.getArticleType().getDescription());
       return factory.createResponse(article);
     });
   }
@@ -91,7 +91,7 @@ public class ArticleService {
     Page<Article> articles = articleRepository.findByTitleContainingOrDescriptionContaining(keyword,
         keyword, pageable);
     return articles.map(article -> {
-      ArticleFactory factory = factoryManager.getFactory(article.getType());
+      ArticleFactory factory = factoryManager.getFactory(article.getArticleType().getDescription());
       return factory.createResponse(article);
     });
   }
@@ -114,7 +114,8 @@ public class ArticleService {
       validateUserArticleAccess(foundArticle, memberId, false);
     }
 
-    ArticleFactory factory = factoryManager.getFactory(foundArticle.getType());
+    ArticleFactory factory = factoryManager.getFactory(
+        foundArticle.getArticleType().getDescription());
     Article updatedArticle = factory.createArticle(foundArticle.getMember(),
         articleUpdateRequest);
 
@@ -125,10 +126,8 @@ public class ArticleService {
     // 사용자 자신의 글타래에서는 볼 수 있으나 지도에는 안뜸
     foundArticle.hideInMap();
 
-    // 저장
     Article savedArticle = articleRepository.save(foundArticle);
 
-    // 응답 반환
     return factory.createResponse(savedArticle);
   }
 
@@ -170,11 +169,11 @@ public class ArticleService {
   // 자신의 글인지 체크
   private void validateArticleAccess(Article foundArticle, Long memberId, Boolean forAnyDelete) {
     if (forAnyDelete) {
-      if (Objects.equals(foundArticle.getMember().getMemberId(), memberId)) {
+      if (!Objects.equals(foundArticle.getMember().getMemberId(), memberId)) {
         throw new MallangsCustomException(ErrorCode.UNAUTHORIZED_DELETE);
       }
     } else {
-      if (Objects.equals(foundArticle.getMember().getMemberId(), memberId)) {
+      if (!Objects.equals(foundArticle.getMember().getMemberId(), memberId)) {
         throw new MallangsCustomException(ErrorCode.UNAUTHORIZED_MODIFY);
       }
     }
@@ -182,7 +181,7 @@ public class ArticleService {
 
   // 장소 접근 체크
   private void validateUserAccessByArticleType(Article foundArticle, Boolean forAnyDelete) {
-    String articleType = foundArticle.getType();
+    String articleType = foundArticle.getArticleType().getDescription();
     if (forAnyDelete) {
       if (Objects.equals(articleType, "place")) {
         throw new MallangsCustomException(ErrorCode.RESOURCE_NOT_DELETABLE);
