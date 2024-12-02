@@ -106,12 +106,18 @@ public class ChatRoomService {
     }
 
     //채팅방 이름 변경
-    public void update(ChatRoomChangeNameRequest chatRoomChangeNameRequest) {
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomChangeNameRequest.getChatRoomId())
-                .orElseThrow(() -> new MallangsCustomException(ErrorCode.CHATROOM_NOT_FOUND));
+    public boolean update(ChatRoomChangeNameRequest chatRoomChangeNameRequest) {
+        try {
+            ChatRoom chatRoom = chatRoomRepository.findById(chatRoomChangeNameRequest.getChatRoomId())
+                    .orElseThrow(() -> new MallangsCustomException(ErrorCode.CHATROOM_NOT_FOUND));
 
         chatRoom.changeChatRoomName(chatRoomChangeNameRequest.getRoomName());
         chatRoomRepository.save(chatRoom);
+        return true;
+        }catch (Exception e){
+            log.error(e.getMessage());
+            throw new MallangsCustomException(ErrorCode.FAILED_UPDATE_CHAT_ROOM);
+        }
     }
 
     //채팅방 삭제
