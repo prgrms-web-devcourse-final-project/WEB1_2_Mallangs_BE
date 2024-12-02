@@ -47,4 +47,5 @@ public class ParticipatedRoom {
     public void changeParticipant(Member member) {
         this.participant = member;
     }
+    public void changeLastReadMessageId(Long lastReadMessageId){this.lastReadMessageId = lastReadMessageId;}
 }

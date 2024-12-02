@@ -19,10 +19,10 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
 
     //채팅 수정
     @Query("SELECT DISTINCT c FROM ChatMessage c " +
-            "JOIN FETCH c.participatedRoom p " +
-            "JOIN FETCH  p.chatRoom r " +
-            "JOIN FETCH c.sender " +
-            "JOIN FETCH c.isRead " +
+            "LEFT JOIN FETCH c.participatedRoom p " +
+            "LEFT JOIN FETCH  p.chatRoom r " +
+            "LEFT JOIN FETCH c.sender " +
+            "LEFT JOIN FETCH c.isRead " +
             "LEFT JOIN FETCH c.messageImage " +
             "WHERE c.chatMessageId =:chatMessageId")
     Optional<ChatMessage> findByChatMessageId(@Param("chatMessageId") Long chatMessageId);

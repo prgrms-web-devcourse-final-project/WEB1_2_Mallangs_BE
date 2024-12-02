@@ -1,6 +1,7 @@
 package com.mallangs.domain.board.repository;
 
 import com.mallangs.domain.board.entity.Category;
+import com.mallangs.domain.board.entity.CategoryLevel;
 import com.mallangs.domain.board.entity.CategoryStatus;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +25,7 @@ class CategoryRepositoryTest {
         Category category = Category.builder()
                 .name(name)
                 .categoryOrder(order)
-                .categoryLevel(level)
+                .categoryLevel(CategoryLevel.SUB_LEVEL)
                 .build();
         category.changeStatus(status);
         return categoryRepository.save(category);

@@ -1,5 +1,8 @@
 package com.mallangs.domain.chat.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mallangs.domain.chat.dto.request.ChatMessageRequest;
 import com.mallangs.domain.chat.dto.request.UpdateChatMessageRequest;
 import com.mallangs.domain.chat.dto.response.ChatMessageListResponse;
@@ -30,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Log4j2
 @Service
@@ -166,8 +170,13 @@ public class ChatMessageService {
     }
 
     //가장 최근 읽음 처리된 메세지 부터, 찾아 읽음 처리하는 메서드
-    public void changeUnReadToRead(Long chatMessageId, Long participatedRoomId, String nickname) {
-        if (isReadRepository.turnUnReadToRead(chatMessageId, participatedRoomId, nickname) < 0) {
+    public void changeUnReadToRead(Long participatedRoomId, String nickname) {
+
+                //참여채팅방 불러오기
+                ParticipatedRoom participatedRoom = participatedRoomRepository.findById(participatedRoomId)
+                        .orElseThrow(()->new MallangsCustomException(ErrorCode.PARTICIPATED_ROOM_NOT_FOUND));
+
+        if (isReadRepository.turnUnReadToRead(participatedRoom.getLastReadMessageId(), participatedRoomId, nickname) < 0) {
             throw new MallangsCustomException(ErrorCode.CHAT_MESSAGE_NOT_FOUND);
         }
     }
