@@ -91,9 +91,9 @@ public class ChatRoomService {
                     .participatedRoomId(room.getParticipatedRoomId())
                     .chatRoomId(room.getChatRoom().getChatRoomId())
                     .nickname(room.getParticipant().getNickname().getValue())
-                    .message(messages.get(0).getMessage())
+                    .message(messages.isEmpty()? null : messages.get(0).getMessage())
                     .chatRoomName(room.getChatRoom().getOccupiedRooms().get(1).getParticipant().getNickname().getValue())
-                    .lastChatTime(messages.get(0).getCreatedAt())
+                    .lastChatTime(messages.isEmpty()? null : messages.get(0).getCreatedAt())
                     .notReadCnt(unreadMessages.size())
                     .build();
             log.info("room정보1 :{}", room.getParticipatedRoomId());
