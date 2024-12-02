@@ -8,6 +8,7 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -26,6 +27,14 @@ public class RescueArticle extends Article {
   @Column(nullable = false)
   private PetType petType;
 
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private CaseStatus rescueStatus;
+
+  private String rescueLocation;
+
+  private LocalDateTime rescueDate;
+
   @Override
   public void applyChanges(Article updatedArticle) {
     super.applyChanges(updatedArticle);
@@ -34,6 +43,15 @@ public class RescueArticle extends Article {
       RescueArticle updatedRescueArticle = (RescueArticle) updatedArticle;
       if (updatedRescueArticle.getPetType() != null) {
         this.petType = updatedRescueArticle.getPetType();
+      }
+      if (updatedRescueArticle.getRescueStatus() != null) {
+        this.rescueStatus = updatedRescueArticle.getRescueStatus();
+      }
+      if (updatedRescueArticle.getRescueLocation() != null) {
+        this.rescueLocation = updatedRescueArticle.getRescueLocation();
+      }
+      if (updatedRescueArticle.getRescueDate() != null) {
+        this.rescueDate = updatedRescueArticle.getRescueDate();
       }
     }
   }
@@ -53,8 +71,11 @@ public class RescueArticle extends Article {
 
     return RescueArticle.builder()
         .petType(createRequest.getPetType())
+        .rescueStatus(createRequest.getRescueStatus())
+        .rescueLocation(createRequest.getRescueLocation())
+        .rescueDate(createRequest.getRescueDate())
         .member(member)
-        .type(createRequest.getType())
+        .articleType(createRequest.getArticleType())
         .articleStatus(createRequest.getArticleStatus())
         .title(createRequest.getTitle())
         .geography(geography)

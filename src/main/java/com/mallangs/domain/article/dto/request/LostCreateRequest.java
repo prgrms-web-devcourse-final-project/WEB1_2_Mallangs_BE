@@ -1,11 +1,11 @@
 package com.mallangs.domain.article.dto.request;
 
-import com.mallangs.domain.article.entity.LostStatus;
+import com.mallangs.domain.article.entity.CaseStatus;
 import com.mallangs.domain.pet.entity.PetGender;
 import com.mallangs.domain.pet.entity.PetType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
-import java.time.LocalDate;
+import jakarta.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -18,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @Schema(description = "자식 클래스 DTO", allOf = ArticleCreateRequest.class)
 public class LostCreateRequest extends ArticleCreateRequest {
 
-  @NotNull
+  @NotBlank(message = "동물 타입은 필수입니다.")
   private PetType petType;
 
   private String breed;
@@ -31,16 +31,19 @@ public class LostCreateRequest extends ArticleCreateRequest {
 
   private Boolean isNeutering;
 
+  private String petColor;
+
   private String chipNumber;
 
-  private LocalDate lostDate;
+  private LocalDateTime lostDate;
 
-  private String lastSeenLocation;
+  @NotBlank(message = "실종 장소는 필수입니다.")
+  private String lostLocation;
 
   private String contact;
 
-  @NotNull
-  private LostStatus lostStatus;
+  @NotBlank(message = "실종 상태는 필수입니다.")
+  private CaseStatus lostStatus;
 
 
 }

@@ -52,6 +52,7 @@ public class ArticleController {
   }
 
 
+  // 조회
   @Operation(summary = "글타래 단건 조회", description = "글타래를 단건 조회합니다.")
   @GetMapping("/public/{articleId}")
   public ResponseEntity<ArticleResponse> getArticleByArticleId(
@@ -64,26 +65,26 @@ public class ArticleController {
   @Operation(summary = "글타래 전체 조회", description = "모든 글타래를 페이지별로 조회합니다.")
   @GetMapping("/public")
   public ResponseEntity<Page<ArticleResponse>> getArticles(
-      @Parameter(description = "페이징 요청 정보", required = true) Pageable pageable) {
-    Page<ArticleResponse> articles = articleService.findAllTypeArticles(pageable);
+      @Parameter(description = "페이징 요청 정보", required = true) Pageable pageable,
+      @RequestParam(value = "articleType", required = false) String articleType) {
+
+    Page<ArticleResponse> articles;
+
+    if (articleType == null || articleType.isEmpty()) {
+      articles = articleService.findAllTypeArticles(pageable);
+    } else {
+      articles = articleService.findArticlesByArticleType(pageable, articleType);
+    }
 
     return ResponseEntity.ok(articles);
   }
 
-  // 글타래 타입 별 조회
-  @Operation(summary = "글타래 타입별 전체 조회", description = "타입의 글타래를 페이지별로 조회합니다.")
-  @GetMapping("/public/type/{articleType}")
-  public ResponseEntity<List<ArticleResponse>> getArticlesByType(
-      @Parameter(description = "조회할 글타래 Type", required = true) @PathVariable String articleType) {
-    List<ArticleResponse> articles = articleService.findArticlesByArticleType(articleType);
-
-    return ResponseEntity.ok(articles);
-  }
-
-  // 위치 기준 지도 조회
+  // 지도에 마커 표시 위한 경로
+  // 위치 기준 지도 전체 글타래 조회 // 타입별 조회
   @Operation(summary = "지도에서 글타래 조회", description = "지도에서 글타래를 조회합니다.")
   @PostMapping("/public/articlesMarkers")
   public ResponseEntity<List<MapBoundsResponse>> getMarkersInBounds(
+      @RequestParam(value = "articleType", required = false) String articleType,
       @RequestBody MapBoundsRequest bounds) {
 
     double southWestLat = bounds.getSouthWestLat();
@@ -91,19 +92,27 @@ public class ArticleController {
     double northEastLat = bounds.getNorthEastLat();
     double northEastLon = bounds.getNorthEastLon();
 
-    List<MapBoundsResponse> articlesInBounds = locationService.findArticlesInBounds(southWestLat,
-        southWestLon,
-        northEastLat, northEastLon);
+    List<MapBoundsResponse> articlesInBounds;
 
+    if (articleType == null || articleType.isEmpty()) {
+      articlesInBounds = locationService.findArticlesInBounds(
+          southWestLat, southWestLon,
+          northEastLat, northEastLon);
+    } else {
+      articlesInBounds = locationService.findArticlesInBoundsByType(
+          southWestLat, southWestLon,
+          northEastLat, northEastLon, articleType);
+    }
     return ResponseEntity.ok(articlesInBounds);
   }
 
   // 검색 조회
   @Operation(summary = "글타래 검색", description = "글타래에서 검색합니다.")
-  @GetMapping("/search")
+  @GetMapping("/public/search")
   public ResponseEntity<Page<ArticleResponse>> searchSightingPosts(
       @Parameter(description = "페이지 요청 정보", required = true) Pageable pageable,
       @RequestParam String keyword) {
+
     Page<ArticleResponse> articles = articleService.findArticlesByKeyword(pageable, keyword);
     return ResponseEntity.ok(articles);
   }
@@ -117,9 +126,9 @@ public class ArticleController {
       @Parameter(description = "페이지 요청 정보", required = true) Pageable pageable,
       @Parameter(description = "현재 인증된 사용자 정보", required = true)
       @AuthenticationPrincipal CustomMemberDetails principal) {
+
     Page<ArticleResponse> articles = articleService.findArticlesByMemberId(pageable,
         principal.getMemberId());
-
     return ResponseEntity.ok(articles);
   }
 
@@ -134,13 +143,12 @@ public class ArticleController {
       @PathVariable("articleId") Long articleId,
       @RequestBody ArticleCreateRequest articleCreateRequest,
       @Parameter(description = "현재 인증된 사용자 정보", required = true)
-      @AuthenticationPrincipal CustomMemberDetails principal
-  ) {
+      @AuthenticationPrincipal CustomMemberDetails principal) {
+
     ArticleResponse articleResponse = articleService.updateArticle(
         articleId,
         articleCreateRequest,
         principal.getMemberId());
-
     return ResponseEntity.ok(articleResponse);
   }
 
@@ -155,9 +163,9 @@ public class ArticleController {
   public ResponseEntity<Void> deactivateArticle(
       @PathVariable("articleId") Long articleId,
       @AuthenticationPrincipal CustomMemberDetails principal) {
+
     Long memberId = principal.getMemberId();
     articleService.deactivateArticle(articleId, memberId);
-
     return ResponseEntity.noContent().build();
   }
 
@@ -168,6 +176,7 @@ public class ArticleController {
   @DeleteMapping("/{articleId}")
   public ResponseEntity<Void> deleteArticle(
       @PathVariable("articleId") Long articleId) {
+
     articleService.deleteArticle(articleId);
     return ResponseEntity.noContent().build();
   }

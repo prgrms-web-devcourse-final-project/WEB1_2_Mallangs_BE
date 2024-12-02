@@ -1,10 +1,10 @@
 package com.mallangs.domain.article.dto.response;
 
+import com.mallangs.domain.article.entity.CaseStatus;
 import com.mallangs.domain.article.entity.LostArticle;
-import com.mallangs.domain.article.entity.LostStatus;
 import com.mallangs.domain.pet.entity.PetGender;
 import com.mallangs.domain.pet.entity.PetType;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -26,15 +26,17 @@ public class LostResponse extends ArticleResponse {
 
   private Boolean isNeutering;
 
+  private String petColor;
+
   private String chipNumber;
 
-  private LocalDate lostDate;
+  private LocalDateTime lostDate;
 
-  private String lastSeenLocation;
+  private String lostLocation;
 
   private String contact;
 
-  private LostStatus lostStatus;
+  private CaseStatus lostStatus;
 
   public LostResponse(LostArticle article) {
     super(article);
@@ -44,9 +46,10 @@ public class LostResponse extends ArticleResponse {
     this.petAge = article.getPetAge();
     this.petGender = article.getPetGender();
     this.isNeutering = article.getIsNeutering();
+    this.petColor = article.getPetColor();
     this.chipNumber = article.getChipNumber();
     this.lostDate = article.getLostDate();
-    this.lastSeenLocation = article.getLastSeenLocation();
+    this.lostLocation = article.getLostLocation();
     this.contact = article.getContact();
     this.lostStatus = article.getLostStatus();
   }
