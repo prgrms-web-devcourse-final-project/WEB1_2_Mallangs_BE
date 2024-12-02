@@ -1,13 +1,12 @@
 package com.mallangs.domain.article.dto.response;
 
-import com.mallangs.domain.article.entity.Article;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @ToString
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class MapBoundsResponse {
 
   private Long articleId;
@@ -21,14 +20,5 @@ public class MapBoundsResponse {
   private double longitude;
 
   private String description;
-
-  public MapBoundsResponse(Article article) {
-    this.articleId = article.getId();
-    this.type = article.getType();
-    this.title = article.getTitle();
-    this.latitude = article.getGeography().getY();
-    this.longitude = article.getGeography().getX();
-    this.description = article.getDescription();
-  }
-
+  
 }

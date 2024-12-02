@@ -48,14 +48,14 @@ public class BoardController {
     }
 
     @Operation(summary = "커뮤니티 전체 게시글 조회", description = "커뮤니티 게시판의 게시글 전체를 조회합니다.")
-    @GetMapping("/community/all")
+    @GetMapping("/community/")
     public ResponseEntity<Page<CommunityListResponse>> getAllCommunity(@RequestParam(defaultValue = "1") int page) {
         PageRequest pageRequest = PageRequest.of(page - 1, 10);
         return ResponseEntity.ok(boardService.getAllCommunitiyBoard(pageRequest));
     }
 
-    @Operation(summary = "커뮤니티 게시글 검색", description = "키워드로 커뮤니티 게시글을 검색합니다.")
-    @GetMapping("/community/search")
+    @Operation(summary = "커뮤니티 게시글 키워드로 검색", description = "키워드로 커뮤니티 게시글을 검색합니다.")
+    @GetMapping("/community/keyword")
     public ResponseEntity<Page<CommunityListResponse>> searchCommunityPosts(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "1") int page
@@ -116,14 +116,14 @@ public class BoardController {
     }
 
     @Operation(summary = "실종신고-목격제보 전체 게시글 조회", description = "실종신고-목격제보 게시판의 게시글 전체를 조회합니다.")
-    @GetMapping("/sighting/all")
+    @GetMapping("/sighting/")
     public ResponseEntity<Page<SightingListResponse>> getAllSighting(@RequestParam(defaultValue = "1") int page) {
         PageRequest pageRequest = PageRequest.of(page - 1, 10);
         return ResponseEntity.ok(boardService.getAllSightingBoard(pageRequest));
     }
 
-    @Operation(summary = "실종신고-목격제보 게시글 검색", description = "키워드로 실종신고-목격제보 게시글을 검색합니다.")
-    @GetMapping("/sighting/search")
+    @Operation(summary = "실종신고-목격제보 게시글 키워드로 검색", description = "키워드로 실종신고-목격제보 게시글을 검색합니다.")
+    @GetMapping("/sighting/keyword")
     public ResponseEntity<Page<SightingListResponse>> searchSightingPosts(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "1") int page
