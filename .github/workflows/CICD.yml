@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - main
-      - 'feature/123-기능-cicd-워크플로우'
+      - 'feature/123-feat-cicd-워크플로우'
 
 jobs:
   build:
