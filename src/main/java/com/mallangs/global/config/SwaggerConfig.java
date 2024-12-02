@@ -30,6 +30,9 @@ public class SwaggerConfig {
 
         return new OpenAPI()
                 .addServersItem(new Server().url("/"))
+                .addServersItem(new Server().url("http://localhost:5173"))
+                .addServersItem(new Server().url("http://localhost:8080"))
+                .addServersItem(new Server().url("http://6dc7-211-209-131-145.ngrok-free.app"))
                 .info(apiInfo())
                 .addSecurityItem(securityRequirement)
                 .components(components);
