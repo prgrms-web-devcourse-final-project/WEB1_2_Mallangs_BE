@@ -71,10 +71,10 @@ public class ChatRoomController {
 
     //채팅방 삭제
     @DeleteMapping("/{participatedRoomId}")
-    @Operation(summary = "채팅방 삭제", description = "채팅방을 나갑니다.")
+    @Operation(summary = "참여 채팅방 삭제", description = "참여 채팅방을 나갑니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "삭제 성공"),
-            @ApiResponse(responseCode = "404", description = "채팅방이 존재하지 않습니다.")
+            @ApiResponse(responseCode = "404", description = "참여 채팅방이 존재하지 않습니다.")
     })
     public ResponseEntity<?> delete(@PathVariable("participatedRoomId") Long participatedRoomId,
                                     Authentication authentication) {
