@@ -20,7 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UploadUtil {
 
-    @Value("${edu.example.upload.path}")
+    @Value("${spring.web.resources.static-locations}")
     private String uploadPath;
 
     @PostConstruct
