@@ -105,7 +105,7 @@ public class PlaceArticle extends Article {
         .isPetFriendly(createRequest.getIsPetFriendly())
         .contact(createRequest.getContact())
         .member(member)
-        .type(createRequest.getType())
+        .articleType(createRequest.getArticleType())
         .articleStatus(createRequest.getArticleStatus())
         .title(createRequest.getTitle())
         .geography(geography)

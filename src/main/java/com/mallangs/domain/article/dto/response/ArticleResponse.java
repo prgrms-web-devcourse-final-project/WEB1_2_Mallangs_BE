@@ -1,6 +1,7 @@
 package com.mallangs.domain.article.dto.response;
 
 import com.mallangs.domain.article.entity.Article;
+import com.mallangs.domain.article.entity.ArticleType;
 import com.mallangs.domain.article.entity.MapVisibility;
 import com.mallangs.domain.board.entity.BoardStatus;
 import lombok.Getter;
@@ -14,7 +15,7 @@ public class ArticleResponse {
 
   private Long articleId;
 
-  private String type;
+  private ArticleType articleType;
 
   private Long memberId;
 
@@ -34,7 +35,7 @@ public class ArticleResponse {
 
   public ArticleResponse(Article article) {
     this.articleId = article.getId();
-    this.type = article.getType();
+    this.articleType = article.getArticleType();
     this.memberId = article.getMember().getMemberId();
     this.mapVisibility = article.getMapVisibility();
     this.articleStatus = article.getArticleStatus();

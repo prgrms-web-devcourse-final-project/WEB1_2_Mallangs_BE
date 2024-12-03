@@ -9,7 +9,7 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -40,17 +40,19 @@ public class LostArticle extends Article {
 
   private Boolean isNeutering;
 
+  private String petColor;
+
   private String chipNumber;
 
-  private LocalDate lostDate;
+  private LocalDateTime lostDate;
 
-  private String lastSeenLocation;
+  private String lostLocation;
 
   private String contact;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "lost_status", nullable = false)
-  private LostStatus lostStatus;
+  private CaseStatus lostStatus;
 
   @Override
   public void applyChanges(Article updatedArticle) {
@@ -76,14 +78,17 @@ public class LostArticle extends Article {
       if (updatedLostArticle.getIsNeutering() != null) {
         this.isNeutering = updatedLostArticle.getIsNeutering();
       }
+      if (updatedLostArticle.getPetColor() != null) {
+        this.petColor = updatedLostArticle.getPetColor();
+      }
       if (updatedLostArticle.getChipNumber() != null) {
         this.chipNumber = updatedLostArticle.getChipNumber();
       }
       if (updatedLostArticle.getLostDate() != null) {
         this.lostDate = updatedLostArticle.getLostDate();
       }
-      if (updatedLostArticle.getLastSeenLocation() != null) {
-        this.lastSeenLocation = updatedLostArticle.getLastSeenLocation();
+      if (updatedLostArticle.getLostLocation() != null) {
+        this.lostLocation = updatedLostArticle.getLostLocation();
       }
       if (updatedLostArticle.getContact() != null) {
         this.contact = updatedLostArticle.getContact();
@@ -113,13 +118,14 @@ public class LostArticle extends Article {
         .petAge(createRequest.getPetAge())
         .petGender(createRequest.getPetGender())
         .isNeutering(createRequest.getIsNeutering())
+        .petColor(createRequest.getPetColor())
         .chipNumber(createRequest.getChipNumber())
         .lostDate(createRequest.getLostDate())
-        .lastSeenLocation(createRequest.getLastSeenLocation())
+        .lostLocation(createRequest.getLostLocation())
         .contact(createRequest.getContact())
         .lostStatus(createRequest.getLostStatus())
         .member(member)
-        .type(createRequest.getType())
+        .articleType(createRequest.getArticleType())
         .articleStatus(createRequest.getArticleStatus())
         .title(createRequest.getTitle())
         .geography(geography)
