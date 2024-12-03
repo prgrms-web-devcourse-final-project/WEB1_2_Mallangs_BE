@@ -100,6 +100,11 @@ dependencies {
     //CSV 데이터 저장
     implementation 'com.opencsv:opencsv:5.9'
 
+    implementation 'mysql:mysql-connector-java:8.0.33'
+
+    jar {
+        enabled = false
+    }
 }
 
 tasks.named('test') {
