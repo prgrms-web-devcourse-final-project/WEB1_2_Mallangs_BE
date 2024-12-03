@@ -108,8 +108,9 @@ public class SecurityConfig {
                                 .requestMatchers("/webjars/**").permitAll() //웹소켓 테스터
                                 .requestMatchers("/ws-stomp/**").permitAll() //웹소켓 테스터
                                 .requestMatchers("/chat-rooms/**").permitAll() // 웹소켓 테스터2
-                                .requestMatchers("/api/v1/member/**").hasAnyRole("USER", "ADMIN") //회원
-                                .requestMatchers("/api/v1/chat-room/**").hasAnyRole("USER", "ADMIN") //채팅방
+                                .requestMatchers("/api/v1/member/**").permitAll() //회원
+                                .requestMatchers("/api/v1/chat-room/**").permitAll() //채팅방
+                                .requestMatchers("/api/v1/chat/**").permitAll() //채팅
                                 .requestMatchers("/api/v1/address/**").permitAll() //주소
                                 .requestMatchers("/api/member-file-test").permitAll() //파일,이미지업로드
                                 // Swagger UI 관련 경로 허용

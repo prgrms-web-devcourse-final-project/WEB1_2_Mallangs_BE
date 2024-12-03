@@ -67,7 +67,7 @@ public class MemberUserController {
     @PostMapping("/register")
     @Operation(summary = "회원등록", description = "회원등록 요청 API")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "회원 등록 성공"),
+            @ApiResponse(responseCode = "201", description = "회원 등록 성공"),
             @ApiResponse(responseCode = "404", description = "입력값이 잘못되었습니다.")
     })
     public ResponseEntity<String> create(@Validated @RequestBody MemberCreateRequest memberCreateRequest) {
@@ -78,7 +78,7 @@ public class MemberUserController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "회원 프로필 조회", description = "회원 프로필 조회 요청 API")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "회원 조회 성공"),
+            @ApiResponse(responseCode = "201", description = "회원 조회 성공"),
             @ApiResponse(responseCode = "404", description = "회원조회에 실패하였습니다.")
     })
     public ResponseEntity<MemberGetResponse> get(Authentication authentication) {
@@ -90,7 +90,7 @@ public class MemberUserController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "회원수정", description = "회원수정 요청 API")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "회원 수정 성공"),
+            @ApiResponse(responseCode = "201", description = "회원 수정 성공"),
             @ApiResponse(responseCode = "404", description = "회원 수정 실패에 실패하였습니다.")
     })
     public ResponseEntity<?> update(@Validated @RequestBody MemberUpdateRequest memberUpdateRequest,
@@ -102,7 +102,7 @@ public class MemberUserController {
     @PostMapping("/find-user-id")
     @Operation(summary = "아이디찾기", description = "아이디찾기 요청 API")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "아이디 찾기 요청 성공"),
+            @ApiResponse(responseCode = "201", description = "아이디 찾기 요청 성공"),
             @ApiResponse(responseCode = "404", description = "아이디 찾기 요청에 실패하였습니다.")
     })
     public ResponseEntity<String> findUserId(@Validated @RequestBody MemberFindUserIdRequest memberFindUserIdRequest) {
@@ -112,7 +112,7 @@ public class MemberUserController {
     @PostMapping("/find-password")
     @Operation(summary = "비밀번호찾기", description = "비밀번호찾기 요청 API")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "비밀번호 찾기 요청 성공"),
+            @ApiResponse(responseCode = "201", description = "비밀번호 찾기 요청 성공"),
             @ApiResponse(responseCode = "404", description = "비밀번호 찾기 요청에 실패하였습니다.")
     })
     public ResponseEntity<String> findPassword(@Validated @RequestBody MemberFindPasswordRequest memberFindPasswordRequest) throws MessagingException {
@@ -124,7 +124,7 @@ public class MemberUserController {
     @PostMapping("/check-password")
     @Operation(summary = "비밀번호 확인", description = "비밀번호 확인 요청 API")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "비밀번호 요청 성공"),
+            @ApiResponse(responseCode = "201", description = "비밀번호 요청 성공"),
             @ApiResponse(responseCode = "404", description = "비밀번호 요청에 실패하였습니다.")
     })
     public ResponseEntity<?> checkPassword(@Validated @RequestBody PasswordDTO passwordDTO
@@ -136,6 +136,10 @@ public class MemberUserController {
 
     @PostMapping("/login")
     @Operation(summary = "로그인", description = "로그인 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "로그인 요청 성공"),
+            @ApiResponse(responseCode = "404", description = "로그인에 실패했습니다.")
+    })
     public ResponseEntity<?> login(@Validated @RequestBody LoginRequest loginRequest) {
         // 인증 토큰 생성
         UsernamePasswordAuthenticationToken authToken =
@@ -200,6 +204,10 @@ public class MemberUserController {
 
     @PostMapping("/logout")
     @Operation(summary = "로그아웃", description = "로그아웃 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "로그아웃 요청 성공"),
+            @ApiResponse(responseCode = "403", description = "토큰이 없습니다.")
+    })
     public ResponseEntity<?> loginOut(HttpServletRequest request, HttpServletResponse response) {
         log.info("커스텀 로그아웃 실행");
 

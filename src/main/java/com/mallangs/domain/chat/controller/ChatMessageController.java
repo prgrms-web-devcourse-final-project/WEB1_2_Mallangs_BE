@@ -18,6 +18,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -41,12 +42,24 @@ public class ChatMessageController {
         chatMessageService.sendMessage(message);
     }
 
+//    //클리이언트로 부터 오는 이미지파일 수신
+//    @MessageMapping("/upload")
+//    @SendTo("/sub/uploadStatus")
+//    public String handleBinaryMessage(byte[] fileData) {
+//        try {
+//            // 파일 저장 로직
+//            return "File uploaded successfully!";
+//        } catch (Exception e) {
+//            return "File upload failed: " + e.getMessage();
+//        }
+//    }
+
     //채팅메세지 조회
     @GetMapping
     @ResponseBody
     @Operation(summary = "채팅메세지 조회", description = "채팅 이력을 불러오는 API")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "201", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "채팅방이 존재하지 않습니다.")
     })
     public ResponseEntity<Page<ChatMessageListResponse>> get(@RequestParam("chatRoomId") Long chatRoomId,
@@ -62,7 +75,7 @@ public class ChatMessageController {
     @ResponseBody
     @Operation(summary = "채팅메세지 수정", description = "채팅내용을 수정하는 API")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "201", description = "수정 성공"),
             @ApiResponse(responseCode = "404", description = "채팅메세지가 존재하지 않습니다.")
     })
     public ResponseEntity<ChatMessageToDTOResponse> update(
@@ -76,7 +89,7 @@ public class ChatMessageController {
     @ResponseBody
     @Operation(summary = "채팅메세지 삭제", description = "채팅내용을 삭제하는 API.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "삭제 성공"),
+            @ApiResponse(responseCode = "201", description = "삭제 성공"),
             @ApiResponse(responseCode = "404", description = "채팅메세지가 존재하지 않습니다.")
     })
     public ResponseEntity<?> delete(@PathVariable("chatMessageId") Long chatMessageId) {
