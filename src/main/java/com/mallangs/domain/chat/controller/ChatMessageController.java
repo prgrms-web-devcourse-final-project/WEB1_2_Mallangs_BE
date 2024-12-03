@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequiredArgsConstructor
 @Log4j2
-@RequestMapping("/api/chat")
+@RequestMapping("/api/v1/chat")
 @Tag(name = "채팅메세지", description = "채팅메세지 CRUD")
 public class ChatMessageController {
 
@@ -67,6 +67,7 @@ public class ChatMessageController {
     })
     public ResponseEntity<ChatMessageToDTOResponse> update(
             @Validated @RequestBody UpdateChatMessageRequest updateChatMessageRequest) {
+
         return ResponseEntity.ok(chatMessageService.update(updateChatMessageRequest));
     }
 
@@ -85,15 +86,4 @@ public class ChatMessageController {
         return ResponseEntity.noContent().build();
     }
 
-    //채팅 메세지 읽음으로 변경
-    @ResponseBody
-    @PutMapping("/{chatMessageId}/{participatedRoomId}")
-    @Operation(summary = "채팅메세지 읽음으로 변경", description = "채팅메세지를 읽음으로 변경하는 API.")
-    public ResponseEntity<?> changeStatus(@PathVariable Long chatMessageId,
-                             @PathVariable Long participatedRoomId,
-                             @AuthenticationPrincipal CustomMemberDetails customMemberDetails){
-        String nickname = customMemberDetails.getNickname();
-        chatMessageService.changeUnReadToRead(chatMessageId, participatedRoomId, nickname);
-        return ResponseEntity.ok("변경 성공");
-    }
 }

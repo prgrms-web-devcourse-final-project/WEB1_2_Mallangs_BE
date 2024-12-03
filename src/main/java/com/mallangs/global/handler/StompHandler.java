@@ -1,5 +1,11 @@
 package com.mallangs.global.handler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mallangs.domain.chat.entity.ParticipatedRoom;
+import com.mallangs.domain.chat.repository.ParticipatedRoomRepository;
+import com.mallangs.domain.chat.service.ChatMessageService;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.embadded.UserId;
 import com.mallangs.global.jwt.entity.CustomMemberDetails;
@@ -38,19 +44,24 @@ public class StompHandler implements ChannelInterceptor {
         if (StompCommand.CONNECT == accessor.getCommand()) {
             String jwtToken = accessor.getFirstNativeHeader("Authorization");
             log.info(" 검증 시작 {}",jwtToken);
-            if (!jwtUtil.isExpired(jwtToken)){
+
+            //토큰 검증
+            if (!jwtUtil.isExpired(jwtToken)) {
                 Map<String, Object> payload = jwtUtil.validateToken(jwtToken);
-                String userId = (String)payload.get("userId");
+                String userId = (String) payload.get("userId");
                 Member foundMember = memberRepository.findByUserId(new UserId(userId))
-                        .orElseThrow(()->new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+                        .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+                //회원 정보 저장
                 CustomMemberDetails customUserDetails = new CustomMemberDetails(foundMember);
 
+                //회원 정보 토큰에 저장
                 Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null,
                         customUserDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authToken);
 
                 Object payload1 = message.getPayload();
-                log.info(" 검증 성공 {}",payload1.toString());
+                log.info(" 검증 성공 {}", payload1.toString());
             }
         }
         return message;

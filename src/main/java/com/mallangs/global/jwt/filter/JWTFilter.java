@@ -48,10 +48,10 @@ public class JWTFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         try {
             //등록된 URI 필터 제외
-            if (request.getRequestURI().startsWith("/api/member/register")||
-                request.getRequestURI().startsWith("/api/member/find-user-id")||
-                request.getRequestURI().startsWith("/api/member/login")||
-                request.getRequestURI().startsWith("/api/member/find-password")) {
+            if (request.getRequestURI().startsWith("/api/v1/member/register")||
+                request.getRequestURI().startsWith("/api/v1/member/find-user-id")||
+                request.getRequestURI().startsWith("/api/v1/member/login")||
+                request.getRequestURI().startsWith("/api/v1/member/find-password")) {
                 filterChain.doFilter(request, response);
                 return;
             }

@@ -1,6 +1,8 @@
 package com.mallangs.domain.chat.repository;
 
-import com.mallangs.domain.chat.entity.*;
+import com.mallangs.domain.chat.entity.ChatMessage;
+import com.mallangs.domain.chat.entity.ChatRoom;
+import com.mallangs.domain.chat.entity.ParticipatedRoom;
 import com.mallangs.domain.image.entity.Image;
 import com.mallangs.domain.image.repository.ImageRepository;
 import com.mallangs.domain.member.entity.Address;
@@ -20,10 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 public class ChatRoomRepositoryTests {
 
@@ -41,8 +39,6 @@ public class ChatRoomRepositoryTests {
     private AddressRepository addressRepository;
     @Autowired
     private ImageRepository imageRepository;
-    @Autowired
-    private IsReadRepository isReadRepository;
 
 
     //회원, 주소, 채팅룸, 채팅방, 참여 채팅, 데이터 입력 1개씩
@@ -85,51 +81,27 @@ public class ChatRoomRepositoryTests {
         chatRoom.addParticipatedRoom(participatedRoom2);
         chatRoomRepository.save(chatRoom);
 
-        // Image 저장
-        Image savedImage1 = imageRepository.save(Image.builder()
-                .url("qwerqweasd")
-                .width(1234)
-                .height(1234)
-                .build());
-        Image savedImage2 = imageRepository.save(Image.builder()
-                .url("qwerqwea1sd")
-                .width(12345)
-                .height(12354)
-                .build());
-
         // ChatMessage 저장
         ChatMessage chatMessage = ChatMessage.builder()
-                .participatedRoom(participatedRoom)
+                .chatRoom(chatRoom)
                 .message("TestMessage")
                 .sender(member)
-                .messageImage(savedImage1)
+                .senderRead(true)
+                .receiverRead(false)
+                .imageUrl("asdf")
                 .build();
-        chatMessageRepository.save(chatMessage);
 
         ChatMessage chatMessage2 = ChatMessage.builder()
-                .participatedRoom(participatedRoom)
+                .chatRoom(chatRoom)
                 .message("TestMessage2")
-                .sender(member)
-                .messageImage(savedImage2)
+                .sender(member2)
+                .senderRead(true)
+                .receiverRead(false)
+                .imageUrl("savedImage2")
                 .build();
-        chatMessageRepository.save(chatMessage2);
 
-        // IsRead 저장
-        IsRead isRead1 = isReadRepository.save(IsRead.builder()
-                        .chatMessage(chatMessage)
-                .reader(chatRoom.getOccupiedRooms().get(0).getParticipant().getNickname().getValue())
-                .build());
-        IsRead isRead2 = isReadRepository.save(IsRead.builder()
-                        .chatMessage(chatMessage2)
-                .reader(chatRoom.getOccupiedRooms().get(1).getParticipant().getNickname().getValue())
-                .build());
 
-        chatMessage.addIsRead(isRead1);
-        chatMessage.addIsRead(isRead2);
         chatMessageRepository.save(chatMessage); // 관계 저장
-
-        chatMessage2.addIsRead(isRead1);
-        chatMessage2.addIsRead(isRead2);
         chatMessageRepository.save(chatMessage2); // 관계 저장
 
         // Address 저장

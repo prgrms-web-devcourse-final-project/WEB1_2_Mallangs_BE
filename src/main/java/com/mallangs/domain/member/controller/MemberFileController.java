@@ -22,7 +22,7 @@ import static com.mallangs.global.exception.ErrorCode.UNSUPPORTED_FILE_TYPE;
 @RestController
 //@PreAuthorize("hasRole('USER')")
 @RequiredArgsConstructor
-@RequestMapping("/api/member/file")
+@RequestMapping("/api/v1/member/file")
 public class MemberFileController {
 
     private final UploadUtil uploadUtil;

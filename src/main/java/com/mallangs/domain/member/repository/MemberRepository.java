@@ -60,10 +60,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "WHERE m.email =:email AND m.userId =:userId")
     Optional<Member> findByEmailAndUserId(@Param("email") Email email, @Param("userId") UserId userId);
 
-    //모든 회원조회+주소
-    @Query("SELECT m FROM Member m join fetch m.addresses WHERE m.userId = :userId")
-    List<Member> memberList();
-
     //모든 회원조회 - UserId
     @Query("SELECT new com.mallangs.domain.member.dto.MemberGetResponseOnlyMember(m) " +
             "FROM Member m " +
