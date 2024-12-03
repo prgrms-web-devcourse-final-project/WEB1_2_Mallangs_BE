@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @PreAuthorize("hasRole('ADMIN')")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/member/admin")
+@RequestMapping("api/v1/member/admin")
 @Tag(name = "관리자", description = "관리자 CRUD")
 public class MemberAdminController {
 

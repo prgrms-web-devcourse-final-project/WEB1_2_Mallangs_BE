@@ -46,7 +46,7 @@ import java.util.UUID;
 @Log4j2
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/member")
+@RequestMapping("api/v1/member")
 @Tag(name = "회원", description = "회원 CRUD")
 public class MemberUserController {
 

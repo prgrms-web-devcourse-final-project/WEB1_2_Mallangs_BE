@@ -1,5 +1,6 @@
 package com.mallangs.domain.chat.controller;
 
+import com.mallangs.domain.chat.dto.response.ChatRoomResponse;
 import com.mallangs.domain.chat.dto.response.ParticipatedRoomListResponse;
 import com.mallangs.domain.chat.service.ChatMessageService;
 import com.mallangs.domain.chat.service.ChatRoomService;
@@ -21,7 +22,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Log4j2
-@RequestMapping("/api/chat-room")
+@RequestMapping("/api/v1/chat-room")
 @Tag(name = "채팅방", description = "채팅방 CRUD")
 public class ChatRoomController {
 
@@ -86,14 +87,16 @@ public class ChatRoomController {
     //채팅방 조회
     @ResponseBody
     @GetMapping("/{participatedRoomId}")
-    @Operation(summary = "채팅메세지 읽음으로 변경", description = "채팅메세지를 읽음으로 변경하는 API.")
-    public ResponseEntity<?> changeStatus(@PathVariable Long participatedRoomId,
-                                          @AuthenticationPrincipal CustomMemberDetails customMemberDetails){
+    @Operation(summary = "채팅방 조회", description = "채팅방을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "채팅방이 존재하지 않습니다.")
+    })
+    public ResponseEntity<ChatRoomResponse> changeStatus(@PathVariable Long participatedRoomId,
+                                                         @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
 
         String nickname = customMemberDetails.getNickname();
-
-        chatMessageService.changeUnReadToRead(participatedRoomId, nickname);
-        return ResponseEntity.ok("변경 성공");
+        return ResponseEntity.ok(chatMessageService.changeUnReadToRead(participatedRoomId, nickname));
     }
 
 }

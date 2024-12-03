@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequiredArgsConstructor
 @Log4j2
-@RequestMapping("/api/chat")
+@RequestMapping("/api/v1/chat")
 @Tag(name = "채팅메세지", description = "채팅메세지 CRUD")
 public class ChatMessageController {
 

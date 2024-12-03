@@ -5,9 +5,6 @@ import com.mallangs.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Getter
 @Builder
@@ -29,23 +26,12 @@ public class ParticipatedRoom {
     @JoinColumn(name = "chat_room_id", nullable = false)
     private ChatRoom chatRoom;
 
-    @OneToMany(mappedBy = "participatedRoom", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
-    @Builder.Default
-    private List<ChatMessage> messages = new ArrayList<>();
+    private String roomName;
 
-    private Long lastReadMessageId;
-
-    public void addChatMessage(ChatMessage chatMessage) {
-        messages.add(chatMessage);
-    }
-    public void removeChatMessage(ChatMessage chatMessage) {
-        messages.remove(chatMessage);
-    }
     public void changeChatRoom(ChatRoom chatRoom) {
         this.chatRoom = chatRoom;
     }
     public void changeParticipant(Member member) {
         this.participant = member;
     }
-    public void changeLastReadMessageId(Long lastReadMessageId){this.lastReadMessageId = lastReadMessageId;}
 }

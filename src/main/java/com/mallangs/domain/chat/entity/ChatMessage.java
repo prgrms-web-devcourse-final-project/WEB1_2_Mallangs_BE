@@ -24,8 +24,8 @@ public class ChatMessage extends BaseTimeEntity {
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "participated_room_id", nullable = false)
-    private ParticipatedRoom participatedRoom;
+    @JoinColumn(name = "chat_room_id", nullable = false)
+    private ChatRoom chatRoom;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
@@ -35,27 +35,20 @@ public class ChatMessage extends BaseTimeEntity {
     @JoinColumn(name = "message")
     private String message;
 
-    @JsonIgnore
-    @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
-    private Image messageImage;
+    private String imageUrl;
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private MessageType type = MessageType.ENTER;
 
     @Builder.Default
-    @OneToMany(mappedBy = "chatMessage", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<IsRead> isRead = new ArrayList<>();
+    private Boolean senderRead = false;
+
+    @Builder.Default
+    private Boolean receiverRead = false;
 
     public void changeMessage(String message) {
         this.message = message;
-    }
-    public void addIsRead(IsRead isRead) {
-        this.isRead.add(isRead);
-        isRead.changeChatMessage(this);
-    }
-    public void addImage(Image image) {
-        this.messageImage = image;
     }
 
 }

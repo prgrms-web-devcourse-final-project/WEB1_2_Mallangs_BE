@@ -84,33 +84,33 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable);
-        // oauth2
-        http
-                .oauth2Login((oauth2) -> oauth2
-                        .loginPage("/login")
-                        .userInfoEndpoint((userInfo) -> userInfo
-                                .userService(customOAuth2MemberService))
-                        .successHandler(customSuccessHandler)
-                        .failureHandler(customFailureHandler)
-                );
+//        // oauth2
+//        http
+//                .oauth2Login((oauth2) -> oauth2
+//                        .loginPage("/login")
+//                        .userInfoEndpoint((userInfo) -> userInfo
+//                                .userService(customOAuth2MemberService))
+//                        .successHandler(customSuccessHandler)
+//                        .failureHandler(customFailureHandler)
+//                );
 
         // 경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) ->
                         auth
-                                .requestMatchers("/api/member/register", "/api/member/login",
-                                        "/api/member/logout", "/api/member/find-user-id",
-                                        "/api/member/find-password").permitAll() //회원가입,로그인,로그아웃,비번찾기,아이디찾기
+                                .requestMatchers("/api/v1/member/register", "/api/v1/member/login",
+                                        "/api/v1/member/logout", "/api/v1/member/find-user-id",
+                                        "/api/v1/member/find-password").permitAll() //회원가입,로그인,로그아웃,비번찾기,아이디찾기
                                 .requestMatchers("/login","/error","/success","/api/auth/**").permitAll()
-                                .requestMatchers("/api/member/oauth2/**").permitAll() //소셜로그인
-                                .requestMatchers("/api/member/admin/**").hasRole("ADMIN") //관리자
+                                .requestMatchers("/api/v1/member/oauth2/**").permitAll() //소셜로그인
+                                .requestMatchers("/api/v1/member/admin/**").hasRole("ADMIN") //관리자
                                 .requestMatchers("/api/chat/websocket-test").permitAll() //웹소켓 테스터
                                 .requestMatchers("/webjars/**").permitAll() //웹소켓 테스터
                                 .requestMatchers("/ws-stomp/**").permitAll() //웹소켓 테스터
                                 .requestMatchers("/chat-rooms/**").permitAll() // 웹소켓 테스터2
-                                .requestMatchers("/api/member/**").hasAnyRole("USER", "ADMIN") //회원
-                                .requestMatchers("/api/chat-room/**").hasAnyRole("USER", "ADMIN") //채팅방
-                                .requestMatchers("/api/address/**").permitAll() //주소
+                                .requestMatchers("/api/v1/member/**").hasAnyRole("USER", "ADMIN") //회원
+                                .requestMatchers("/api/v1/chat-room/**").hasAnyRole("USER", "ADMIN") //채팅방
+                                .requestMatchers("/api/v1/address/**").permitAll() //주소
                                 .requestMatchers("/api/member-file-test").permitAll() //파일,이미지업로드
                                 // Swagger UI 관련 경로 허용
                                 .requestMatchers("/swagger-ui/**").permitAll()
