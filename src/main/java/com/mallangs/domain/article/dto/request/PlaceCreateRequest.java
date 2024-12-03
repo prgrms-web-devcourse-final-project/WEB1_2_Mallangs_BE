@@ -1,6 +1,7 @@
 package com.mallangs.domain.article.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -30,6 +31,9 @@ public class PlaceCreateRequest extends ArticleCreateRequest {
   private Boolean isPetFriendly; // 반려동물 동반 가능 여부
 
   private String contact;
+
+  @NotNull
+  private Boolean isPublicData;
 
 
 }
