@@ -75,28 +75,19 @@ public class MemberUserController {
     }
 
     @GetMapping("")
-<<<<<<< HEAD
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @Operation(summary = "회원조회", description = "회원조회 요청 API")
-=======
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "회원 프로필 조회", description = "회원 프로필 조회 요청 API")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "회원 조회 성공"),
             @ApiResponse(responseCode = "404", description = "회원조회에 실패하였습니다.")
     })
->>>>>>> 73aa0cbc01cf0525b48bcfbb74d455eb9df33cf8
     public ResponseEntity<MemberGetResponse> get(Authentication authentication) {
         String userId = authentication.getName();
         return ResponseEntity.ok(memberUserService.get(userId));
     }
 
     @PutMapping("/{memberId}")
-<<<<<<< HEAD
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-=======
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
->>>>>>> 73aa0cbc01cf0525b48bcfbb74d455eb9df33cf8
     @Operation(summary = "회원수정", description = "회원수정 요청 API")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "회원 수정 성공"),
@@ -108,21 +99,8 @@ public class MemberUserController {
         return ResponseEntity.ok().build();
     }
 
-<<<<<<< HEAD
-    @DeleteMapping("/{memberId}")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @Operation(summary = "회원탈퇴", description = "회원탈퇴 요청 API")
-    public ResponseEntity<?> delete(@PathVariable("memberId") Long memberId) {
-        memberUserService.delete(memberId);
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/list")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-=======
     @GetMapping("/list")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
->>>>>>> 73aa0cbc01cf0525b48bcfbb74d455eb9df33cf8
     @Operation(summary = "회원리스트 조회", description = "회원리스트 조회 요청 API")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "회원 리스트 조회 성공"),
@@ -155,11 +133,7 @@ public class MemberUserController {
         return ResponseEntity.ok(memberUserService.mailSend(mail));
     }
 
-<<<<<<< HEAD
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-=======
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
->>>>>>> 73aa0cbc01cf0525b48bcfbb74d455eb9df33cf8
     @PostMapping("/check-password")
     @Operation(summary = "비밀번호 확인", description = "비밀번호 확인 요청 API")
     @ApiResponses({
@@ -221,16 +195,6 @@ public class MemberUserController {
         Member foundMember = memberRepository.findByUserId(new UserId(userId))
                 .orElseThrow(()->new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
         foundMember.recordLoginTime();
-<<<<<<< HEAD
-
-        //차단된 계정이면 차단
-        if (!foundMember.getIsActive()){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("사용자는 "+foundMember.getReasonForBan()
-                    +"문제로 인해 차단되었습니다.");
-        }
-        memberRepository.save(foundMember);
-
-=======
         memberRepository.save(foundMember);
 
         //차단계정인지 확인
@@ -240,7 +204,6 @@ public class MemberUserController {
                     + foundMember.getExpiryDate() + " 까지 웹서비스 이용 제한됩니다.");
         }
 
->>>>>>> 73aa0cbc01cf0525b48bcfbb74d455eb9df33cf8
         // 응답 반환
         return ResponseEntity.ok(Map.of(
                 "AccessToken", accessToken,
