@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - 'feature/#123-feat-cicd'
+
 jobs:
   build:
     runs-on: ubuntu-latest
