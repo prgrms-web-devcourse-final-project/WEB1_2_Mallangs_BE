@@ -46,8 +46,8 @@ jobs:
       - name: Beanstalk Deploy
         uses: einaregilsson/beanstalk-deploy@v20
         with:
-          aws_access_key: ${{secrets.MALLANG_ACCESS_KEY}}
-          aws_secret_key: ${{secrets.MALLANG_SECRET_KEY}}
+          aws_access_key: ${{secrets.AWS_ACTION_ACCESS_KEY}}
+          aws_secret_key: ${{secrets.AWS_ACTION_SECRET_ACCESS_KEY}}
           application_name: Mallangs2-two
           environment_name: Mallangs2-two-env
           version_label: github-action-${{steps.current-time.outputs.formattedTime}}
