@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@org.springframework.data.relational.core.mapping.Table
 public class Board extends BaseTimeEntity {
 
     @Id

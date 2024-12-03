@@ -13,6 +13,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@org.springframework.data.relational.core.mapping.Table
 public class Category extends BaseTimeEntity {
 
     @Id

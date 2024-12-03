@@ -5,6 +5,7 @@ import com.mallangs.domain.member.entity.embadded.*;
 import com.mallangs.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.redis.core.RedisHash;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
@@ -18,7 +19,8 @@ import java.util.List;
 @EqualsAndHashCode(of = "memberId", callSuper = false)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "member")
+//@Table(name = "member")
+@RedisHash
 public class Member extends BaseTimeEntity {
 
     @Id

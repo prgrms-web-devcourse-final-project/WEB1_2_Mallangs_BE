@@ -12,12 +12,14 @@ import lombok.experimental.SuperBuilder;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.springframework.data.relational.core.mapping.Table;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DiscriminatorValue("place")
 @SuperBuilder
+@Table
 public class PlaceArticle extends Article {
 
   @Column(length = 255)

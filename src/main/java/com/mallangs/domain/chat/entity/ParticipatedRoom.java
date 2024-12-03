@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "participated_room")
+@org.springframework.data.relational.core.mapping.Table
 public class ParticipatedRoom {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "participated_room_id")

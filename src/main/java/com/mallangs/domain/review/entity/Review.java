@@ -3,14 +3,17 @@ package com.mallangs.domain.review.entity;
 import com.mallangs.domain.article.entity.PlaceArticle;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.global.common.BaseTimeEntity;
+
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.relational.core.mapping.Table;
 
 @Entity
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table
 public class Review extends BaseTimeEntity {
 
     @Id

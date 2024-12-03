@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@org.springframework.data.relational.core.mapping.Table
 public class Pet extends BaseTimeEntity {
 
     @Id

@@ -16,12 +16,14 @@ import lombok.experimental.SuperBuilder;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.springframework.data.relational.core.mapping.Table;
 
 @Entity
 @Getter
 @NoArgsConstructor
 @DiscriminatorValue("lost")
 @SuperBuilder
+@Table
 public class LostArticle extends Article {
 
   @Column(nullable = false)

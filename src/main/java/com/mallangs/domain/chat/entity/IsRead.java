@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@org.springframework.data.relational.core.mapping.Table
 public class IsRead {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
