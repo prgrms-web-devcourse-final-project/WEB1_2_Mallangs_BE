@@ -45,9 +45,12 @@ jobs:
           format: YYYY-MM-DDTHH-mm-ss
           utcOffset: "+09:00"
 
-      # 배포용 패키지 경로 저장
-      - name: Set artifact
-        run: echo "::set-env name=artifact::$(ls ./build/libs/mallangs-*.jar)"
+      # 배포 패키지 경로를 환경 변수로 설정
+      - name: Set artifact path
+        id: set-artifact-path  # 스텝 ID 추가
+        run: |
+          artifact_path=$(ls ./build/libs/mallangs-*.jar)
+          echo "ARTIFACT_PATH=$artifact_path" >> $GITHUB_ENV  # 환경 변수 설정
 
       # 빈스토크 배포
       - name: Beanstalk Deploy
@@ -59,4 +62,4 @@ jobs:
           environment_name: Mallangs-web-env
           version_label: github-action-${{ steps.current-time.outputs.formattedTime }}
           region: ap-northeast-2
-          deployment_package: ${{ env.artifact }}
+          deployment_package: ${{ env.ARTIFACT_PATH }}  # 환경 변수 사용
