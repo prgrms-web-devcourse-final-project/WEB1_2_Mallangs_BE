@@ -80,6 +80,9 @@ dependencies {
     testImplementation 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
 
+    //h2 의존성
+    runtimeOnly 'com.h2database:h2'
+
     //SMTP의존성
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
