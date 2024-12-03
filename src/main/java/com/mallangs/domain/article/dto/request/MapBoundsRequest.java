@@ -1,6 +1,6 @@
 package com.mallangs.domain.article.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
@@ -10,16 +10,16 @@ import lombok.ToString;
 @AllArgsConstructor
 public class MapBoundsRequest {
 
-  @NotBlank(message = "북동쪽 위도 값은 필수입니다.")
-  private double northEastLat;
+  @NotNull(message = "북동쪽 위도 값은 필수입니다.")
+  private Double northEastLat;
 
-  @NotBlank(message = "북동쪽 경도 값은 필수입니다.")
-  private double northEastLon;
+  @NotNull(message = "북동쪽 경도 값은 필수입니다.")
+  private Double northEastLon;
 
-  @NotBlank(message = "남서쪽 위도 값은 필수입니다.")
-  private double southWestLat;
+  @NotNull(message = "남서쪽 위도 값은 필수입니다.")
+  private Double southWestLat;
 
-  @NotBlank(message = "남서쪽 경도 값은 필수입니다.")
-  private double southWestLon;
+  @NotNull(message = "남서쪽 경도 값은 필수입니다.")
+  private Double southWestLon;
 
 }
