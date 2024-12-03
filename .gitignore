@@ -266,7 +266,8 @@ gradle-app.setting
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij,java,gradle,macos,windows
 **/application.properties
-
+**/application.yml
+**/application-secret.yml
 .env
 logs/
 **/generated/
