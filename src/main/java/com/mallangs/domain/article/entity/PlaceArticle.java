@@ -48,6 +48,9 @@ public class PlaceArticle extends Article {
   @Column
   private String contact;
 
+  @Column(nullable = false)
+  private Boolean isPublicData;
+
   @Override
   public void applyChanges(Article updatedArticle) {
     super.applyChanges(updatedArticle);
@@ -104,6 +107,7 @@ public class PlaceArticle extends Article {
         .hasParking(createRequest.getHasParking())
         .isPetFriendly(createRequest.getIsPetFriendly())
         .contact(createRequest.getContact())
+        .isPublicData(createRequest.getIsPublicData())
         .member(member)
         .articleType(createRequest.getArticleType())
         .articleStatus(createRequest.getArticleStatus())
