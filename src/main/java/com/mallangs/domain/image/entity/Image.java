@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "image")
+@org.springframework.data.relational.core.mapping.Table
 public class Image {
     @Id
     @Column(nullable = false, unique = true)

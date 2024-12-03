@@ -13,7 +13,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table
+@org.springframework.data.relational.core.mapping.Table
 public class Review extends BaseTimeEntity {
 
     @Id

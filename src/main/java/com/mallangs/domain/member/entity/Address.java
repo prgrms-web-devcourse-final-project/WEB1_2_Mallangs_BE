@@ -16,7 +16,7 @@ import org.locationtech.jts.geom.Point;
 @EqualsAndHashCode
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "address")
+@org.springframework.data.relational.core.mapping.Table
 public class Address {
 
     @Id
