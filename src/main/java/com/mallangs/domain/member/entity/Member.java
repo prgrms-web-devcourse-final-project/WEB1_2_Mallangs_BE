@@ -120,4 +120,8 @@ public class Member extends BaseTimeEntity {
         this.participatedRooms.add(participatedRoom);
         participatedRoom.changeParticipant(this);
     }
+
+    public void changeRole(MemberRole memberRole){
+        this.memberRole = memberRole;
+    }
 }

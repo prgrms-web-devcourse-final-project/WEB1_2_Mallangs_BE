@@ -1,0 +1,14 @@
+# Datasource 설정
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.url=jdbc:h2:mem:test
+spring.datasource.username=sa
+spring.datasource.password=
+# H2 데이터베이스 방언 설정
+
+spring.data.redis.host=localhost
+spring.data.redis.port=6379
+
+# Hibernate ?? (??)
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.jpa.show-sql=true
+spring.jpa.hibernate.ddl-auto=update
