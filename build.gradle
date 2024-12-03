@@ -101,7 +101,7 @@ dependencies {
     implementation 'com.opencsv:opencsv:5.9'
 
     implementation 'mysql:mysql-connector-java:8.0.33'
-    implementation 'com.mysql:mysql-connector-j:8.0.33'
+
 
     jar {
         enabled = false
