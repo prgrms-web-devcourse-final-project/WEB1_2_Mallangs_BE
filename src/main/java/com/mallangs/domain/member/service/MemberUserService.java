@@ -71,7 +71,7 @@ public class MemberUserService {
 
     //회원조회
     public MemberGetResponse get(String userId) {
-        Member foundMember = memberRepository.findByUserId(new UserId(userId))
+        Member foundMember = memberRepository.findByUserIdForProfile(new UserId(userId))
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
         if (foundMember.getIsActive().equals(false)) {
             throw new MallangsCustomException(ErrorCode.BANNED_MEMBER);

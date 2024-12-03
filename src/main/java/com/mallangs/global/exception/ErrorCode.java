@@ -6,8 +6,7 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_ACCEPTABLE;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
-
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.CONFLICT;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +32,7 @@ public enum ErrorCode {
   CHATROOM_NOT_FOUND(NOT_FOUND, "채팅방 정보를 찾을 수 없습니다"),
   FAILED_DELETE_CHATROOM(UNAUTHORIZED, "참여 채팅방 삭제 권한이 없는 사용자 입니다."),
   PARTICIPATED_ROOM_NOT_FOUND(NOT_FOUND, "참여채팅방 정보를 찾을 수 없습니다."),
+  FAILED_UPDATE_CHAT_ROOM(NOT_FOUND, "참여채팅방 정보를 찾을 수 없습니다."),
 
   //ChatMessage
   FAILED_GET_CHAT_MESSAGE(BAD_REQUEST, "채팅 조회에 실패하였습니다."),
@@ -78,7 +78,15 @@ public enum ErrorCode {
 
   //Location
   LOCATION_INVALIDE_PARAMS(HttpStatus.INTERNAL_SERVER_ERROR, "입력된 데이터가 유효하지 않습니다."),
-  LOCATION_INVALIDE_RANGE(HttpStatus.INTERNAL_SERVER_ERROR, "유효하지 않은 범위입니다.");
+  LOCATION_INVALIDE_RANGE(HttpStatus.INTERNAL_SERVER_ERROR, "유효하지 않은 범위입니다."),
+
+  // Comment
+  COMMENT_NOT_FOUND(NOT_FOUND, "댓글을 찾을 수 없습니다."),
+  COMMENT_NOT_REGISTERED(CONFLICT, "댓글 등록에 실패했습니다."),
+  COMMENT_NOT_MODIFIED(CONFLICT, "댓글 업데이트에 실패했습니다."),
+  COMMENT_NOT_REMOVED(CONFLICT, "댓글 삭제에 실패했습니다."),
+  FORBIDDEN_ACCESS(FORBIDDEN, "권한이 없습니다."),
+  POST_NOT_FOUND(NOT_FOUND, "해당 게시물을 찾을 수 없습니다.");
 
   private final HttpStatus httpStatus;
   private final String message;

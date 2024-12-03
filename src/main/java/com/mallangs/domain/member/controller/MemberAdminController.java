@@ -3,6 +3,8 @@ package com.mallangs.domain.member.controller;
 import com.mallangs.domain.member.dto.*;
 import com.mallangs.domain.member.service.MemberAdminService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,12 +24,20 @@ public class MemberAdminController {
 
     @PostMapping("/ban")
     @Operation(summary = "회원차단", description = "회원차단 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원 차단 성공"),
+            @ApiResponse(responseCode = "404", description = "회원 차단 실패.")
+    })
     public ResponseEntity<Integer> delete(@Validated @RequestBody MemberBanRequest memberBanRequest) {
         return ResponseEntity.ok(memberAdminService.banMember(memberBanRequest));
     }
 
     @PostMapping("/user-id")
     @Operation(summary = "유저아이디로 회원리스트 검색", description = "유저아이디로 회원리스트 검색 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "아이디로 검색 성공"),
+            @ApiResponse(responseCode = "404", description = "검색 실패.")
+    })
     public ResponseEntity<Page<MemberGetResponseOnlyMember>> listByUser(
             @Validated @RequestBody MemberGetRequestByUserId memberGetRequestByUserId) {
 
@@ -40,6 +50,10 @@ public class MemberAdminController {
 
     @PostMapping("/email")
     @Operation(summary = "이메일로 회원리스트 검색", description = "이메일로 회원리스트 검색 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "이메일로 검색 성공"),
+            @ApiResponse(responseCode = "404", description = "검색 실패.")
+    })
     public ResponseEntity<Page<MemberGetResponseOnlyMember>> listByEmail(
             @Validated @RequestBody MemberGetRequestByEmail memberGetRequestByEmail) {
 
@@ -52,6 +66,10 @@ public class MemberAdminController {
 
     @PostMapping("/nickname")
     @Operation(summary = "닉네임으로 회원리스트 검색", description = "닉네임으로 회원리스트 검색 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "닉네임으로 검색 성공"),
+            @ApiResponse(responseCode = "404", description = "검색 실패.")
+    })
     public ResponseEntity<Page<MemberGetResponseOnlyMember>> listByNickname(
             @Validated @RequestBody MemberGetRequestByNickname memberGetRequestByNickname) {
 

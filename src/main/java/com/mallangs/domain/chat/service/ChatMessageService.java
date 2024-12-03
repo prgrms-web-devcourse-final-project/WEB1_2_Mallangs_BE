@@ -1,9 +1,10 @@
 package com.mallangs.domain.chat.service;
 
 import com.mallangs.domain.chat.dto.request.ChatMessageRequest;
+import com.mallangs.domain.chat.dto.request.UpdateChatMessageRequest;
 import com.mallangs.domain.chat.dto.response.ChatMessageListResponse;
 import com.mallangs.domain.chat.dto.response.ChatMessageResponse;
-import com.mallangs.domain.chat.dto.request.UpdateChatMessageRequest;
+import com.mallangs.domain.chat.dto.response.ChatMessageToDTOResponse;
 import com.mallangs.domain.chat.dto.response.IsReadResponse;
 import com.mallangs.domain.chat.entity.ChatMessage;
 import com.mallangs.domain.chat.entity.ChatRoom;
@@ -17,24 +18,18 @@ import com.mallangs.domain.image.dto.ImageResponse;
 import com.mallangs.domain.image.entity.Image;
 import com.mallangs.domain.image.repository.ImageRepository;
 import com.mallangs.domain.member.dto.PageRequestDTO;
-import com.mallangs.domain.member.entity.embadded.UserId;
 import com.mallangs.global.exception.ErrorCode;
 import com.mallangs.global.exception.MallangsCustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
-import static com.mallangs.domain.chat.entity.QIsRead.isRead;
 
 @Log4j2
 @Service
@@ -115,20 +110,22 @@ public class ChatMessageService {
     }
 
     //채팅 수정
-    public void update(UpdateChatMessageRequest chatMessageRequest) {
+    public ChatMessageToDTOResponse update(UpdateChatMessageRequest chatMessageRequest) {
 
         ChatMessage foundChatMessage = chatMessageRepository.findByChatMessageId(chatMessageRequest.getChatMessageId())
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.CHAT_MESSAGE_NOT_FOUND));
 
         foundChatMessage.changeMessage(chatMessageRequest.getMessage());
-        chatMessageRepository.save(foundChatMessage);
+        ChatMessage save = chatMessageRepository.save(foundChatMessage);
+        return new ChatMessageToDTOResponse(save);
     }
 
     //채팅 삭제
-    public void delete(Long chatMessageId) {
+    public boolean delete(Long chatMessageId) {
         boolean isExist = chatMessageRepository.existsById(chatMessageId);
         if (isExist) {
             chatMessageRepository.deleteById(chatMessageId);
+            return true;
         } else throw new MallangsCustomException(ErrorCode.CHAT_MESSAGE_NOT_FOUND);
     }
 

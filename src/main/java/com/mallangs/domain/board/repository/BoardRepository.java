@@ -12,6 +12,12 @@ import org.springframework.data.repository.query.Param;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
+    // 게시판 타입별 전체 게시글 조회
+    @Query("""
+            SELECT b FROM Board b WHERE b.boardStatus = 'PUBLISHED' AND b.boardType = :boardType ORDER BY b.createdAt DESC
+            """)
+    Page<Board> findAllByBoardType(@Param("boardType") BoardType boardType, Pageable pageable);
+
     // 카테고리별 게시글 목록 조회 (최신순으로 정렬)
     @Query("""
             SELECT b FROM Board b WHERE b.category.categoryId = :categoryId AND b.boardStatus = 'PUBLISHED' AND b.boardType = :boardType ORDER BY b.createdAt DESC

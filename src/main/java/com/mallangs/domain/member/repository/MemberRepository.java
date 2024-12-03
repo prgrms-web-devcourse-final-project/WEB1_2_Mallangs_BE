@@ -40,8 +40,15 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByEmail(@Param("email") Email email);
 
     //단일 회원조회 - 유저아이디
-    @Query("SELECT m FROM Member m join fetch m.addresses WHERE m.userId =:userId")
+    @Query(" SELECT m FROM Member m JOIN FETCH m.addresses " +
+            " WHERE m.userId =:userId ")
     Optional<Member> findByUserId(@Param("userId") UserId userId);
+
+    //단일 회원조회 - 회원프로필 조회
+    @Query("SELECT DISTINCT m FROM Member m LEFT JOIN FETCH m.addresses" +
+            " LEFT JOIN m.pets " +
+            "WHERE m.userId =:userId")
+    Optional<Member> findByUserIdForProfile(@Param("userId") UserId userId);
 
     //단일 회원조회 - 아이디 찾기
     @Query("SELECT m FROM Member m join fetch m.addresses " +
@@ -61,8 +68,13 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("SELECT new com.mallangs.domain.member.dto.MemberGetResponseOnlyMember(m) " +
             "FROM Member m " +
             "WHERE (:isActive IS NULL OR m.isActive = :isActive) " +
+<<<<<<< HEAD
             "AND (:createAt IS NULL OR m.createdAt >= :createAt) " +
             "AND m.userId = :userId")
+=======
+            "AND (:userId IS NULL OR m.userId.value = :userId) " +
+            "AND (:createAt IS NULL OR m.createdAt >= :createAt)")
+>>>>>>> 73aa0cbc01cf0525b48bcfbb74d455eb9df33cf8
     Page<MemberGetResponseOnlyMember> memberListByUserId(
             @Param("isActive") Boolean isActive,
             @Param("userId") UserId userId,
@@ -70,11 +82,19 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             Pageable pageable);
 
     //모든 회원조회 - Email
+<<<<<<< HEAD
     @Query("SELECT new com.mallangs.domain.member.dto.MemberGetResponseOnlyMember(m) " +
             "FROM Member m " +
             "WHERE (:isActive IS NULL OR m.isActive = :isActive) " +
             "AND (:createAt IS NULL OR m.createdAt >= :createAt)" +
             "AND m.email = :email")
+=======
+    @Query(" SELECT new com.mallangs.domain.member.dto.MemberGetResponseOnlyMember(m) " +
+            " FROM Member m " +
+            " WHERE (:isActive IS NULL OR m.isActive = :isActive) " +
+            " AND (:email IS NULL OR m.email.value = :email)" +
+            " AND (:createAt IS NULL OR m.createdAt >= :createAt) ")
+>>>>>>> 73aa0cbc01cf0525b48bcfbb74d455eb9df33cf8
     Page<MemberGetResponseOnlyMember> memberListByEmail(
             @Param("isActive") Boolean isActive,
             @Param("email") Email email,

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Log4j2
 @Service
@@ -56,9 +57,14 @@ public class AddressService {
     }
 
     //주소 삭제
-    public void delete(Long addressId) {
+    public boolean delete(Long addressId) {
         try {
+            Optional<Address> foundAddress = addressRepository.findById(addressId);
+            if (foundAddress.isEmpty()){
+                return false;
+            }
             addressRepository.deleteById(addressId);
+            return true;
         } catch (Exception e) {
             log.error("주소 삭제에 실패하였습니다. {}", e.getMessage());
             throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);

@@ -15,6 +15,8 @@ import com.mallangs.global.jwt.service.AccessTokenBlackList;
 import com.mallangs.global.jwt.service.RefreshTokenService;
 import com.mallangs.global.jwt.util.JWTUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.Cookie;
@@ -64,27 +66,49 @@ public class MemberUserController {
 
     @PostMapping("/register")
     @Operation(summary = "회원등록", description = "회원등록 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원 등록 성공"),
+            @ApiResponse(responseCode = "404", description = "입력값이 잘못되었습니다.")
+    })
     public ResponseEntity<String> create(@Validated @RequestBody MemberCreateRequest memberCreateRequest) {
         return ResponseEntity.ok(memberUserService.create(memberCreateRequest));
     }
 
     @GetMapping("")
+<<<<<<< HEAD
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "회원조회", description = "회원조회 요청 API")
+=======
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @Operation(summary = "회원 프로필 조회", description = "회원 프로필 조회 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "회원조회에 실패하였습니다.")
+    })
+>>>>>>> 73aa0cbc01cf0525b48bcfbb74d455eb9df33cf8
     public ResponseEntity<MemberGetResponse> get(Authentication authentication) {
         String userId = authentication.getName();
         return ResponseEntity.ok(memberUserService.get(userId));
     }
 
     @PutMapping("/{memberId}")
+<<<<<<< HEAD
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+=======
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+>>>>>>> 73aa0cbc01cf0525b48bcfbb74d455eb9df33cf8
     @Operation(summary = "회원수정", description = "회원수정 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원 수정 성공"),
+            @ApiResponse(responseCode = "404", description = "회원 수정 실패에 실패하였습니다.")
+    })
     public ResponseEntity<?> update(@Validated @RequestBody MemberUpdateRequest memberUpdateRequest,
                                     @PathVariable("memberId") Long memberId) {
         memberUserService.update(memberUpdateRequest, memberId);
         return ResponseEntity.ok().build();
     }
 
+<<<<<<< HEAD
     @DeleteMapping("/{memberId}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "회원탈퇴", description = "회원탈퇴 요청 API")
@@ -95,7 +119,15 @@ public class MemberUserController {
 
     @GetMapping("/list")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+=======
+    @GetMapping("/list")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+>>>>>>> 73aa0cbc01cf0525b48bcfbb74d455eb9df33cf8
     @Operation(summary = "회원리스트 조회", description = "회원리스트 조회 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원 리스트 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "조회에 실패하였습니다..")
+    })
     public ResponseEntity<Page<MemberGetResponse>> list(@RequestParam(value = "page", defaultValue = "1") int page,
                                                         @RequestParam(value = "size", defaultValue = "10") int size) {
         PageRequestDTO pageRequestDTO = PageRequestDTO.builder().page(page).size(size).build();
@@ -104,20 +136,36 @@ public class MemberUserController {
 
     @PostMapping("/find-user-id")
     @Operation(summary = "아이디찾기", description = "아이디찾기 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "아이디 찾기 요청 성공"),
+            @ApiResponse(responseCode = "404", description = "아이디 찾기 요청에 실패하였습니다.")
+    })
     public ResponseEntity<String> findUserId(@Validated @RequestBody MemberFindUserIdRequest memberFindUserIdRequest) {
         return ResponseEntity.ok(memberUserService.findUserId(memberFindUserIdRequest));
     }
 
     @PostMapping("/find-password")
     @Operation(summary = "비밀번호찾기", description = "비밀번호찾기 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "비밀번호 찾기 요청 성공"),
+            @ApiResponse(responseCode = "404", description = "비밀번호 찾기 요청에 실패하였습니다.")
+    })
     public ResponseEntity<String> findPassword(@Validated @RequestBody MemberFindPasswordRequest memberFindPasswordRequest) throws MessagingException {
         MemberSendMailResponse mail = memberUserService.findPassword(memberFindPasswordRequest);
         return ResponseEntity.ok(memberUserService.mailSend(mail));
     }
 
+<<<<<<< HEAD
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+=======
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+>>>>>>> 73aa0cbc01cf0525b48bcfbb74d455eb9df33cf8
     @PostMapping("/check-password")
     @Operation(summary = "비밀번호 확인", description = "비밀번호 확인 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "비밀번호 요청 성공"),
+            @ApiResponse(responseCode = "404", description = "비밀번호 요청에 실패하였습니다.")
+    })
     public ResponseEntity<?> checkPassword(@Validated @RequestBody PasswordDTO passwordDTO
             , Authentication authentication) {
         String userId = authentication.getName();
@@ -173,6 +221,7 @@ public class MemberUserController {
         Member foundMember = memberRepository.findByUserId(new UserId(userId))
                 .orElseThrow(()->new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
         foundMember.recordLoginTime();
+<<<<<<< HEAD
 
         //차단된 계정이면 차단
         if (!foundMember.getIsActive()){
@@ -181,6 +230,17 @@ public class MemberUserController {
         }
         memberRepository.save(foundMember);
 
+=======
+        memberRepository.save(foundMember);
+
+        //차단계정인지 확인
+        if (!foundMember.getIsActive()){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(foundMember.getNickname().getValue()+"님은 "+foundMember.getReasonForBan()+" 이유로"
+                    + foundMember.getExpiryDate() + " 까지 웹서비스 이용 제한됩니다.");
+        }
+
+>>>>>>> 73aa0cbc01cf0525b48bcfbb74d455eb9df33cf8
         // 응답 반환
         return ResponseEntity.ok(Map.of(
                 "AccessToken", accessToken,

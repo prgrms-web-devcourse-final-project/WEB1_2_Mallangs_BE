@@ -93,7 +93,7 @@ public class ChatRoomService {
                     .message(messages.isEmpty()? null : messages.get(0).getMessage())
                     .chatRoomName(room.getChatRoom().getOccupiedRooms().get(1).getParticipant().getNickname().getValue())
                     .lastChatTime(messages.isEmpty()? null : messages.get(0).getCreatedAt())
-                    .notReadCnt(unreadMessages.isEmpty()? null : unreadMessages.size())
+                    .notReadCnt(unreadMessages.size())
                     .build();
             log.info("room정보1 :{}", room.getParticipatedRoomId());
             log.info("room정보2 :{}", room.getChatRoom().getChatRoomId());
@@ -105,12 +105,18 @@ public class ChatRoomService {
     }
 
     //채팅방 이름 변경
-    public void update(ChatRoomChangeNameRequest chatRoomChangeNameRequest) {
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomChangeNameRequest.getChatRoomId())
-                .orElseThrow(() -> new MallangsCustomException(ErrorCode.CHATROOM_NOT_FOUND));
+    public boolean update(ChatRoomChangeNameRequest chatRoomChangeNameRequest) {
+        try {
+            ChatRoom chatRoom = chatRoomRepository.findById(chatRoomChangeNameRequest.getChatRoomId())
+                    .orElseThrow(() -> new MallangsCustomException(ErrorCode.CHATROOM_NOT_FOUND));
 
         chatRoom.changeChatRoomName(chatRoomChangeNameRequest.getRoomName());
         chatRoomRepository.save(chatRoom);
+        return true;
+        }catch (Exception e){
+            log.error(e.getMessage());
+            throw new MallangsCustomException(ErrorCode.FAILED_UPDATE_CHAT_ROOM);
+        }
     }
 
     //채팅방 삭제
