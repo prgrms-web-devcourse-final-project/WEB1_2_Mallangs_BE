@@ -74,8 +74,8 @@ public class MemberUserController {
     }
 
     @GetMapping("")
-    @PreAuthorize("hasRole('USER')")
-    @Operation(summary = "회원조회", description = "회원조회 요청 API")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @Operation(summary = "회원 프로필 조회", description = "회원 프로필 조회 요청 API")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "회원 조회 성공"),
             @ApiResponse(responseCode = "404", description = "회원조회에 실패하였습니다.")
@@ -86,7 +86,7 @@ public class MemberUserController {
     }
 
     @PutMapping("/{memberId}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "회원수정", description = "회원수정 요청 API")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "회원 수정 성공"),
@@ -99,7 +99,7 @@ public class MemberUserController {
     }
 
     @GetMapping("/list")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "회원리스트 조회", description = "회원리스트 조회 요청 API")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "회원 리스트 조회 성공"),
@@ -132,7 +132,7 @@ public class MemberUserController {
         return ResponseEntity.ok(memberUserService.mailSend(mail));
     }
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @PostMapping("/check-password")
     @Operation(summary = "비밀번호 확인", description = "비밀번호 확인 요청 API")
     @ApiResponses({
@@ -189,6 +189,20 @@ public class MemberUserController {
 
         //리프레시 토큰 레디스에 저장하기
         refreshTokenService.insertInRedis(refreshPayloadMap, refreshToken);
+
+        //로그인 시간 저장
+        Member foundMember = memberRepository.findByUserId(new UserId(userId))
+                .orElseThrow(()->new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+        foundMember.recordLoginTime();
+        memberRepository.save(foundMember);
+
+        //차단계정인지 확인
+        if (!foundMember.getIsActive()){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(foundMember.getNickname().getValue()+"님은 "+foundMember.getReasonForBan()+" 이유로"
+                    + foundMember.getExpiryDate() + " 까지 웹서비스 이용 제한됩니다.");
+        }
+
         // 응답 반환
         return ResponseEntity.ok(Map.of(
                 "AccessToken", accessToken,
