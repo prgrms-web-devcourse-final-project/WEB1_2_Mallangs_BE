@@ -3,6 +3,7 @@ package com.mallangs.domain.member.controller;
 import com.mallangs.domain.member.dto.*;
 import com.mallangs.domain.member.dto.request.LoginRequest;
 import com.mallangs.domain.member.entity.Member;
+import com.mallangs.domain.member.entity.MemberRole;
 import com.mallangs.domain.member.entity.embadded.UserId;
 import com.mallangs.domain.member.repository.MemberRepository;
 import com.mallangs.domain.member.service.MemberUserService;
@@ -41,6 +42,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Log4j2
@@ -184,15 +186,15 @@ public class MemberUserController {
 
         //로그인 시간 저장
         Member foundMember = memberRepository.findByUserId(new UserId(userId))
-                .orElseThrow(()->new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
         foundMember.recordLoginTime();
         memberRepository.save(foundMember);
 
         //차단계정인지 확인
-        if (!foundMember.getIsActive()){
+        if (!foundMember.getIsActive()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(foundMember.getNickname().getValue()+"님은 "+foundMember.getReasonForBan()+" 이유로 "
-                    + (foundMember.getExpiryDate().getDayOfYear() - LocalDateTime.now().getDayOfYear()) + "일간 웹서비스 이용 제한됩니다.");
+                    .body(foundMember.getNickname().getValue() + "님은 " + foundMember.getReasonForBan() + " 이유로 "
+                            + (foundMember.getExpiryDate().getDayOfYear() - LocalDateTime.now().getDayOfYear()) + "일간 웹서비스 이용 제한됩니다.");
         }
 
         // 응답 반환
@@ -249,7 +251,7 @@ public class MemberUserController {
         } catch (Exception e) {
             log.error("토큰 블랙리스트 처리에 실패하였습니다 : {}", e.getMessage());
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error","Token processing failed"));
+                    .body(Map.of("error", "Token processing failed"));
         }
 
         // 쿠키 비우기
@@ -279,4 +281,22 @@ public class MemberUserController {
         return null;
 
     }
+
+
+    @PutMapping("/member-role")
+    @Operation(summary = "관리자로 권한변환", description = "관리자로 권한 변환 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "관리자로 권한 병환 성공"),
+            @ApiResponse(responseCode = "404", description = "관리자로 권한 병환 실패.")
+    })
+    public ResponseEntity<?> changeMemberRole(@AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
+        String userId = customMemberDetails.getUserId();
+        //맴버 찾기
+        Member foundMember = memberRepository.findByUserId(new UserId(userId))
+                .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+        //권한 변경
+        foundMember.changeRole(MemberRole.ROLE_ADMIN);
+        return ResponseEntity.ok(memberRepository.save(foundMember));
+    }
+
 }
