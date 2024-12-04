@@ -1,24 +1,21 @@
 package com.mallangs.global.config;
 
+import com.mallangs.domain.member.repository.MemberRepository;
 import com.mallangs.global.jwt.filter.JWTFilter;
-import com.mallangs.global.jwt.filter.LoginFilter;
-import com.mallangs.global.jwt.filter.LogoutFilter;
 import com.mallangs.global.jwt.service.AccessTokenBlackList;
-import com.mallangs.global.jwt.service.CustomerMemberDetailService;
 import com.mallangs.global.jwt.service.RefreshTokenService;
 import com.mallangs.global.jwt.util.JWTUtil;
 import com.mallangs.global.oauth2.handler.CustomFailureHandler;
-import com.mallangs.domain.member.repository.MemberRepository;
 import com.mallangs.global.oauth2.handler.CustomSuccessHandler;
 import com.mallangs.global.oauth2.service.CustomOAuth2MemberService;
+import java.util.Arrays;
+import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,7 +25,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -40,25 +36,27 @@ import java.util.List;
 @RequiredArgsConstructor
 
 public class SecurityConfig {
-    // 토큰 만료 시간
-    @Value("${spring.jwt.access-token-validity-in-minutes}")
-    private Long accessTokenValidity;
-    @Value("${spring.jwt.refresh-token-validity-in-minutes}")
-    private Long accessRefreshTokenValidity;
 
-    private final AuthenticationConfiguration authenticationConfiguration;
-    private final JWTUtil jwtUtil;
-    private final RefreshTokenService refreshTokenService;
-    private final AccessTokenBlackList accessTokenBlackList;
-    private final MemberRepository memberRepository;
-    private final CustomOAuth2MemberService customOAuth2MemberService;
-    private final CustomSuccessHandler customSuccessHandler;
-    private final CustomFailureHandler customFailureHandler;
+  // 토큰 만료 시간
+  @Value("${spring.jwt.access-token-validity-in-minutes}")
+  private Long accessTokenValidity;
+  @Value("${spring.jwt.refresh-token-validity-in-minutes}")
+  private Long accessRefreshTokenValidity;
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
-    }
+  private final AuthenticationConfiguration authenticationConfiguration;
+  private final JWTUtil jwtUtil;
+  private final RefreshTokenService refreshTokenService;
+  private final AccessTokenBlackList accessTokenBlackList;
+  private final MemberRepository memberRepository;
+  private final CustomOAuth2MemberService customOAuth2MemberService;
+  private final CustomSuccessHandler customSuccessHandler;
+  private final CustomFailureHandler customFailureHandler;
+
+  @Bean
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
+      throws Exception {
+    return configuration.getAuthenticationManager();
+  }
 
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -75,9 +73,9 @@ public class SecurityConfig {
                     configuration.setExposedHeaders(Collections.singletonList("Set-Cookie"));
                     configuration.setExposedHeaders(Collections.singletonList("Authorization"));
 
-                    return configuration;
+          return configuration;
 
-                }));
+        }));
 
         // 다른 기능 정지
         http
@@ -98,6 +96,8 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth) ->
                         auth
+                                .requestMatchers("/favicon.ico").permitAll()
+                                .requestMatchers("/").permitAll()
                                 .requestMatchers("/api/v1/member/register", "/api/v1/member/login",
                                         "/api/v1/member/logout", "/api/v1/member/find-user-id",
                                         "/api/v1/member/find-password").permitAll() //회원가입,로그인,로그아웃,비번찾기,아이디찾기
@@ -115,6 +115,8 @@ public class SecurityConfig {
 
                                 //파일 이미지
                                 .requestMatchers("/api/member-file-test").permitAll() //파일,이미지업로드
+                                .requestMatchers("/api/articles/public").permitAll() // 글타래 public
+               
                                 // Swagger UI 관련 경로 허용
                                 .requestMatchers("/swagger-ui/**").permitAll()
                                 .requestMatchers("/v3/api-docs/**").permitAll()
@@ -130,5 +132,6 @@ public class SecurityConfig {
                                 ,UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+
 }
 
