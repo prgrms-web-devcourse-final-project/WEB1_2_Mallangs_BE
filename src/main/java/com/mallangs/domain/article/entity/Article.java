@@ -41,8 +41,9 @@ public abstract class Article {
   @Column(name = "article_id")
   private Long id;
 
+  @Enumerated(EnumType.STRING)
   @Column(name = "type", nullable = false)
-  private String type;
+  private ArticleType articleType;
 
   @Builder.Default
   @Column(name = "isDeleted", nullable = false)
@@ -87,6 +88,7 @@ public abstract class Article {
     this.isDeleted = true;
   }
 
+  // 글 상태에 따라 지도에서 숨기기
   public void hideInMap() {
     if (this.articleStatus != BoardStatus.PUBLISHED) {
       this.mapVisibility = MapVisibility.HIDDEN;
@@ -94,8 +96,8 @@ public abstract class Article {
   }
 
   public void applyChanges(Article updatedArticle) {
-    if (updatedArticle.getType() != null) {
-      this.type = updatedArticle.getType();
+    if (updatedArticle.getArticleType() != null) {
+      this.articleType = updatedArticle.getArticleType();
     }
     if (updatedArticle.getArticleStatus() != null) {
       this.articleStatus = updatedArticle.getArticleStatus();
