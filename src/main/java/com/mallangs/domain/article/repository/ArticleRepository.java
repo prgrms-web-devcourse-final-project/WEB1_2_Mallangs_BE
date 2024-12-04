@@ -43,6 +43,6 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
       @Param("title") String title,
       @Param("description") String description,
       Pageable pageable);
-  
+
 
 }
