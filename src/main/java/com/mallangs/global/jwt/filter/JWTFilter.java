@@ -63,6 +63,8 @@ public class JWTFilter extends OncePerRequestFilter {
 
             // PathVariable 포함 URI 매칭
             if (pathMatcher.match("/api/v1/board/community/category/{categoryId}", uri) ||
+                    pathMatcher.match("/api/v1/comments/board/{boardId}", uri) ||
+                    pathMatcher.match("/api/v1/comments/article/{articleId}", uri) ||
                     pathMatcher.match("/api/v1/board/sighting/category/{categoryId}", uri) ||
                     pathMatcher.match("/api/v1/place-articles/{placeArticleId}/reviews/{reviewId}", uri) ||
                     pathMatcher.match("/api/v1/pets/{petId}", uri)) {

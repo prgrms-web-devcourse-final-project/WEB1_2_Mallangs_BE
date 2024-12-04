@@ -112,11 +112,8 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/articles/**").permitAll() //글타래
                                 .requestMatchers("/api/v1/place-articles/**").permitAll() //장소
                                 .requestMatchers("/api/v1/comments/**").permitAll() //댓글
+                                .requestMatchers("/tourapi/v1/**").permitAll() //공공데이터
 
-                                //파일 이미지
-                                .requestMatchers("/api/member-file-test").permitAll() //파일,이미지업로드
-                                .requestMatchers("/api/articles/public").permitAll() // 글타래 public
-               
                                 // Swagger UI 관련 경로 허용
                                 .requestMatchers("/swagger-ui/**").permitAll()
                                 .requestMatchers("/v3/api-docs/**").permitAll()
