@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class MallangsApplication {
 
+
   public static void main(String[] args) {
     SpringApplication.run(MallangsApplication.class, args);
   }
