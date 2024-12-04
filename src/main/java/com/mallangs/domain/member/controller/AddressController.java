@@ -21,7 +21,7 @@ import java.util.List;
 @Log4j2
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/address")
+@RequestMapping("api/v1/address")
 @Tag(name = "주소", description = "주소 CRUD")
 public class AddressController {
 

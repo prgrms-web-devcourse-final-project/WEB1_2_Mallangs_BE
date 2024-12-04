@@ -14,7 +14,5 @@ public class ChatMessageRequest {
     @Length(min = 1, max = 300)
     private String message;
     private String imageUrl;
-    private Integer width;
-    private Integer height;
 
 }

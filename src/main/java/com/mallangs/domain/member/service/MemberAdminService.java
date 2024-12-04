@@ -1,6 +1,8 @@
 package com.mallangs.domain.member.service;
 
 import com.mallangs.domain.member.dto.*;
+import com.mallangs.domain.member.entity.embadded.Email;
+import com.mallangs.domain.member.entity.embadded.UserId;
 import com.mallangs.domain.member.repository.MemberRepository;
 import com.mallangs.global.exception.ErrorCode;
 import com.mallangs.global.exception.MallangsCustomException;

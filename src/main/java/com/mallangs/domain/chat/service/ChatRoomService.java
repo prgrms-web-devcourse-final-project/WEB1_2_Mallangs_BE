@@ -4,15 +4,11 @@ import com.mallangs.domain.chat.dto.request.ChatRoomChangeNameRequest;
 import com.mallangs.domain.chat.dto.response.ParticipatedRoomListResponse;
 import com.mallangs.domain.chat.entity.ChatMessage;
 import com.mallangs.domain.chat.entity.ChatRoom;
-import com.mallangs.domain.chat.entity.IsRead;
 import com.mallangs.domain.chat.entity.ParticipatedRoom;
 import com.mallangs.domain.chat.repository.ChatMessageRepository;
 import com.mallangs.domain.chat.repository.ChatRoomRepository;
-import com.mallangs.domain.chat.repository.IsReadRepository;
 import com.mallangs.domain.chat.repository.ParticipatedRoomRepository;
 import com.mallangs.domain.member.entity.Member;
-import com.mallangs.domain.member.entity.embadded.Nickname;
-import com.mallangs.domain.member.entity.embadded.UserId;
 import com.mallangs.domain.member.repository.MemberRepository;
 import com.mallangs.global.exception.ErrorCode;
 import com.mallangs.global.exception.MallangsCustomException;
@@ -21,8 +17,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Log4j2
 @Service
@@ -32,11 +28,10 @@ public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final MemberRepository memberRepository;
     private final ParticipatedRoomRepository participatedRoomRepository;
-    private final IsReadRepository isReadRepository;
     private final ChatMessageRepository chatMessageRepository;
 
     // 채팅방 생성
-    public Long create(Long myId,Long partnerId) {
+    public Long create(Long myId, Long partnerId) {
         //채팅방 생성
         ChatRoom chatRoom = ChatRoom.builder().build();
         ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
@@ -52,19 +47,21 @@ public class ChatRoomService {
         //참여 채팅방 생성 - 나
         ParticipatedRoom participatedRoom1 = ParticipatedRoom.builder()
                 .chatRoom(chatRoom)
+                .roomName(partner.getNickname().getValue())
                 .participant(me).build();
         participatedRoomRepository.save(participatedRoom1);
 
         //참여 채팅방 생성 - 상대방
         ParticipatedRoom participatedRoom2 = ParticipatedRoom.builder()
                 .chatRoom(chatRoom)
+                .roomName(me.getNickname().getValue())
                 .participant(partner).build();
         participatedRoomRepository.save(participatedRoom2);
 
         return savedChatRoom.getChatRoomId();
     }
 
-    //채팅방 조회
+    //채팅방 리스트 조회
     public List<ParticipatedRoomListResponse> get(Long memberId) {
         List<ParticipatedRoomListResponse> chatRooms = new ArrayList<>();
 
@@ -76,24 +73,19 @@ public class ChatRoomService {
 
             List<ChatMessage> unreadMessages = new ArrayList<>();
             for (ChatMessage message : messages) {
-                if (message.getIsRead() != null) {
-                    for (IsRead isRead : message.getIsRead()) {
-                        if (!isRead.getReadCheck()) {
-                            unreadMessages.add(message);
-                            break;
-                        }
-                    }
+                if (!message.getReceiverRead()) {
+                    unreadMessages.add(message);
+                    break;
                 }
             }
 
-            Collections.reverse(room.getMessages());
             ParticipatedRoomListResponse info = ParticipatedRoomListResponse.builder()
                     .participatedRoomId(room.getParticipatedRoomId())
                     .chatRoomId(room.getChatRoom().getChatRoomId())
                     .nickname(room.getParticipant().getNickname().getValue())
-                    .message(messages.get(0).getMessage())
-                    .chatRoomName(room.getChatRoom().getOccupiedRooms().get(1).getParticipant().getNickname().getValue())
-                    .lastChatTime(messages.get(0).getCreatedAt())
+                    .message(messages.isEmpty() ? null : messages.get(0).getMessage())
+                    .chatRoomName(room.getRoomName())
+                    .lastChatTime(messages.isEmpty() ? null : messages.get(0).getCreatedAt())
                     .notReadCnt(unreadMessages.size())
                     .build();
             log.info("room정보1 :{}", room.getParticipatedRoomId());
@@ -102,6 +94,7 @@ public class ChatRoomService {
 
             chatRooms.add(info);
         }
+
         return chatRooms;
     }
 
@@ -111,10 +104,10 @@ public class ChatRoomService {
             ChatRoom chatRoom = chatRoomRepository.findById(chatRoomChangeNameRequest.getChatRoomId())
                     .orElseThrow(() -> new MallangsCustomException(ErrorCode.CHATROOM_NOT_FOUND));
 
-        chatRoom.changeChatRoomName(chatRoomChangeNameRequest.getRoomName());
-        chatRoomRepository.save(chatRoom);
-        return true;
-        }catch (Exception e){
+            chatRoom.changeChatRoomName(chatRoomChangeNameRequest.getRoomName());
+            chatRoomRepository.save(chatRoom);
+            return true;
+        } catch (Exception e) {
             log.error(e.getMessage());
             throw new MallangsCustomException(ErrorCode.FAILED_UPDATE_CHAT_ROOM);
         }

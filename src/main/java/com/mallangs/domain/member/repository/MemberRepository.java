@@ -12,12 +12,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
+@Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Boolean existsByUserId(UserId userId);
@@ -40,8 +41,15 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByEmail(@Param("email") Email email);
 
     //단일 회원조회 - 유저아이디
-    @Query("SELECT m FROM Member m join fetch m.addresses WHERE m.userId =:userId")
+    @Query(" SELECT m FROM Member m JOIN FETCH m.addresses " +
+            " WHERE m.userId =:userId ")
     Optional<Member> findByUserId(@Param("userId") UserId userId);
+
+    //단일 회원조회 - 회원프로필 조회
+    @Query("SELECT DISTINCT m FROM Member m LEFT JOIN FETCH m.addresses" +
+            " LEFT JOIN m.pets " +
+            "WHERE m.userId =:userId")
+    Optional<Member> findByUserIdForProfile(@Param("userId") UserId userId);
 
     //단일 회원조회 - 아이디 찾기
     @Query("SELECT m FROM Member m join fetch m.addresses " +
@@ -53,16 +61,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "WHERE m.email =:email AND m.userId =:userId")
     Optional<Member> findByEmailAndUserId(@Param("email") Email email, @Param("userId") UserId userId);
 
-    //모든 회원조회+주소
-    @Query("SELECT m FROM Member m join fetch m.addresses WHERE m.userId = :userId")
-    List<Member> memberList();
-
     //모든 회원조회 - UserId
     @Query("SELECT new com.mallangs.domain.member.dto.MemberGetResponseOnlyMember(m) " +
             "FROM Member m " +
-            "WHERE (:isActive IS NOT NULL OR m.isActive = :isActive) " +
-            "AND (:userId IS NOT NULL OR m.userId.value LIKE CONCAT('%', :userId, '%')) " +
-            "AND (:createAt IS NOT NULL OR m.createdAt >= :createAt)")
+            "WHERE (:isActive IS NULL OR m.isActive = :isActive) " +
+            "AND (:userId IS NULL OR m.userId.value = :userId) " +
+            "AND (:createAt IS NULL OR m.createdAt >= :createAt)")
     Page<MemberGetResponseOnlyMember> memberListByUserId(
             @Param("isActive") Boolean isActive,
             @Param("userId") String userId,
@@ -70,11 +74,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             Pageable pageable);
 
     //모든 회원조회 - Email
-    @Query("SELECT new com.mallangs.domain.member.dto.MemberGetResponseOnlyMember(m) " +
-            "FROM Member m " +
-            "WHERE (:isActive IS NOT NULL OR m.isActive = :isActive) " +
-            "AND (:email IS NOT NULL OR m.email.value LIKE CONCAT('%', :email, '%')) " +
-            "AND (:createAt IS NOT NULL OR m.createdAt >= :createAt)")
+    @Query(" SELECT new com.mallangs.domain.member.dto.MemberGetResponseOnlyMember(m) " +
+            " FROM Member m " +
+            " WHERE (:isActive IS NULL OR m.isActive = :isActive) " +
+            " AND (:email IS NULL OR m.email.value = :email)" +
+            " AND (:createAt IS NULL OR m.createdAt >= :createAt) ")
     Page<MemberGetResponseOnlyMember> memberListByEmail(
             @Param("isActive") Boolean isActive,
             @Param("email") String email,

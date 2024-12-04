@@ -22,7 +22,7 @@ import static com.mallangs.global.exception.ErrorCode.UNSUPPORTED_FILE_TYPE;
 @RestController
 //@PreAuthorize("hasRole('USER')")
 @RequiredArgsConstructor
-@RequestMapping("/api/member/file")
+@RequestMapping("/api/v1/member/file")
 public class MemberFileController {
 
     private final UploadUtil uploadUtil;
@@ -30,7 +30,7 @@ public class MemberFileController {
     @DeleteMapping("/{profileImage}")
     @Operation(summary = "프로필 사진 삭제", description = "프로필 사진을 삭제때 사용하는 API")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "프로필 삭제 성공"),
+            @ApiResponse(responseCode = "201", description = "프로필 삭제 성공"),
             @ApiResponse(responseCode = "404", description = "삭제 실패.")
     })
     public ResponseEntity<?> fileDelete(@PathVariable String profileImage) {
@@ -42,7 +42,7 @@ public class MemberFileController {
     @PostMapping("/upload")
     @Operation(summary = "프로필 사진 등록", description = "회원 가입 시 프로필 사진을 등록할 때 사용하는 API")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "파일 업로드 성공"),
+            @ApiResponse(responseCode = "201", description = "파일 업로드 성공"),
             @ApiResponse(responseCode = "404", description = "업로드 실패.")
     })
     public ResponseEntity<String> uploadFile(@RequestParam("profileImage") MultipartFile profileImage) {

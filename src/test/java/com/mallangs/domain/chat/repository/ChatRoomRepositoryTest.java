@@ -31,8 +31,6 @@ public class ChatRoomRepositoryTest {
     private ChatMessageRepository chatMessageRepository;
     @Autowired
     AddressRepository addressRepository;
-    @Autowired
-    IsReadRepository isReadRepository;
 
     @Test
     @Transactional
@@ -76,31 +74,20 @@ public class ChatRoomRepositoryTest {
         chatRoomRepository.save(chatRoom);
 
         ChatMessage chatMessage = ChatMessage.builder()
-                .participatedRoom(participatedRoom)
+                .chatRoom(chatRoom)
                 .sender(member)
                 .message("TestMessage")
                 .type(MessageType.ENTER)
                 .build();
         chatMessageRepository.save(chatMessage);
         ChatMessage chatMessage2 = ChatMessage.builder()
-                .participatedRoom(participatedRoom2)
+                .chatRoom(chatRoom)
                 .sender(member2)
                 .message("TestMessage")
                 .type(MessageType.ENTER)
                 .build();
         chatMessageRepository.save(chatMessage2);
-        participatedRoom.addChatMessage(chatMessage);
-        participatedRoom2.addChatMessage(chatMessage2);
         participatedRoomRepository.save(participatedRoom);
-
-        IsRead isRead = IsRead.builder()
-                .chatMessage(chatMessage)
-                .reader(member.getNickname().getValue()).build();
-        isReadRepository.save(isRead);
-        IsRead isRead2 = IsRead.builder()
-                .chatMessage(chatMessage2)
-                .reader(member2.getNickname().getValue()).build();
-        isReadRepository.save(isRead2);
 
         //when
         ChatRoom results = chatRoomRepository.findById(chatRoom.getChatRoomId()).get();

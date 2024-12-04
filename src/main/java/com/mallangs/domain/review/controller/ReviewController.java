@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/place-articles")
+@RequestMapping("/api/v1/place-articles")
 @Tag(name = "리뷰", description = "장소 리뷰 API (CRUD). 장소 글타래는 일반 글타래와 동일하게 articleId를 고유 식별자로 사용하지만, 명확성을 위해 placeArticleId를 엔드포인트에 사용합니다. (받는 값은 articleId)")
 public class ReviewController {
 

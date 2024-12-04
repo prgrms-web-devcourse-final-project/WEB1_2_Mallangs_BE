@@ -2,9 +2,11 @@ package com.mallangs.domain.member.entity;
 
 import com.mallangs.domain.chat.entity.ParticipatedRoom;
 import com.mallangs.domain.member.entity.embadded.*;
+import com.mallangs.domain.pet.entity.Pet;
 import com.mallangs.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
@@ -37,10 +39,12 @@ public class Member extends BaseTimeEntity {
     @Embedded
     private Email email;
 
+    //주소
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Address> addresses = new ArrayList<>();
 
+    //채팅방
     @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ParticipatedRoom> participatedRooms = new ArrayList<>();
@@ -59,14 +63,22 @@ public class Member extends BaseTimeEntity {
     @Builder.Default
     private Boolean isActive = true;
 
+    //차단 만기 날짜
     @Column(name = "expiry_date")
     private LocalDateTime expiryDate;
 
+    //차단 사유
     @Column(name = "reason_for_ban")
     private String reasonForBan;
 
     @Column(name = "last_login_time")
     private LocalDateTime lastLoginTime;
+
+    //Pet
+    @JsonIgnore
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Pet> pets = new ArrayList<>();
 
     // 회원가입
     public Member(String userId, String nickname, Password password, String email, String profileImage, Boolean hasPet){
@@ -107,5 +119,9 @@ public class Member extends BaseTimeEntity {
     public void addParticipatedRoom(ParticipatedRoom participatedRoom){
         this.participatedRooms.add(participatedRoom);
         participatedRoom.changeParticipant(this);
+    }
+
+    public void changeRole(MemberRole memberRole){
+        this.memberRole = memberRole;
     }
 }

@@ -30,7 +30,7 @@ public class LogoutFilter extends OncePerRequestFilter {
     @Override
     //등록된 필터만 필터링 허용
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return !request.getRequestURI().equals("/api/member/logout");
+        return !request.getRequestURI().equals("/api/v1/member/logout");
     }
 
     @Override
