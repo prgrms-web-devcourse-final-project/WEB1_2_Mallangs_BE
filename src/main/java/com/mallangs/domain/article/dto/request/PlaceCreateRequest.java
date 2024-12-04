@@ -1,5 +1,6 @@
 package com.mallangs.domain.article.dto.request;
 
+import com.mallangs.domain.article.validation.ValidationGroups;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -32,8 +33,8 @@ public class PlaceCreateRequest extends ArticleCreateRequest {
 
   private String contact;
 
-  @NotNull
-  private Boolean isPublicData;
+  @NotNull(message = "공공데이터 여부는 필수입니다.", groups = ValidationGroups.CreateGroup.class)
+  private Boolean isPublicData = false;
 
 
 }
