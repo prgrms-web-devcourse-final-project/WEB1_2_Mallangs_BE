@@ -54,11 +54,19 @@ public class ArticleController {
 
 
   // 조회
+  // 관리자 전부 조회 가능
+  // 회원 visible + 자신의 글 조회 가능
+  // 비회원 mapVisible 만 조회 가능
   @Operation(summary = "글타래 단건 조회", description = "글타래를 단건 조회합니다.")
   @GetMapping("/public/{articleId}")
   public ResponseEntity<ArticleResponse> getArticleByArticleId(
-      @Parameter(description = "조회할 글타래 ID", required = true) @PathVariable Long articleId) {
-    ArticleResponse articleResponse = articleService.getArticleById(articleId);
+      @Parameter(description = "조회할 글타래 ID", required = true) @PathVariable Long articleId,
+      @AuthenticationPrincipal CustomMemberDetails principal) {
+
+    String userRole = principal.getRole();
+    Long memberId = principal.getMemberId();
+
+    ArticleResponse articleResponse = articleService.getArticleById(articleId, userRole, memberId);
 
     return ResponseEntity.ok(articleResponse);
   }
@@ -90,6 +98,7 @@ public class ArticleController {
   }
 
   // 실종 페이지
+  // map visible 만 보임
   @Operation(summary = "실종 글타래 전체 조회", description = "실종 글타래를 조회합니다.")
   @GetMapping("/public/lost")
   public ResponseEntity<Page<ArticleResponse>> getLostArticles(
@@ -104,6 +113,7 @@ public class ArticleController {
 
   // 지도에 마커 표시 위한 경로
   // 위치 기준 지도 전체 글타래 조회 // 타입별 조회
+  // map visible 만 보임
   @Operation(summary = "지도에서 글타래 조회", description = "지도에서 글타래를 조회합니다.")
   @PostMapping("/public/articlesMarkers")
   public ResponseEntity<List<MapBoundsResponse>> getMarkersInBounds(
@@ -132,7 +142,7 @@ public class ArticleController {
         articlesInBounds = locationService.findArticlesInBoundsByType(
             southWestLat, southWestLon,
             northEastLat, northEastLon, articleType); // 실종 목격 구조 장소 사용자등록장소
-      } else { // 시설 업체, 사용자 등록 장소 소분류 존재
+      } else { // 시설 업체, 사용자 등록 => 장소 소분류 존재
         articlesInBounds = locationService.findPlaceArticlesInBoundsByCategory(
             southWestLat, southWestLon,
             northEastLat, northEastLon, articleType, placeCategory);
@@ -143,6 +153,7 @@ public class ArticleController {
   }
 
   // 검색 조회
+  // map visible 만 보임
   @Operation(summary = "글타래 검색", description = "글타래에서 검색합니다.")
   @GetMapping("/public/search")
   public ResponseEntity<Page<ArticleResponse>> searchSightingPosts(
@@ -155,6 +166,7 @@ public class ArticleController {
 
 
   // 회원 자신이 작성한 글타래 목록 조회
+  // is deleted false 안 보임
   @Operation(summary = "사용자가 작성한 전체 글타래 조회", description = "사용자가 자신이 작성한 글타래 목록을 조회합니다.")
   @PreAuthorize("hasAuthority('ROLE_USER')")
   @GetMapping("/myArticles")
