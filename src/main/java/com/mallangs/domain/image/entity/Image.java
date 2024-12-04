@@ -19,7 +19,6 @@ public class Image extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long imageId;
 
-    // 이미지가 필요한 도메인: Article, Board, Member, Pet, Review
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_id")
     private Article article;
@@ -40,9 +39,6 @@ public class Image extends BaseTimeEntity {
     @JoinColumn(name = "review_id")
     private Review review;
 
-    @Enumerated(EnumType.STRING)
-    private ImageOrder imageOrder;
-
     @Column(nullable = false)
     private String originalFileName;
 
@@ -50,10 +46,13 @@ public class Image extends BaseTimeEntity {
     private String storedFileName;
 
     @Column(nullable = false)
-    private int fileSize;
+    private String filePath;
 
     @Column(nullable = false)
-    private String s3Url;
+    private String fileType;
+
+    @Column(nullable = false)
+    private Integer fileSize;
 
     @Column(nullable = false)
     private Integer width;

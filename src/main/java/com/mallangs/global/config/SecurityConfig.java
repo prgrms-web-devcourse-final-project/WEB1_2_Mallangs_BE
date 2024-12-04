@@ -25,9 +25,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -58,30 +55,31 @@ public class SecurityConfig {
     return configuration.getAuthenticationManager();
   }
 
-    @Bean
-    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        // cors 필터
-        http
-                .cors(corsCustomizer -> corsCustomizer.configurationSource(request -> {
-                    CorsConfiguration configuration = new CorsConfiguration();
-                    configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:8080",
-                            "http://localhost:5173",  "https://*.ngrok-free.app"));
-                    configuration.setAllowedMethods(Collections.singletonList("*"));
-                    configuration.setAllowCredentials(true);
-                    configuration.setAllowedHeaders(Collections.singletonList("*"));
-                    configuration.setMaxAge(3600L);
-                    configuration.setExposedHeaders(Collections.singletonList("Set-Cookie"));
-                    configuration.setExposedHeaders(Collections.singletonList("Authorization"));
+  @Bean
+  public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+    // cors 필터
+    http
+        .cors(corsCustomizer -> corsCustomizer.configurationSource(request -> {
+          CorsConfiguration configuration = new CorsConfiguration();
+          configuration.setAllowedOrigins(
+              Arrays.asList("http://localhost:3000", "http://localhost:8080",
+                  "http://localhost:5173", "https://*.ngrok-free.app"));
+          configuration.setAllowedMethods(Collections.singletonList("*"));
+          configuration.setAllowCredentials(true);
+          configuration.setAllowedHeaders(Collections.singletonList("*"));
+          configuration.setMaxAge(3600L);
+          configuration.setExposedHeaders(Collections.singletonList("Set-Cookie"));
+          configuration.setExposedHeaders(Collections.singletonList("Authorization"));
 
           return configuration;
 
         }));
 
-        // 다른 기능 정지
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable);
+    // 다른 기능 정지
+    http
+        .csrf(AbstractHttpConfigurer::disable)
+        .formLogin(AbstractHttpConfigurer::disable)
+        .httpBasic(AbstractHttpConfigurer::disable);
 //        // oauth2
 //        http
 //                .oauth2Login((oauth2) -> oauth2
