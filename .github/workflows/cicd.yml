@@ -17,7 +17,7 @@ jobs:
           java-version: '17'
 
       - run: touch ./src/main/resources/application.properties
-      - run: echo ${{secrets.MALLANG_APPLICATION}} > ./src/main/resources/application.properties
+      - run: echo "${{secrets.MALLANG_APPLICATION}}" > ./src/main/resources/application.properties
 
       - uses: actions/upload-artifact@v3
         with:
