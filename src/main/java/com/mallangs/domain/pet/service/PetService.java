@@ -45,6 +45,18 @@ public class PetService {
     //반려동물 조회
     public PetResponse getPet(Long petId, CustomMemberDetails customMemberDetails) {
         Pet pet = petRepository.findById(petId).orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
+
+        // 비회원인 경우 공개된 정보만 반환
+        if (customMemberDetails == null) {
+            if (!pet.getIsOpenProfile()) {
+                throw new MallangsCustomException(ErrorCode.PET_NOT_PROFILE_OPEN);
+            }
+            if (!pet.getIsActive()) {
+                throw new MallangsCustomException(ErrorCode.PET_NOT_ACTIVATE);
+            }
+            return new PetResponse(pet); //
+        }
+
         Member member = getMember(customMemberDetails);
         //타인의 비활성화 반려동물 조회시 예외 던짐
         if (!pet.getIsActive() && !pet.getMember().getMemberId().equals(member.getMemberId())) {
@@ -246,6 +258,7 @@ public class PetService {
 
         return memberRepository.findByUserId(userId).orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
+
 
 
 }
