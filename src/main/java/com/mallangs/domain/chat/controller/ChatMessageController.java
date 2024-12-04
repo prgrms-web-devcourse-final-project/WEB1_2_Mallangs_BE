@@ -2,9 +2,7 @@ package com.mallangs.domain.chat.controller;
 
 import com.mallangs.domain.chat.dto.request.ChatMessageRequest;
 import com.mallangs.domain.chat.dto.request.UpdateChatMessageRequest;
-import com.mallangs.domain.chat.dto.response.ChatMessageListResponse;
-import com.mallangs.domain.chat.dto.response.ChatMessageResponse;
-import com.mallangs.domain.chat.dto.response.ChatMessageToDTOResponse;
+import com.mallangs.domain.chat.dto.response.*;
 import com.mallangs.domain.chat.service.ChatMessageService;
 import com.mallangs.domain.member.dto.PageRequestDTO;
 import com.mallangs.domain.member.service.MemberUserService;
@@ -16,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -38,8 +37,12 @@ public class ChatMessageController {
 
     //클라이언트로 부터 오는 메세지 수신 -> Redis로 송신
     @MessageMapping("/api/chat/send-message")
-    public void sendMessage(ChatMessageRequest message) {
-        chatMessageService.sendMessage(message);
+    @Operation(summary = "채팅메세지 수신", description = "채팅메세지 수신 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "메세지 수신 성공"),
+    })
+    public ResponseEntity<ChatMessageSuccessResponse> sendMessage(ChatMessageRequest message) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(chatMessageService.sendMessage(message));
     }
 
 //    //클리이언트로 부터 오는 이미지파일 수신
@@ -60,14 +63,13 @@ public class ChatMessageController {
     @Operation(summary = "채팅메세지 조회", description = "채팅 이력을 불러오는 API")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "조회 성공"),
-            @ApiResponse(responseCode = "400", description = "채팅방이 존재하지 않습니다.")
     })
     public ResponseEntity<Page<ChatMessageListResponse>> get(@RequestParam("chatRoomId") Long chatRoomId,
                                                              @RequestParam(value = "page", defaultValue = "1") int page,
                                                              @RequestParam(value = "size", defaultValue = "10") int size) {
 
         PageRequestDTO pageRequestDTO = PageRequestDTO.builder().page(page).size(size).build();
-        return ResponseEntity.ok(chatMessageService.getPage(pageRequestDTO, chatRoomId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(chatMessageService.getPage(pageRequestDTO, chatRoomId));
     }
 
     //채팅메세지 수정
@@ -76,12 +78,12 @@ public class ChatMessageController {
     @Operation(summary = "채팅메세지 수정", description = "채팅내용을 수정하는 API")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "수정 성공"),
-            @ApiResponse(responseCode = "400", description = "채팅메세지가 존재하지 않습니다.")
+            @ApiResponse(responseCode = "400", description = "입력값을 확인해주세요.")
     })
     public ResponseEntity<ChatMessageToDTOResponse> update(
             @Validated @RequestBody UpdateChatMessageRequest updateChatMessageRequest) {
 
-        return ResponseEntity.ok(chatMessageService.update(updateChatMessageRequest));
+        return ResponseEntity.status(HttpStatus.CREATED).body(chatMessageService.update(updateChatMessageRequest));
     }
 
     //채팅메세지 삭제
@@ -90,13 +92,10 @@ public class ChatMessageController {
     @Operation(summary = "채팅메세지 삭제", description = "채팅내용을 삭제하는 API.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "삭제 성공"),
-            @ApiResponse(responseCode = "400", description = "채팅메세지가 존재하지 않습니다.")
+            @ApiResponse(responseCode = "400", description = "채팅메세지 번호를 확인해주세요.")
     })
-    public ResponseEntity<?> delete(@PathVariable("chatMessageId") Long chatMessageId) {
-        if (chatMessageService.delete(chatMessageId)){
-            return ResponseEntity.ok("삭제성공");
-        };
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ChatMessageDeleteSuccessResponse> delete(@PathVariable("chatMessageId") Long chatMessageId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(chatMessageService.delete(chatMessageId));
     }
 
 }
