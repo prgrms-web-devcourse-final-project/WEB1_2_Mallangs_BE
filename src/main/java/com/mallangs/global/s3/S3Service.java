@@ -3,6 +3,9 @@ package com.mallangs.global.s3;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.mallangs.global.exception.ErrorCode;
+import com.mallangs.global.exception.MallangsCustomException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,24 +27,20 @@ public class S3Service {
     /**
      * S3에 이미지 업로드 하기
      */
-    public String uploadImage(MultipartFile image) throws IOException {
-        String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename(); // 고유한 파일 이름 생성
+        public String uploadFile(MultipartFile file, String storedFilename) {
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType(file.getContentType());
+            metadata.setContentLength(file.getSize());
 
-        // 메타데이터 설정
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType(image.getContentType());
-        metadata.setContentLength(image.getSize());
+            try {
+                amazonS3.putObject(bucket, storedFilename, file.getInputStream(), metadata);
+                return amazonS3.getUrl(bucket, storedFilename).toString();
+            } catch (IOException e) {
+                throw new MallangsCustomException(ErrorCode.IMAGE_PROCESSING_ERROR);
+            }
+        }
 
-        // S3에 파일 업로드 요청 생성
-        PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, fileName, image.getInputStream(), metadata);
-
-        // S3에 파일 업로드
-        amazonS3.putObject(putObjectRequest);
-
-        return getPublicUrl(fileName);
-    }
-
-    private String getPublicUrl(String fileName) {
-        return String.format("https://%s.s3.%s.amazonaws.com/%s", bucket, amazonS3.getRegionName(), fileName);
-    }
+        public void deleteFile(String storedFilename) {
+            amazonS3.deleteObject(bucket, storedFilename);
+        }
 }
