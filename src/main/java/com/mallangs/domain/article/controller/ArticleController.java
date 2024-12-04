@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/articles")
+@RequestMapping("/api/v1/articles")
 @RequiredArgsConstructor
 @Tag(name = "Article Controller", description = "글타래 API")
 public class ArticleController {
@@ -62,18 +62,26 @@ public class ArticleController {
     return ResponseEntity.ok(articleResponse);
   }
 
-  @Operation(summary = "글타래 전체 조회", description = "모든 글타래를 페이지별로 조회합니다.")
-  @GetMapping("/public")
+  // 관리자 페이지
+  @Operation(summary = "관리자 글타래 전체 조회", description = "관리자가 글타래를 조회합니다.")
+  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+  @GetMapping("/admin")
   public ResponseEntity<Page<ArticleResponse>> getArticles(
       @Parameter(description = "페이징 요청 정보", required = true) Pageable pageable,
-      @RequestParam(value = "articleType", required = false) String articleType) {
+      @RequestParam(value = "articleType", required = false) String articleType, // 대분류
+      @RequestParam(value = "placeCategory", required = false) String placeCategory) { // 소분류
 
     Page<ArticleResponse> articles;
 
     if (articleType == null || articleType.isEmpty()) {
       articles = articleService.findAllTypeArticles(pageable);
     } else {
-      articles = articleService.findArticlesByArticleType(pageable, articleType);
+      if (placeCategory == null || placeCategory.isEmpty()) {
+        articles = articleService.findArticlesByArticleType(pageable, articleType);
+      } else {
+        articles = articleService.findPlaceArticlesByCategory(pageable, placeCategory);
+      }
+
     }
 
     return ResponseEntity.ok(articles);
@@ -85,6 +93,7 @@ public class ArticleController {
   @PostMapping("/public/articlesMarkers")
   public ResponseEntity<List<MapBoundsResponse>> getMarkersInBounds(
       @RequestParam(value = "articleType", required = false) String articleType,
+      @RequestParam(value = "placeCategory", required = false) String placeCategory,
       @RequestBody MapBoundsRequest bounds) {
 
     double southWestLat = bounds.getSouthWestLat();
@@ -94,14 +103,26 @@ public class ArticleController {
 
     List<MapBoundsResponse> articlesInBounds;
 
-    if (articleType == null || articleType.isEmpty()) {
+    // 대분류 소분류
+    // 대분류 null 인경우 전체 조회
+    // 대분류 존재하는 경우 해당 값 조회 // 시설/위치 ---구조 ---목격 ---사용자 등록 정보
+    // 시설/위치는 소분류도 존재
+    // 사용자 등록 정보는?
+    if (articleType == null || articleType.isEmpty()) { // 대분류 null 전체 조회
       articlesInBounds = locationService.findArticlesInBounds(
           southWestLat, southWestLon,
           northEastLat, northEastLon);
-    } else {
-      articlesInBounds = locationService.findArticlesInBoundsByType(
-          southWestLat, southWestLon,
-          northEastLat, northEastLon, articleType);
+    } else { // 대준류 null 아님
+      if (placeCategory == null || placeCategory.isEmpty()) { // 소분류 없는 경우 // 글타래 타입 기준 조회
+        articlesInBounds = locationService.findArticlesInBoundsByType(
+            southWestLat, southWestLon,
+            northEastLat, northEastLon, articleType); // 실종 목격 구조 장소 사용자등록장소
+      } else { // 시설 업체, 사용자 등록 장소 소분류 존재
+        articlesInBounds = locationService.findPlaceArticlesInBoundsByCategory(
+            southWestLat, southWestLon,
+            northEastLat, northEastLon, articleType, placeCategory);
+      }
+
     }
     return ResponseEntity.ok(articlesInBounds);
   }
