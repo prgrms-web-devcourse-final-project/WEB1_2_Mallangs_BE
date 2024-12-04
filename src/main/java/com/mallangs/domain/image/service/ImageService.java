@@ -4,6 +4,8 @@ import com.mallangs.domain.article.entity.Article;
 import com.mallangs.domain.article.repository.ArticleRepository;
 import com.mallangs.domain.board.entity.Board;
 import com.mallangs.domain.board.repository.BoardRepository;
+import com.mallangs.domain.chat.entity.ChatMessage;
+import com.mallangs.domain.chat.repository.ChatMessageRepository;
 import com.mallangs.domain.image.dto.ImageDto;
 import com.mallangs.domain.image.entity.Image;
 import com.mallangs.domain.image.repository.ImageRepository;
@@ -16,6 +18,7 @@ import com.mallangs.domain.review.repository.ReviewRepository;
 import com.mallangs.global.exception.ErrorCode;
 import com.mallangs.global.exception.MallangsCustomException;
 import com.mallangs.global.s3.S3Service;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +46,7 @@ public class ImageService {
 
     private static final int MAX_IMAGE_COUNT = 4;
     private static final int MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
+    private final ChatMessageRepository chatMessageRepository;
 
     // Article 이미지 처리
     public List<ImageDto.SimpleResponse> uploadArticleImages(Long articleId, List<MultipartFile> files) {
@@ -50,17 +54,13 @@ public class ImageService {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.ARTICLE_NOT_FOUND));
         List<Image> images = uploadImages(files, ImageTarget.builder().article(article).build());
-        return images.stream()
-                .map(this::toSimpleResponse)
-                .collect(Collectors.toList());
+        return images.stream().map(this::toSimpleResponse).collect(Collectors.toList());
     }
 
     public List<ImageDto.DetailResponse> getArticleImages(Long articleId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.ARTICLE_NOT_FOUND));
-        return imageRepository.findByArticle(article).stream()
-                .map(this::toDetailResponse)
-                .collect(Collectors.toList());
+        return imageRepository.findByArticle(article).stream().map(this::toDetailResponse).collect(Collectors.toList());
     }
 
     public void deleteArticleImages(Long articleId) {
@@ -77,17 +77,13 @@ public class ImageService {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.BOARD_NOT_FOUND));
         List<Image> images = uploadImages(files, ImageTarget.builder().board(board).build());
-        return images.stream()
-                .map(this::toSimpleResponse)
-                .collect(Collectors.toList());
+        return images.stream().map(this::toSimpleResponse).collect(Collectors.toList());
     }
 
     public List<ImageDto.DetailResponse> getBoardImages(Long boardId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.BOARD_NOT_FOUND));
-        return imageRepository.findByBoard(board).stream()
-                .map(this::toDetailResponse)
-                .collect(Collectors.toList());
+        return imageRepository.findByBoard(board).stream().map(this::toDetailResponse).collect(Collectors.toList());
     }
 
     public void deleteBoardImages(Long boardId) {
@@ -104,17 +100,13 @@ public class ImageService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
         List<Image> images = uploadImages(files, ImageTarget.builder().member(member).build());
-        return images.stream()
-                .map(this::toSimpleResponse)
-                .collect(Collectors.toList());
+        return images.stream().map(this::toSimpleResponse).collect(Collectors.toList());
     }
 
     public List<ImageDto.DetailResponse> getMemberImages(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
-        return imageRepository.findByMember(member).stream()
-                .map(this::toDetailResponse)
-                .collect(Collectors.toList());
+        return imageRepository.findByMember(member).stream().map(this::toDetailResponse).collect(Collectors.toList());
     }
 
     public void deleteMemberImages(Long memberId) {
@@ -131,17 +123,13 @@ public class ImageService {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
         List<Image> images = uploadImages(files, ImageTarget.builder().pet(pet).build());
-        return images.stream()
-                .map(this::toSimpleResponse)
-                .collect(Collectors.toList());
+        return images.stream().map(this::toSimpleResponse).collect(Collectors.toList());
     }
 
     public List<ImageDto.DetailResponse> getPetImages(Long petId) {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
-        return imageRepository.findByPet(pet).stream()
-                .map(this::toDetailResponse)
-                .collect(Collectors.toList());
+        return imageRepository.findByPet(pet).stream().map(this::toDetailResponse).collect(Collectors.toList());
     }
 
     public void deletePetImages(Long petId) {
@@ -158,17 +146,13 @@ public class ImageService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.REVIEW_NOT_FOUND));
         List<Image> images = uploadImages(files, ImageTarget.builder().review(review).build());
-        return images.stream()
-                .map(this::toSimpleResponse)
-                .collect(Collectors.toList());
+        return images.stream().map(this::toSimpleResponse).collect(Collectors.toList());
     }
 
     public List<ImageDto.DetailResponse> getReviewImages(Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.REVIEW_NOT_FOUND));
-        return imageRepository.findByReview(review).stream()
-                .map(this::toDetailResponse)
-                .collect(Collectors.toList());
+        return imageRepository.findByReview(review).stream().map(this::toDetailResponse).collect(Collectors.toList());
     }
 
     public void deleteReviewImages(Long reviewId) {
@@ -179,14 +163,38 @@ public class ImageService {
         imageRepository.deleteByReview(review);
     }
 
+    // ChatMessage 이미지 처리
+    public List<ImageDto.SimpleResponse> uploadChatMessageImages(Long chatMessageId, List<MultipartFile> files) {
+        validateImageUpload(files);
+        ChatMessage chatMessage = chatMessageRepository.findById(chatMessageId)
+                .orElseThrow(() -> new MallangsCustomException(ErrorCode.CHAT_MESSAGE_NOT_FOUND));
+        List<Image> images = uploadImages(files, ImageTarget.builder().chatMessage(chatMessage).build());
+        return images.stream().map(this::toSimpleResponse).collect(Collectors.toList());
+    }
+
+    public List<ImageDto.DetailResponse> getChatMessageImages(Long chatMessageId) {
+        ChatMessage chatMessage = chatMessageRepository.findById(chatMessageId)
+                .orElseThrow(() -> new MallangsCustomException(ErrorCode.CHAT_MESSAGE_NOT_FOUND));
+        return imageRepository.findByChatMessage(chatMessage).stream().map(this::toDetailResponse).collect(Collectors.toList());
+    }
+
+    public void deleteChatMessageImages(Long chatMessageId) {
+        ChatMessage chatMessage = chatMessageRepository.findById(chatMessageId)
+                .orElseThrow(() -> new MallangsCustomException(ErrorCode.CHAT_MESSAGE_NOT_FOUND));
+        List<Image> images = imageRepository.findByChatMessage(chatMessage);
+        deleteImages(images);
+        imageRepository.deleteByChatMessage(chatMessage);
+    }
+
     // 이미지 타겟 엔티티
-    @lombok.Builder
+    @Builder
     private static class ImageTarget {
         private Article article;
         private Board board;
         private Member member;
         private Pet pet;
         private Review review;
+        private ChatMessage chatMessage;
     }
 
     // Private 헬퍼 메서드

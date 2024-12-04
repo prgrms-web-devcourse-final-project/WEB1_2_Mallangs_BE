@@ -2,6 +2,7 @@ package com.mallangs.domain.image.entity;
 
 import com.mallangs.domain.article.entity.Article;
 import com.mallangs.domain.board.entity.Board;
+import com.mallangs.domain.chat.entity.ChatMessage;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.pet.entity.Pet;
 import com.mallangs.domain.review.entity.Review;
@@ -38,6 +39,10 @@ public class Image extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id")
     private Review review;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "chat_message_id")
+    private ChatMessage chatMessage;
 
     @Column(nullable = false)
     private String originalFileName;
