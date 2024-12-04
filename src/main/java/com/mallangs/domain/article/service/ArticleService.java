@@ -92,9 +92,26 @@ public class ArticleService {
         });
   }
 
-  // 글타래 타입 별 전체/실종/구조 조회 // 장소 카테고리도 설정 가능?
-  public Page<ArticleResponse> findArticlesByArticleType(Pageable pageable, String articleType) {
+  // 글타래 타입 별 전체/실종/구조 조회 // 장소 카테고리도 설정 가능? // 대분류
+  public Page<ArticleResponse> findArticlesByArticleType(Pageable pageable,
+      String articleType) {
+
+    // 장소, 사용자 등록 위치
+    boolean isPublicData;
+    isPublicData = Objects.equals("place", articleType); // place 면 isPublicData = true
+    if (Objects.equals(articleType, "place") || Objects.equals(articleType, "user")) {
+      Page<Article> articles = articleRepository.findPlaceArticlesByCategory(pageable, isPublicData,
+          null);
+
+      return articles.map(article -> {
+        ArticleFactory factory = factoryManager.getFactory("place"); // 둘 다 장소 place factory 이용
+        return factory.createResponse(article);
+      });
+    }
+
+    // 실종, 구조
     ArticleType type = ArticleType.valueOf(articleType.toUpperCase());
+
     Page<Article> articles = articleRepository.findByArticleType(pageable, type);
     return articles.map(article -> {
       ArticleFactory factory = factoryManager.getFactory(article.getArticleType().getDescription());
@@ -114,8 +131,9 @@ public class ArticleService {
   // 장소 세부 카테고리 있는 것
   public Page<ArticleResponse> findPlaceArticlesByCategory(Pageable pageable,
       String articleType, String placeCategory) {
+    ArticleType type = ArticleType.valueOf(articleType.toUpperCase());
     boolean isPublicData;
-    isPublicData = Objects.equals(articleType, "place");
+    isPublicData = Objects.equals(type, ArticleType.PLACE); // place 인 경우
     Page<Article> articles = articleRepository.findPlaceArticlesByCategory(pageable, isPublicData,
         placeCategory);
 
