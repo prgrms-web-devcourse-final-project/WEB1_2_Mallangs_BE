@@ -59,7 +59,7 @@ public class JWTFilter extends OncePerRequestFilter {
           request.getRequestURI().startsWith("/api/member/find-user-id") ||
           request.getRequestURI().startsWith("/api/member/login") ||
           request.getRequestURI().startsWith("/api/member/find-password") ||
-          request.getRequestURI().startsWith("/api/articles/public")) {
+          request.getRequestURI().startsWith("/api/v1/articles/public")) {
         filterChain.doFilter(request, response);
         return;
       }
