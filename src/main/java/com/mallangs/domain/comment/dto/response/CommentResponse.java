@@ -13,41 +13,42 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class CommentResponse {
-    private Long commentId;
-    private Long memberId;
-    private String content;
-    private Nickname nickname;
-    private String profileImage;
 
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    private LocalDateTime createdAt;
+  private Long commentId;
+  private Long memberId;
+  private String content;
+  private Nickname nickname;
+  private String profileImage;
 
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    private LocalDateTime updatedAt;
+  @JsonSerialize(using = LocalDateTimeSerializer.class)
+  @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+  private LocalDateTime createdAt;
 
-    private Long postId;
-    private String postType;
-    private String postTitle;
+  @JsonSerialize(using = LocalDateTimeSerializer.class)
+  @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+  private LocalDateTime updatedAt;
 
-    public CommentResponse(Comment comment) {
-        this.commentId = comment.getCommentId();
-        this.memberId = comment.getMember().getMemberId();
-        this.content = comment.getContent();
-        this.nickname = comment.getMember().getNickname();
-        this.profileImage = comment.getMember().getProfileImage();
-        this.createdAt = comment.getCreatedAt();
-        this.updatedAt = comment.getUpdatedAt();
+  private Long postId;
+  private String postType;
+  private String postTitle;
 
-        if (comment.getBoard() != null) {
-            this.postId = comment.getBoard().getBoardId();
-            this.postType = comment.getBoard().getBoardType().name();
-            this.postTitle = comment.getBoard().getTitle();
-        } else if (comment.getArticle() != null) {
-            this.postId = comment.getArticle().getId();
-            this.postType = comment.getArticle().getType();
-            this.postTitle = comment.getArticle().getTitle();
-        }
+  public CommentResponse(Comment comment) {
+    this.commentId = comment.getCommentId();
+    this.memberId = comment.getMember().getMemberId();
+    this.content = comment.getContent();
+    this.nickname = comment.getMember().getNickname();
+    this.profileImage = comment.getMember().getProfileImage();
+    this.createdAt = comment.getCreatedAt();
+    this.updatedAt = comment.getUpdatedAt();
+
+    if (comment.getBoard() != null) {
+      this.postId = comment.getBoard().getBoardId();
+      this.postType = comment.getBoard().getBoardType().name();
+      this.postTitle = comment.getBoard().getTitle();
+    } else if (comment.getArticle() != null) {
+      this.postId = comment.getArticle().getId();
+      this.postType = comment.getArticle().getArticleType().getDescription();
+      this.postTitle = comment.getArticle().getTitle();
     }
+  }
 }
