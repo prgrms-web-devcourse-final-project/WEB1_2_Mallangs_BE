@@ -28,6 +28,8 @@ public class PlaceResponse extends ArticleResponse {
 
   private String contact;
 
+  private Boolean isPublicData; // 공공데이터 사용자등록데이터 구분
+
   public PlaceResponse(PlaceArticle article) {
     super(article);
     this.businessHours = article.getBusinessHours();
@@ -39,6 +41,7 @@ public class PlaceResponse extends ArticleResponse {
     this.hasParking = article.getHasParking();
     this.isPetFriendly = article.getIsPetFriendly();
     this.contact = article.getContact();
+    this.isPublicData = article.getIsPublicData();
   }
 
 }

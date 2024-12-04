@@ -31,7 +31,7 @@ import java.util.Set;
 
 @Tag(name = "커뮤니티 & 실종신고-목격제보 API", description = "커뮤니티/실종신고-목격제보 관련 API")
 @RestController
-@RequestMapping("/api/board")
+@RequestMapping("/api/v1/board")
 @RequiredArgsConstructor
 @Slf4j
 public class BoardController {

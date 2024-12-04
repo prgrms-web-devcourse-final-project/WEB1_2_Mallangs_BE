@@ -61,7 +61,7 @@ dependencies {
     annotationProcessor(
             'jakarta.persistence:jakarta.persistence-api',
             'jakarta.annotation:jakarta.annotation-api',
-            'com.querydsl:querydsl-apt:5.1.0:jakarta',
+            'com.querydsl:querydsl-apt:5.1.0:jakarta'
     )
 
     // 실시간 채팅을 위한 필요 라이브러리들
@@ -100,8 +100,12 @@ dependencies {
     //CSV 데이터 저장
     implementation 'com.opencsv:opencsv:5.9'
 
-}
+    implementation 'mysql:mysql-connector-java:8.0.33'
 
+}
+jar {
+    enabled = false
+}
 tasks.named('test') {
     useJUnitPlatform()
 }
