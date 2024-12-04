@@ -7,6 +7,7 @@ import com.mallangs.domain.article.dto.response.MapBoundsResponse;
 import com.mallangs.domain.article.entity.CaseStatus;
 import com.mallangs.domain.article.service.ArticleService;
 import com.mallangs.domain.article.service.LocationService;
+import com.mallangs.domain.article.validation.ValidationGroups;
 import com.mallangs.global.jwt.entity.CustomMemberDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -42,7 +44,7 @@ public class ArticleController {
   @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN')")
   @PostMapping
   public ResponseEntity<ArticleResponse> createArticle(
-      @RequestBody ArticleCreateRequest articleCreateRequest,
+      @Validated(ValidationGroups.CreateGroup.class) @RequestBody ArticleCreateRequest articleCreateRequest,
       @Parameter(description = "현재 인증된 사용자 정보", required = true)
       @AuthenticationPrincipal CustomMemberDetails principal) {
     Long memberId = principal.getMemberId();
