@@ -138,4 +138,30 @@ public class ImageController {
         imageService.deleteReviewImages(reviewId);
         return ResponseEntity.noContent().build();
     }
+
+    // ChatMessage 이미지 API
+    @Operation(summary = "ChatMessage 이미지 저장", description = "채팅에 이미지를 저장합니다.")
+    @PostMapping(value = "/chat/{chatMessageId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<List<ImageDto.SimpleResponse>> uploadChatMessage(
+            @PathVariable Long chatMessageId,
+            @RequestParam("files") List<MultipartFile> files
+    ) {
+        return ResponseEntity.ok(imageService.uploadChatMessageImages(chatMessageId, files));
+    }
+
+    @Operation(summary = "Review 이미지 조회", description = "리븊에 저장된 이미지의 정보를 조회합니다.")
+    @GetMapping("/chat/{chatMessageId}")
+    public ResponseEntity<ImageDto.ImageListResponse> getChatMessageImages(@PathVariable Long chatMessageId) {
+        List<ImageDto.DetailResponse> images = imageService.getChatMessageImages(chatMessageId);
+        return ResponseEntity.ok(ImageDto.ImageListResponse.of(images));
+    }
+
+    @Operation(summary = "Review 이미지 삭제", description = "리뷰에 저장된 이미지를 삭제합니다.")
+    @DeleteMapping("/chat/{chatMessageId}")
+    public ResponseEntity<Void> deleteChatMessageImages(@PathVariable Long chatMessageId) {
+        imageService.deleteChatMessageImages(chatMessageId);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }
