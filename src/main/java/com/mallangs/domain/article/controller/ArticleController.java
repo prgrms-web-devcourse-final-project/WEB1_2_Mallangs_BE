@@ -4,6 +4,7 @@ import com.mallangs.domain.article.dto.request.ArticleCreateRequest;
 import com.mallangs.domain.article.dto.request.MapBoundsRequest;
 import com.mallangs.domain.article.dto.response.ArticleResponse;
 import com.mallangs.domain.article.dto.response.MapBoundsResponse;
+import com.mallangs.domain.article.entity.CaseStatus;
 import com.mallangs.domain.article.service.ArticleService;
 import com.mallangs.domain.article.service.LocationService;
 import com.mallangs.global.jwt.entity.CustomMemberDetails;
@@ -63,6 +64,8 @@ public class ArticleController {
   }
 
   // 관리자 페이지
+  // articleType : lost rescue place user
+  // placeCategory : place 하위
   @Operation(summary = "관리자 글타래 전체 조회", description = "관리자가 글타래를 조회합니다.")
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   @GetMapping("/admin")
@@ -79,13 +82,25 @@ public class ArticleController {
       if (placeCategory == null || placeCategory.isEmpty()) {
         articles = articleService.findArticlesByArticleType(pageable, articleType);
       } else {
-        articles = articleService.findPlaceArticlesByCategory(pageable, placeCategory);
+        articles = articleService.findPlaceArticlesByCategory(pageable, articleType, placeCategory);
       }
-
     }
 
     return ResponseEntity.ok(articles);
   }
+
+  // 실종 페이지
+  @Operation(summary = "실종 글타래 전체 조회", description = "실종 글타래를 조회합니다.")
+  @GetMapping("/public/lost")
+  public ResponseEntity<Page<ArticleResponse>> getLostArticles(
+      @Parameter(description = "페이징 요청 정보", required = true) Pageable pageable,
+      @RequestParam(value = "lostStatus", required = false) CaseStatus lostStatus) {
+
+    Page<ArticleResponse> articles = articleService.findLostArticles(pageable, lostStatus);
+
+    return ResponseEntity.ok(articles);
+  }
+
 
   // 지도에 마커 표시 위한 경로
   // 위치 기준 지도 전체 글타래 조회 // 타입별 조회
