@@ -73,4 +73,37 @@ public class JdbcLocationRepository implements LocationRepository {
     );
   }
 
+  @Override
+  public List<MapBoundsResponse> findPlaceArticlesInBoundsByCategory(double southWestLat,
+      double southWestLon, double northEastLat, double northEastLon,
+      String placeCategory, boolean isPublicData) {
+
+    String query = String.format(
+        "SELECT a.article_id, a.type, a.title, ST_X(a.geography) AS latitude, " +
+            "ST_Y(a.geography) AS longitude, a.description " +
+            "FROM place p "
+            + "JOIN article a ON p.article_id = a.article_id" +
+            "WHERE MBRContains(ST_GeomFromText('POLYGON((%f %f, %f %f, %f %f, %f %f, %f %f))', 4326), a.geography) "
+            + "AND p.place_category = '%s' AND p.is_public_data = %b",
+        southWestLat, southWestLon,
+        southWestLat, northEastLon,
+        northEastLat, northEastLon,
+        northEastLat, southWestLon,
+        southWestLat, southWestLon,
+        placeCategory, isPublicData);
+
+    log.info(query);
+
+    return jdbcTemplate.query(query, (rs, rowNum) ->
+        new MapBoundsResponse(
+            rs.getLong("article_id"),
+            rs.getString("type"),
+            rs.getString("title"),
+            rs.getDouble("latitude"), // geography의 x 값
+            rs.getDouble("longitude"),  // geography의 y 값
+            rs.getString("description")
+        )
+    );
+  }
+
 }
