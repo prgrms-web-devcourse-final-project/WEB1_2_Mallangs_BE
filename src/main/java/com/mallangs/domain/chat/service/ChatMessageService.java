@@ -2,10 +2,7 @@ package com.mallangs.domain.chat.service;
 
 import com.mallangs.domain.chat.dto.request.ChatMessageRequest;
 import com.mallangs.domain.chat.dto.request.UpdateChatMessageRequest;
-import com.mallangs.domain.chat.dto.response.ChatMessageListResponse;
-import com.mallangs.domain.chat.dto.response.ChatMessageResponse;
-import com.mallangs.domain.chat.dto.response.ChatMessageToDTOResponse;
-import com.mallangs.domain.chat.dto.response.ChatRoomResponse;
+import com.mallangs.domain.chat.dto.response.*;
 import com.mallangs.domain.chat.entity.ChatMessage;
 import com.mallangs.domain.chat.entity.ChatRoom;
 import com.mallangs.domain.chat.entity.ParticipatedRoom;
@@ -34,7 +31,7 @@ public class ChatMessageService {
     private final RedisSubscriber redisSubscriber;
 
     //채팅 메세지 생성/송신
-    public void sendMessage(ChatMessageRequest chatMessageRequest) {
+    public ChatMessageSuccessResponse sendMessage(ChatMessageRequest chatMessageRequest) {
         try {
             log.info("보내진 채팅 정보: {}", chatMessageRequest.toString());
 
@@ -70,6 +67,7 @@ public class ChatMessageService {
 
             //채팅 보내기
             redisSubscriber.sendMessage(chatMessageResponse);
+            return new ChatMessageSuccessResponse(savedChatMessage.getSender().getUserId().getValue());
         } catch (Exception e) {
             throw new MallangsCustomException(ErrorCode.FAILED_CREATE_CHAT_MESSAGE);
         }
@@ -87,26 +85,30 @@ public class ChatMessageService {
     }
 
     //채팅 삭제
-    public boolean delete(Long chatMessageId) {
+    public ChatMessageDeleteSuccessResponse delete(Long chatMessageId) {
         boolean isExist = chatMessageRepository.existsById(chatMessageId);
         if (isExist) {
             chatMessageRepository.deleteById(chatMessageId);
-            return true;
+            return new ChatMessageDeleteSuccessResponse(chatMessageId);
         } else throw new MallangsCustomException(ErrorCode.CHAT_MESSAGE_NOT_FOUND);
     }
 
     //채팅목록 페이징
     public Page<ChatMessageListResponse> getPage(PageRequestDTO pageRequestDTO, Long chatRoomId) { //목록
+
+        //page, size, sort
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = pageRequestDTO.getPageable(sort);
+
+        log.info("쿼리 이전");
+
+        // 채팅 마다 필요 데이터 DTO 매핑
+        Page<ChatMessage> chatMessages = chatMessageRepository.findMessagesByChatRoomId(chatRoomId, pageable);
+        if (chatMessages.isEmpty()) {
+            throw new MallangsCustomException(ErrorCode.CHAT_MESSAGE_NOT_FOUND);
+        }
+
         try {
-            //page, size, sort
-            Sort sort = Sort.by("createdAt").descending();
-            Pageable pageable = pageRequestDTO.getPageable(sort);
-
-            log.info("쿼리 이전");
-
-            // 채팅 마다 필요 데이터 DTO 매핑
-            Page<ChatMessage> chatMessages = chatMessageRepository.findMessagesByChatRoomId(chatRoomId, pageable);
-
             log.info("리스트 중 채팅 조회 값: {}", chatMessages.toString());
 
             Page<ChatMessageListResponse> chatMessageResponse = chatMessages.map(
@@ -139,6 +141,9 @@ public class ChatMessageService {
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.PARTICIPATED_ROOM_NOT_FOUND));
 
         ChatRoom chatRoom = foundPartRoom.getChatRoom();
+        if (chatRoom == null) {
+            throw new MallangsCustomException(ErrorCode.CHATROOM_NOT_FOUND);
+        }
 
         int numChanged = chatMessageRepository.updateRead(chatRoom.getChatRoomId(), nickname);
 

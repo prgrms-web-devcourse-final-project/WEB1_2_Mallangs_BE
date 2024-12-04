@@ -13,34 +13,15 @@ import java.util.List;
 
 @Repository
 public interface ImageRepository extends JpaRepository<Image, Long> {
-
-    // Article에 연결된 이미지 조회
     List<Image> findByArticle(Article article);
-
-    // Board에 연결된 이미지 조회
     List<Image> findByBoard(Board board);
-
-    // Member에 연결된 이미지 조회
     List<Image> findByMember(Member member);
-
-    // Pet에 연결된 이미지 조회
     List<Image> findByPet(Pet pet);
-
-    // Review에 연결된 이미지 조회
     List<Image> findByReview(Review review);
 
-    // Article에 연결된 이미지 삭제
     void deleteByArticle(Article article);
-
-    // Board에 연결된 이미지 삭제
     void deleteByBoard(Board board);
-
-    // Member에 연결된 이미지 삭제
     void deleteByMember(Member member);
-
-    // Pet에 연결된 이미지 삭제
     void deleteByPet(Pet pet);
-
-    // Review에 연결된 이미지 삭제
     void deleteByReview(Review review);
 }

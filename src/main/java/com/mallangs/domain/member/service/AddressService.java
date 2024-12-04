@@ -1,5 +1,7 @@
 package com.mallangs.domain.member.service;
 
+import com.mallangs.domain.member.dto.AddressCreateSuccessResponse;
+import com.mallangs.domain.member.dto.AddressDeleteSuccessResponse;
 import com.mallangs.domain.member.dto.MemberAddressRequest;
 import com.mallangs.domain.member.dto.MemberAddressResponse;
 import com.mallangs.domain.member.entity.Address;
@@ -28,17 +30,18 @@ public class AddressService {
     private final MemberRepository memberRepository;
 
     //주소 추가
-    public void create(String userId, MemberAddressRequest memberAddressRequest) {
-        try {
-            Member foundMember = memberRepository.findByUserId(new UserId(userId))
-                    .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+    public AddressCreateSuccessResponse create(String userId, MemberAddressRequest memberAddressRequest) {
+        Member foundMember = memberRepository.findByUserId(new UserId(userId))
+                .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
 
+        try {
             Address address = memberAddressRequest.toEntity();
             address.addMember(foundMember);
-            Address save = addressRepository.save(address);
+            addressRepository.save(address);
 
             foundMember.getAddresses().add(address);
             memberRepository.save(foundMember);
+            return new AddressCreateSuccessResponse(foundMember.getUserId().getValue());
         } catch (Exception e) {
             log.error("주소 추가에 실패하였습니다. {}", e.getMessage());
             throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);
@@ -57,14 +60,14 @@ public class AddressService {
     }
 
     //주소 삭제
-    public boolean delete(Long addressId) {
+    public AddressDeleteSuccessResponse delete(Long addressId) {
         try {
             Optional<Address> foundAddress = addressRepository.findById(addressId);
-            if (foundAddress.isEmpty()){
-                return false;
+            if (foundAddress.isEmpty()) {
+                throw new MallangsCustomException(ErrorCode.ADDRESS_NOT_FOUND);
             }
             addressRepository.deleteById(addressId);
-            return true;
+            return new AddressDeleteSuccessResponse(addressId);
         } catch (Exception e) {
             log.error("주소 삭제에 실패하였습니다. {}", e.getMessage());
             throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);

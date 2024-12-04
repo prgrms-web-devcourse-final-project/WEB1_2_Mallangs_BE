@@ -1,7 +1,6 @@
 package com.mallangs.domain.chat.dto.response;
 
 import com.mallangs.domain.chat.entity.MessageType;
-import com.mallangs.domain.image.dto.ImageResponse;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
