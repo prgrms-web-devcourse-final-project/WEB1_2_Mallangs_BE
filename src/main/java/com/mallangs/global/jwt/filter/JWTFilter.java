@@ -34,104 +34,97 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @RequiredArgsConstructor
 public class JWTFilter extends OncePerRequestFilter {
 
-    private final JWTUtil jwtUtil;
-    private final RefreshTokenService refreshTokenService;
-    private final Long accessTokenValidity;
-    private final Long accessRefreshTokenValidity;
-    private final AccessTokenBlackList accessTokenBlackList;
-    private final MemberRepository memberRepository;
+  private final JWTUtil jwtUtil;
+  private final RefreshTokenService refreshTokenService;
+  private final Long accessTokenValidity;
+  private final Long accessRefreshTokenValidity;
+  private final AccessTokenBlackList accessTokenBlackList;
+  private final MemberRepository memberRepository;
 
-    @Override
-    //jwt Token 전용 필터 ( 토큰 유효한지 확인 )
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
-        try {
-            //등록된 URI 필터 제외
-            if (request.getRequestURI().startsWith("/api/v1/member/register")||
-                request.getRequestURI().startsWith("/api/v1/member/find-user-id")||
-                request.getRequestURI().startsWith("/api/v1/member/login")||
-                request.getRequestURI().startsWith("/api/v1/member/find-password")||
-                request.getRequestURI().startsWith("/api/articles/public")) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-            //request 에서 Access Token 꺼내기
-            String authorizationHeader = request.getHeader("Authorization");
-            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-                String accessToken = authorizationHeader.substring(7);
-                Map<String, Object> claims = jwtUtil.validateToken(accessToken);
+  @Override
+  //jwt Token 전용 필터 ( 토큰 유효한지 확인 )
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+      FilterChain filterChain)
+      throws ServletException, IOException {
+    try {
+      //등록된 URI 필터 제외
+      if (request.getRequestURI().startsWith("/api/member/register") ||
+          request.getRequestURI().startsWith("/api/member/find-user-id") ||
+          request.getRequestURI().startsWith("/api/member/login") ||
+          request.getRequestURI().startsWith("/api/member/find-password") ||
+          request.getRequestURI().startsWith("/api/articles/public")) {
+        filterChain.doFilter(request, response);
+        return;
+      }
+      //request 에서 Access Token 꺼내기
+      String authorizationHeader = request.getHeader("Authorization");
+      if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+        String accessToken = authorizationHeader.substring(7);
+        Map<String, Object> claims = jwtUtil.validateToken(accessToken);
 
-                //블랙리스트에 있는지 확인
-                if (accessTokenBlackList.checkBlackList(accessToken)){
-                    handleException(response, new Exception("ACCESS TOKEN IS BLOCKED"));
-                    return;
-                }
-                //Access Token 만료 확인
-                if (jwtUtil.isExpired(accessToken)) {
-                    String refreshTokenFromCookies = getRefreshTokenFromCookies(request);
+        //블랙리스트에 있는지 확인
+        if (accessTokenBlackList.checkBlackList(accessToken)) {
+          handleException(response, new Exception("ACCESS TOKEN IS BLOCKED"));
+          return;
+        }
+        //Access Token 만료 확인
+        if (jwtUtil.isExpired(accessToken)) {
+          String refreshTokenFromCookies = getRefreshTokenFromCookies(request);
 
-                    if (refreshTokenFromCookies != null) {
-                        try {
-                            Map<String, Object> RefreshPayloadMap = jwtUtil.validateRefreshToken(refreshTokenFromCookies);
-                            String refreshTokenInRedis = refreshTokenService.readRefreshTokenInRedis(RefreshPayloadMap);
+          if (refreshTokenFromCookies != null) {
+            try {
+              Map<String, Object> RefreshPayloadMap = jwtUtil.validateRefreshToken(
+                  refreshTokenFromCookies);
+              String refreshTokenInRedis = refreshTokenService.readRefreshTokenInRedis(
+                  RefreshPayloadMap);
 
-                            if (refreshTokenFromCookies.equals(refreshTokenInRedis)) {
+              if (refreshTokenFromCookies.equals(refreshTokenInRedis)) {
 
-                                //userId로 맴버 찾기
-                                Member foundMember = memberRepository.findByUserId(new UserId((String) RefreshPayloadMap.get("userId")))
-                                        .orElseThrow(()->new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+                //userId로 맴버 찾기
+                Member foundMember = memberRepository.findByUserId(
+                        new UserId((String) RefreshPayloadMap.get("userId")))
+                    .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
 
-                                Map<String, Object> payloadMap = new HashMap<>();
-                                payloadMap.put("userId", foundMember.getUserId().getValue());
-                                payloadMap.put("nickname", foundMember.getNickname().getValue());
-                                payloadMap.put("email", foundMember.getEmail().getValue());
-                                payloadMap.put("role", foundMember.getMemberRole().name());
-                                payloadMap.put("category", TokenCategory.ACCESS_TOKEN.name());
+                Map<String, Object> payloadMap = new HashMap<>();
+                payloadMap.put("userId", foundMember.getUserId().getValue());
+                payloadMap.put("nickname", foundMember.getNickname().getValue());
+                payloadMap.put("email", foundMember.getEmail().getValue());
+                payloadMap.put("role", foundMember.getMemberRole().name());
+                payloadMap.put("category", TokenCategory.ACCESS_TOKEN.name());
 
-                                //Access Token 새로만들기
-                                if (!jwtUtil.isExpired(refreshTokenFromCookies)) {
-                                    String newAccessToken = jwtUtil.createAccessToken(payloadMap, accessTokenValidity);
+                //Access Token 새로만들기
+                if (!jwtUtil.isExpired(refreshTokenFromCookies)) {
+                  String newAccessToken = jwtUtil.createAccessToken(payloadMap,
+                      accessTokenValidity);
 
-                                    //Refresh Token 새로 만들기
-                                    Map<String, Object> refreshPayloadMap = new HashMap<>();
-                                    refreshPayloadMap.put("userId", foundMember.getUserId().getValue());
+                  //Refresh Token 새로 만들기
+                  Map<String, Object> refreshPayloadMap = new HashMap<>();
+                  refreshPayloadMap.put("userId", foundMember.getUserId().getValue());
 
-                                    //식별 위한 UserID 입력
-                                    String randomUUID = UUID.randomUUID().toString();
-                                    refreshPayloadMap.put("randomUUID", randomUUID);
-                                    String newRefreshToken = jwtUtil.createRefreshToken(refreshPayloadMap, accessRefreshTokenValidity);
-                                    refreshTokenService.insertInRedis(refreshPayloadMap, newRefreshToken);
+                  //식별 위한 UserID 입력
+                  String randomUUID = UUID.randomUUID().toString();
+                  refreshPayloadMap.put("randomUUID", randomUUID);
+                  String newRefreshToken = jwtUtil.createRefreshToken(refreshPayloadMap,
+                      accessRefreshTokenValidity);
+                  refreshTokenService.insertInRedis(refreshPayloadMap, newRefreshToken);
 
-                                    //토큰 전송
-                                    response.setContentType("application/json");
-                                    response.setCharacterEncoding("UTF-8");
-                                    response.getWriter().write(
-                                            "{\"AccessToken\": \"" + newAccessToken + "\"," +
-                                            " \"RefreshToken\": \"" + newRefreshToken + "\",");
+                  //토큰 전송
+                  response.setContentType("application/json");
+                  response.setCharacterEncoding("UTF-8");
+                  response.getWriter().write(
+                      "{\"AccessToken\": \"" + newAccessToken + "\"," +
+                          " \"RefreshToken\": \"" + newRefreshToken + "\",");
 
-                                    response.addHeader("Authorization", "Bearer " + accessToken);
-                                    response.addCookie(createCookie(newRefreshToken));
-                                    response.setStatus(HttpStatus.OK.value());
+                  response.addHeader("Authorization", "Bearer " + accessToken);
+                  response.addCookie(createCookie(newRefreshToken));
+                  response.setStatus(HttpStatus.OK.value());
 
-                                    //SecurityContextHolder 에 회원 등록
-                                    log.info("필터, 리프레시 새로만듬: {}, refresh: {}", newAccessToken,newRefreshToken);
-                                    CustomMemberDetails customUserDetails = new CustomMemberDetails(foundMember);
-                                    Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
-                                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                                } else {
-                                    handleException(response, new Exception("EXPIRED REFRESH TOKEN"));
-                                }
-                            } else {
-                                handleException(response, new Exception("INVALID REFRESH TOKEN"));
-                            }
-                        } catch (Exception e) {
-                            handleException(response, new Exception("REFRESH TOKEN VALIDATION FAILED"));
-                        }
-                    } else {
-                        handleException(response, new Exception("REFRESH TOKEN NOT FOUND"));
-                    }
-                    filterChain.doFilter(request, response);
-
+                  //SecurityContextHolder 에 회원 등록
+                  log.info("필터, 리프레시 새로만듬: {}, refresh: {}", newAccessToken, newRefreshToken);
+                  CustomMemberDetails customUserDetails = new CustomMemberDetails(foundMember);
+                  Authentication authToken = new UsernamePasswordAuthenticationToken(
+                      customUserDetails, null, customUserDetails.getAuthorities());
+                  SecurityContextHolder.getContext().setAuthentication(authToken);
                 } else {
                   handleException(response, new Exception("EXPIRED REFRESH TOKEN"));
                 }
