@@ -12,7 +12,7 @@ public class ImageResponse {
     private Integer height;
 
     public ImageResponse(Image image){
-        this.url = image.getUrl();
+//        this.url = image.getUrl();
         this.width = image.getWidth();
         this.height = image.getHeight();
     }
