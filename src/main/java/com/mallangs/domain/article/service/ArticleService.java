@@ -48,7 +48,7 @@ public class ArticleService {
     return factory.createResponse(savedArticle);
   }
 
-  // 글타래 단건 조회
+  // 글타래 단건 조회 // public, 조건 한개 인 경우
   public ArticleResponse getArticleById(Long articleId) {
     Article foundArticle = articleRepository.findById(articleId)
         .orElseThrow(() -> new MallangsCustomException(ErrorCode.ARTICLE_NOT_FOUND));
@@ -77,6 +77,19 @@ public class ArticleService {
     });
   }
 
+  // 장소 세부 카테고리 있는 것
+  public Page<ArticleResponse> findPlaceArticlesByCategory(Pageable pageable,
+      String placeCategory) {
+    Page<Article> articles = articleRepository.findPlaceArticlesByCategory(pageable, placeCategory);
+
+    return articles.map(article -> {
+      ArticleFactory factory = factoryManager.getFactory("place");
+      return factory.createResponse(article);
+    });
+
+  }
+
+
   // 글타래 멤버 개인 글타래 목록 조회
   public Page<ArticleResponse> findArticlesByMemberId(Pageable pageable, Long memberId) {
     Page<Article> articles = articleRepository.findByMemberId(pageable, memberId);
@@ -87,8 +100,10 @@ public class ArticleService {
   }
 
   // 검색어 기준
+  // 지도 표시 여부 체크 // 사용자, 관리자 모두 지도 표시 여부로 확인
   public Page<ArticleResponse> findArticlesByKeyword(Pageable pageable, String keyword) {
-    Page<Article> articles = articleRepository.findByTitleContainingOrDescriptionContaining(keyword,
+    Page<Article> articles = articleRepository.findByTitleContainingOrDescriptionContainingAndMapVisibility(
+        keyword,
         keyword, pageable);
     return articles.map(article -> {
       ArticleFactory factory = factoryManager.getFactory(article.getArticleType().getDescription());
@@ -112,6 +127,12 @@ public class ArticleService {
     // foundMember role 체크, foundArticle 타입 체크
     if (foundMember.getMemberRole() == MemberRole.ROLE_USER) {
       validateUserArticleAccess(foundArticle, memberId, false);
+    }
+
+    // 글타래 타입 불변인지 체크
+    if (!Objects.equals(foundArticle.getArticleType().getDescription(),
+        articleUpdateRequest.getArticleType().getDescription())) {
+      throw new MallangsCustomException(ErrorCode.INVALID_TYPE_CHANGE);
     }
 
     ArticleFactory factory = factoryManager.getFactory(
