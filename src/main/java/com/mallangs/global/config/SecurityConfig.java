@@ -101,17 +101,19 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/member/register", "/api/v1/member/login",
                                         "/api/v1/member/logout", "/api/v1/member/find-user-id",
                                         "/api/v1/member/find-password").permitAll() //회원가입,로그인,로그아웃,비번찾기,아이디찾기
-                                .requestMatchers("/login","/error","/success","/api/auth/**").permitAll()
-                                .requestMatchers("/api/v1/member/oauth2/**").permitAll() //소셜로그인
+//                                .requestMatchers("/api/v1/member/oauth2/**").permitAll() //소셜로그인
                                 .requestMatchers("/api/v1/member/admin/**").hasRole("ADMIN") //관리자
-                                .requestMatchers("/api/chat/websocket-test").permitAll() //웹소켓 테스터
-                                .requestMatchers("/webjars/**").permitAll() //웹소켓 테스터
-                                .requestMatchers("/ws-stomp/**").permitAll() //웹소켓 테스터
-                                .requestMatchers("/chat-rooms/**").permitAll() // 웹소켓 테스터2
                                 .requestMatchers("/api/v1/member/**").permitAll() //회원
+                                .requestMatchers("/api/v1/address/**").permitAll() //주소
+                                .requestMatchers("/api/v1/pets/**").permitAll() //반려동물
                                 .requestMatchers("/api/v1/chat-room/**").permitAll() //채팅방
                                 .requestMatchers("/api/v1/chat/**").permitAll() //채팅
-                                .requestMatchers("/api/v1/address/**").permitAll() //주소
+                                .requestMatchers("/api/v1/board/**").permitAll() //게시판
+                                .requestMatchers("/api/v1/articles/**").permitAll() //글타래
+                                .requestMatchers("/api/v1/place-articles/**").permitAll() //장소
+                                .requestMatchers("/api/v1/comments/**").permitAll() //댓글
+
+                                //파일 이미지
                                 .requestMatchers("/api/member-file-test").permitAll() //파일,이미지업로드
                                 // Swagger UI 관련 경로 허용
                                 .requestMatchers("/swagger-ui/**").permitAll()

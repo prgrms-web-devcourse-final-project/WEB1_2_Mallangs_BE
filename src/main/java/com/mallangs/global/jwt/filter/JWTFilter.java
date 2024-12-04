@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -41,17 +42,43 @@ public class JWTFilter extends OncePerRequestFilter {
     private final Long accessRefreshTokenValidity;
     private final AccessTokenBlackList accessTokenBlackList;
     private final MemberRepository memberRepository;
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
     //jwt Token 전용 필터 ( 토큰 유효한지 확인 )
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
-            //등록된 URI 필터 제외
-            if (request.getRequestURI().startsWith("/api/v1/member/register")||
-                request.getRequestURI().startsWith("/api/v1/member/find-user-id")||
-                request.getRequestURI().startsWith("/api/v1/member/login")||
-                request.getRequestURI().startsWith("/api/v1/member/find-password")) {
+            String uri = request.getRequestURI();
+
+            // PathVariable 포함 URI 매칭
+            if (pathMatcher.match("/api/v1/board/community/category/{categoryId}", uri) ||
+                    pathMatcher.match("/api/v1/board/sighting/category/{categoryId}", uri) ||
+                    pathMatcher.match("/api/v1/place-articles/{placeArticleId}/reviews/{reviewId}", uri) ||
+                    pathMatcher.match("/api/v1/pets/{petId}", uri)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            // 단순 경로 매칭 (PathVariable 제외)
+            if (uri.startsWith("/api/v1/member/register") ||
+                    //회원
+                    uri.startsWith("/api/v1/member/find-user-id") ||
+                    uri.startsWith("/api/v1/member/login") ||
+                    uri.startsWith("/api/v1/member/find-password") ||
+
+                    //게시판
+                    uri.startsWith("/api/v1/board/community") ||
+                    uri.startsWith("/api/v1/board/community/keyword") ||
+                    uri.startsWith("/api/v1/board/sighting") ||
+                    uri.startsWith("/api/v1/board/sighting/keyword") ||
+
+                    //글타래
+                    uri.startsWith("/api/v1/articles/public") ||
+                    uri.startsWith("/api/v1/place-articles/reviews/average-score") ||
+
+                    //반려동물
+                    uri.startsWith("/api/v1/pets/nearby")) {
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -62,7 +89,7 @@ public class JWTFilter extends OncePerRequestFilter {
                 Map<String, Object> claims = jwtUtil.validateToken(accessToken);
 
                 //블랙리스트에 있는지 확인
-                if (accessTokenBlackList.checkBlackList(accessToken)){
+                if (accessTokenBlackList.checkBlackList(accessToken)) {
                     handleException(response, new Exception("ACCESS TOKEN IS BLOCKED"));
                     return;
                 }
@@ -79,7 +106,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
                                 //userId로 맴버 찾기
                                 Member foundMember = memberRepository.findByUserId(new UserId((String) RefreshPayloadMap.get("userId")))
-                                        .orElseThrow(()->new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+                                        .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
 
                                 Map<String, Object> payloadMap = new HashMap<>();
                                 payloadMap.put("userId", foundMember.getUserId().getValue());
@@ -107,14 +134,14 @@ public class JWTFilter extends OncePerRequestFilter {
                                     response.setCharacterEncoding("UTF-8");
                                     response.getWriter().write(
                                             "{\"AccessToken\": \"" + newAccessToken + "\"," +
-                                            " \"RefreshToken\": \"" + newRefreshToken + "\",");
+                                                    " \"RefreshToken\": \"" + newRefreshToken + "\",");
 
                                     response.addHeader("Authorization", "Bearer " + accessToken);
                                     response.addCookie(createCookie(newRefreshToken));
                                     response.setStatus(HttpStatus.OK.value());
 
                                     //SecurityContextHolder 에 회원 등록
-                                    log.info("필터, 리프레시 새로만듬: {}, refresh: {}", newAccessToken,newRefreshToken);
+                                    log.info("필터, 리프레시 새로만듬: {}, refresh: {}", newAccessToken, newRefreshToken);
                                     CustomMemberDetails customUserDetails = new CustomMemberDetails(foundMember);
                                     Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
                                     SecurityContextHolder.getContext().setAuthentication(authToken);
@@ -141,8 +168,8 @@ public class JWTFilter extends OncePerRequestFilter {
                         handleException(response, new Exception("INVALID TOKEN PAYLOAD"));
                         return;
                     }
-                    log.info("맴버아이디 토큰 필터 {}",claims.get("memberId"));
-                    Long memberId = ((Integer)claims.get("memberId")).longValue();
+                    log.info("맴버아이디 토큰 필터 {}", claims.get("memberId"));
+                    Long memberId = ((Integer) claims.get("memberId")).longValue();
                     String userId = claims.get("userId").toString();
                     String nickname = claims.get("nickname").toString();
                     String email = claims.get("email").toString();
@@ -196,7 +223,7 @@ public class JWTFilter extends OncePerRequestFilter {
     //쿠키 만들기
     private Cookie createCookie(String refreshCookie) {
         Cookie cookie = new Cookie("RefreshToken", refreshCookie);
-        cookie.setMaxAge(3*24 * 60 * 60);
+        cookie.setMaxAge(3 * 24 * 60 * 60);
         // cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
