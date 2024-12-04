@@ -5,6 +5,7 @@ import com.mallangs.domain.article.repository.PlaceArticleRepository;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.embadded.UserId;
 import com.mallangs.domain.member.repository.MemberRepository;
+import com.mallangs.domain.pet.dto.PetResponse;
 import com.mallangs.domain.review.dto.PageRequest;
 import com.mallangs.domain.review.dto.ReviewCreateRequest;
 import com.mallangs.domain.review.dto.ReviewInfoResponse;
@@ -96,11 +97,19 @@ public class ReviewService {
 
     //리뷰 조회 (리뷰 ID로)
     public ReviewInfoResponse getReviewById(CustomMemberDetails customMemberDetails, Long reviewId) {
-        Member member = getMember(customMemberDetails);
-
         Review review = reviewRepository.findByReviewId(reviewId)
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.REVIEW_NOT_FOUND));
-        //공개만
+
+        // 비회원인 경우 공개된 정보만 반환
+        if (customMemberDetails == null) {
+            if (!review.getStatus().equals(ReviewStatus.HIDDEN)) {
+                throw new MallangsCustomException(ErrorCode.REVIEW_NOT_OPEN);
+            }
+            return new ReviewInfoResponse(review); //
+        }
+        Member member = getMember(customMemberDetails);
+
+        //본인꺼는 볼 수 있음
         if (!review.getMember().equals(member) && review.getStatus().equals(ReviewStatus.HIDDEN)) {
             throw new MallangsCustomException(ErrorCode.REVIEW_NOT_OPEN);
 
