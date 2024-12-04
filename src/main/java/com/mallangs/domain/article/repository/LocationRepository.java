@@ -11,6 +11,9 @@ public interface LocationRepository {
   List<MapBoundsResponse> findArticlesInBoundsByType(double southWestLat, double southWestLon,
       double northEastLat, double northEastLon, String type);
 
+  List<MapBoundsResponse> findPlaceArticlesInBoundsByType(double southWestLat,
+      double southWestLon, double northEastLat, double northEastLon, boolean isPublicData);
+
   List<MapBoundsResponse> findPlaceArticlesInBoundsByCategory(double southWestLat,
       double southWestLon,
       double northEastLat, double northEastLon, String placeCategory, boolean isPublicData);
