@@ -52,7 +52,7 @@ public class LocationService {
           southWestLon, northEastLat, northEastLon, isPublicData);
     }
 
-    // 일반 대분류
+    // 실종, 구조
     return locationRepository.findArticlesInBoundsByType(
         southWestLat, southWestLon,
         northEastLat, northEastLon,
