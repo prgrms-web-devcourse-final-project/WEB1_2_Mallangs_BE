@@ -111,7 +111,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/chat/**").permitAll() //채팅
                 .requestMatchers("/api/v1/address/**").permitAll() //주소
                 .requestMatchers("/api/member-file-test").permitAll() //파일,이미지업로드
-                .requestMatchers("/api/articles/public/**").permitAll() // 글타래 public
+                .requestMatchers("/api/v1/articles/public/**").permitAll() // 글타래 public
 
                 // Swagger UI 관련 경로 허용
                 .requestMatchers("/swagger-ui/**").permitAll()
