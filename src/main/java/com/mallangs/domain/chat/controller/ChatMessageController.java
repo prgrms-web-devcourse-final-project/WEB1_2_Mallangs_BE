@@ -60,7 +60,7 @@ public class ChatMessageController {
     @Operation(summary = "채팅메세지 조회", description = "채팅 이력을 불러오는 API")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "채팅방이 존재하지 않습니다.")
+            @ApiResponse(responseCode = "400", description = "채팅방이 존재하지 않습니다.")
     })
     public ResponseEntity<Page<ChatMessageListResponse>> get(@RequestParam("chatRoomId") Long chatRoomId,
                                                              @RequestParam(value = "page", defaultValue = "1") int page,
@@ -76,7 +76,7 @@ public class ChatMessageController {
     @Operation(summary = "채팅메세지 수정", description = "채팅내용을 수정하는 API")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "수정 성공"),
-            @ApiResponse(responseCode = "404", description = "채팅메세지가 존재하지 않습니다.")
+            @ApiResponse(responseCode = "400", description = "채팅메세지가 존재하지 않습니다.")
     })
     public ResponseEntity<ChatMessageToDTOResponse> update(
             @Validated @RequestBody UpdateChatMessageRequest updateChatMessageRequest) {
@@ -90,7 +90,7 @@ public class ChatMessageController {
     @Operation(summary = "채팅메세지 삭제", description = "채팅내용을 삭제하는 API.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "삭제 성공"),
-            @ApiResponse(responseCode = "404", description = "채팅메세지가 존재하지 않습니다.")
+            @ApiResponse(responseCode = "400", description = "채팅메세지가 존재하지 않습니다.")
     })
     public ResponseEntity<?> delete(@PathVariable("chatMessageId") Long chatMessageId) {
         if (chatMessageService.delete(chatMessageId)){
