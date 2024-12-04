@@ -96,6 +96,8 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth) ->
                         auth
+                                .requestMatchers("/favicon.ico").permitAll()
+                                .requestMatchers("/").permitAll()
                                 .requestMatchers("/api/v1/member/register", "/api/v1/member/login",
                                         "/api/v1/member/logout", "/api/v1/member/find-user-id",
                                         "/api/v1/member/find-password").permitAll() //회원가입,로그인,로그아웃,비번찾기,아이디찾기

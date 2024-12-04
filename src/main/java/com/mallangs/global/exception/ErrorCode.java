@@ -87,7 +87,13 @@ public enum ErrorCode {
   COMMENT_NOT_MODIFIED(CONFLICT, "댓글 업데이트에 실패했습니다."),
   COMMENT_NOT_REMOVED(CONFLICT, "댓글 삭제에 실패했습니다."),
   FORBIDDEN_ACCESS(FORBIDDEN, "권한이 없습니다."),
-  POST_NOT_FOUND(NOT_FOUND, "해당 게시물을 찾을 수 없습니다.");
+  POST_NOT_FOUND(NOT_FOUND, "해당 게시물을 찾을 수 없습니다."),
+
+  // Image
+  IMAGE_COUNT_EXCEEDED(BAD_REQUEST, "이미지 개수가 혀용치(4개)를 초과했습니다."),
+  IMAGE_SIZE_EXCEEDED(BAD_REQUEST, "이미지 크기가 허용치(3MB)를 초과했습니다."),
+  IMAGE_NOT_FOUND(NOT_FOUND, "이미지를 찾을 수 없습니다."),
+  INVAILD_IMAGE_FORMAT(BAD_REQUEST, "지원하지 않는 이미지 형식입니다.");
 
   private final HttpStatus httpStatus;
   private final String message;
