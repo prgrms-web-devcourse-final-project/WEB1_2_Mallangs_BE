@@ -36,7 +36,7 @@ public class ChatMessageController {
     private final MemberUserService memberUserService;
 
     //클라이언트로 부터 오는 메세지 수신 -> Redis로 송신
-    @MessageMapping("/api/chat/send-message")
+    @MessageMapping("/api/v1/chat/send-message")
     @Operation(summary = "채팅메세지 수신", description = "채팅메세지 수신 API")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "메세지 수신 성공"),
