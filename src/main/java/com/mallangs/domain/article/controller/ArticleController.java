@@ -4,6 +4,7 @@ import com.mallangs.domain.article.dto.request.ArticleCreateRequest;
 import com.mallangs.domain.article.dto.request.MapBoundsRequest;
 import com.mallangs.domain.article.dto.response.ArticleResponse;
 import com.mallangs.domain.article.dto.response.MapBoundsResponse;
+import com.mallangs.domain.article.entity.CaseStatus;
 import com.mallangs.domain.article.service.ArticleService;
 import com.mallangs.domain.article.service.LocationService;
 import com.mallangs.global.jwt.entity.CustomMemberDetails;
@@ -29,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/articles")
+@RequestMapping("/api/v1/articles")
 @RequiredArgsConstructor
 @Tag(name = "Article Controller", description = "글타래 API")
 public class ArticleController {
@@ -52,38 +53,72 @@ public class ArticleController {
   }
 
 
+  // 조회
+  // 관리자 전부 조회 가능
+  // 회원 visible + 자신의 글 조회 가능
+  // 비회원 mapVisible 만 조회 가능
   @Operation(summary = "글타래 단건 조회", description = "글타래를 단건 조회합니다.")
   @GetMapping("/public/{articleId}")
   public ResponseEntity<ArticleResponse> getArticleByArticleId(
-      @Parameter(description = "조회할 글타래 ID", required = true) @PathVariable Long articleId) {
-    ArticleResponse articleResponse = articleService.getArticleById(articleId);
+      @Parameter(description = "조회할 글타래 ID", required = true) @PathVariable Long articleId,
+      @AuthenticationPrincipal CustomMemberDetails principal) {
+
+    String userRole = principal.getRole();
+    Long memberId = principal.getMemberId();
+
+    ArticleResponse articleResponse = articleService.getArticleById(articleId, userRole, memberId);
 
     return ResponseEntity.ok(articleResponse);
   }
 
-  @Operation(summary = "글타래 전체 조회", description = "모든 글타래를 페이지별로 조회합니다.")
-  @GetMapping("/public")
+  // 관리자 페이지
+  // articleType : lost rescue place user
+  // placeCategory : place 하위
+  @Operation(summary = "관리자 글타래 전체 조회", description = "관리자가 글타래를 조회합니다.")
+  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+  @GetMapping("/admin")
   public ResponseEntity<Page<ArticleResponse>> getArticles(
-      @Parameter(description = "페이징 요청 정보", required = true) Pageable pageable) {
-    Page<ArticleResponse> articles = articleService.findAllTypeArticles(pageable);
+      @Parameter(description = "페이징 요청 정보", required = true) Pageable pageable,
+      @RequestParam(value = "articleType", required = false) String articleType, // 대분류
+      @RequestParam(value = "placeCategory", required = false) String placeCategory) { // 소분류
+
+    Page<ArticleResponse> articles;
+
+    if (articleType == null || articleType.isEmpty()) {
+      articles = articleService.findAllTypeArticles(pageable);
+    } else {
+      if (placeCategory == null || placeCategory.isEmpty()) {
+        articles = articleService.findArticlesByArticleType(pageable, articleType);
+      } else {
+        articles = articleService.findPlaceArticlesByCategory(pageable, articleType, placeCategory);
+      }
+    }
 
     return ResponseEntity.ok(articles);
   }
 
-  // 글타래 타입 별 조회
-  @Operation(summary = "글타래 타입별 전체 조회", description = "타입의 글타래를 페이지별로 조회합니다.")
-  @GetMapping("/public/type/{articleType}")
-  public ResponseEntity<List<ArticleResponse>> getArticlesByType(
-      @Parameter(description = "조회할 글타래 Type", required = true) @PathVariable String articleType) {
-    List<ArticleResponse> articles = articleService.findArticlesByArticleType(articleType);
+  // 실종 페이지
+  // map visible 만 보임
+  @Operation(summary = "실종 글타래 전체 조회", description = "실종 글타래를 조회합니다.")
+  @GetMapping("/public/lost")
+  public ResponseEntity<Page<ArticleResponse>> getLostArticles(
+      @Parameter(description = "페이징 요청 정보", required = true) Pageable pageable,
+      @RequestParam(value = "lostStatus", required = false) CaseStatus lostStatus) {
+
+    Page<ArticleResponse> articles = articleService.findLostArticles(pageable, lostStatus);
 
     return ResponseEntity.ok(articles);
   }
 
-  // 위치 기준 지도 조회
+
+  // 지도에 마커 표시 위한 경로
+  // 위치 기준 지도 전체 글타래 조회 // 타입별 조회
+  // map visible 만 보임
   @Operation(summary = "지도에서 글타래 조회", description = "지도에서 글타래를 조회합니다.")
   @PostMapping("/public/articlesMarkers")
   public ResponseEntity<List<MapBoundsResponse>> getMarkersInBounds(
+      @RequestParam(value = "articleType", required = false) String articleType,
+      @RequestParam(value = "placeCategory", required = false) String placeCategory,
       @RequestBody MapBoundsRequest bounds) {
 
     double southWestLat = bounds.getSouthWestLat();
@@ -91,25 +126,47 @@ public class ArticleController {
     double northEastLat = bounds.getNorthEastLat();
     double northEastLon = bounds.getNorthEastLon();
 
-    List<MapBoundsResponse> articlesInBounds = locationService.findArticlesInBounds(southWestLat,
-        southWestLon,
-        northEastLat, northEastLon);
+    List<MapBoundsResponse> articlesInBounds;
 
+    // 대분류 소분류
+    // 대분류 null 인경우 전체 조회
+    // 대분류 존재하는 경우 해당 값 조회 // 시설/위치 ---구조 ---목격 ---사용자 등록 정보
+    // 시설/위치는 소분류도 존재
+    // 사용자 등록 정보는?
+    if (articleType == null || articleType.isEmpty()) { // 대분류 null 전체 조회
+      articlesInBounds = locationService.findArticlesInBounds(
+          southWestLat, southWestLon,
+          northEastLat, northEastLon);
+    } else { // 대준류 null 아님
+      if (placeCategory == null || placeCategory.isEmpty()) { // 소분류 없는 경우 // 글타래 타입 기준 조회
+        articlesInBounds = locationService.findArticlesInBoundsByType(
+            southWestLat, southWestLon,
+            northEastLat, northEastLon, articleType); // 실종 목격 구조 장소 사용자등록장소
+      } else { // 시설 업체, 사용자 등록 => 장소 소분류 존재
+        articlesInBounds = locationService.findPlaceArticlesInBoundsByCategory(
+            southWestLat, southWestLon,
+            northEastLat, northEastLon, articleType, placeCategory);
+      }
+
+    }
     return ResponseEntity.ok(articlesInBounds);
   }
 
   // 검색 조회
+  // map visible 만 보임
   @Operation(summary = "글타래 검색", description = "글타래에서 검색합니다.")
-  @GetMapping("/search")
+  @GetMapping("/public/search")
   public ResponseEntity<Page<ArticleResponse>> searchSightingPosts(
       @Parameter(description = "페이지 요청 정보", required = true) Pageable pageable,
       @RequestParam String keyword) {
+
     Page<ArticleResponse> articles = articleService.findArticlesByKeyword(pageable, keyword);
     return ResponseEntity.ok(articles);
   }
 
 
   // 회원 자신이 작성한 글타래 목록 조회
+  // is deleted false 안 보임
   @Operation(summary = "사용자가 작성한 전체 글타래 조회", description = "사용자가 자신이 작성한 글타래 목록을 조회합니다.")
   @PreAuthorize("hasAuthority('ROLE_USER')")
   @GetMapping("/myArticles")
@@ -117,9 +174,9 @@ public class ArticleController {
       @Parameter(description = "페이지 요청 정보", required = true) Pageable pageable,
       @Parameter(description = "현재 인증된 사용자 정보", required = true)
       @AuthenticationPrincipal CustomMemberDetails principal) {
+
     Page<ArticleResponse> articles = articleService.findArticlesByMemberId(pageable,
         principal.getMemberId());
-
     return ResponseEntity.ok(articles);
   }
 
@@ -134,13 +191,12 @@ public class ArticleController {
       @PathVariable("articleId") Long articleId,
       @RequestBody ArticleCreateRequest articleCreateRequest,
       @Parameter(description = "현재 인증된 사용자 정보", required = true)
-      @AuthenticationPrincipal CustomMemberDetails principal
-  ) {
+      @AuthenticationPrincipal CustomMemberDetails principal) {
+
     ArticleResponse articleResponse = articleService.updateArticle(
         articleId,
         articleCreateRequest,
         principal.getMemberId());
-
     return ResponseEntity.ok(articleResponse);
   }
 
@@ -155,9 +211,9 @@ public class ArticleController {
   public ResponseEntity<Void> deactivateArticle(
       @PathVariable("articleId") Long articleId,
       @AuthenticationPrincipal CustomMemberDetails principal) {
+
     Long memberId = principal.getMemberId();
     articleService.deactivateArticle(articleId, memberId);
-
     return ResponseEntity.noContent().build();
   }
 
@@ -168,6 +224,7 @@ public class ArticleController {
   @DeleteMapping("/{articleId}")
   public ResponseEntity<Void> deleteArticle(
       @PathVariable("articleId") Long articleId) {
+
     articleService.deleteArticle(articleId);
     return ResponseEntity.noContent().build();
   }
