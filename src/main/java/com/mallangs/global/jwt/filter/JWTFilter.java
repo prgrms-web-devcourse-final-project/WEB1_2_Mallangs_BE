@@ -41,6 +41,13 @@ public class JWTFilter extends OncePerRequestFilter {
   private final AccessTokenBlackList accessTokenBlackList;
   private final MemberRepository memberRepository;
 
+  // favicon.ico 요청은 필터링하지 않음
+  @Override
+  protected boolean shouldNotFilter(HttpServletRequest request) {
+    String path = request.getServletPath();
+    return "/favicon.ico".equals(path);
+  }
+
   @Override
   //jwt Token 전용 필터 ( 토큰 유효한지 확인 )
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -212,4 +219,6 @@ public class JWTFilter extends OncePerRequestFilter {
     cookie.setHttpOnly(true);
     return cookie;
   }
+
+
 }
