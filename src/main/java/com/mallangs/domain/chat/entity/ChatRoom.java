@@ -22,6 +22,10 @@ public class ChatRoom {
     @Builder.Default
     private List<ParticipatedRoom> occupiedRooms = new ArrayList<>();
 
+    @OneToMany(mappedBy = "chatRoom")
+    @Builder.Default
+    private List<ChatMessage> messages = new ArrayList<>();
+
     @Column(name = "chat_room_name")
     private String chatRoomName;
 

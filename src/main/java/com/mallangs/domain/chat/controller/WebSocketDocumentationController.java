@@ -26,7 +26,7 @@ public class WebSocketDocumentationController {
                     )
             ),
             responses = {
-                    @ApiResponse(responseCode = "200", description = "메시지 전송 성공"),
+                    @ApiResponse(responseCode = "201", description = "메시지 전송 성공"),
                     @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
             }
     )
