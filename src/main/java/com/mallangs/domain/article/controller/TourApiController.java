@@ -1,4 +1,4 @@
-package com.mallangs.domain.article.service;
+package com.mallangs.domain.article.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
@@ -20,7 +19,7 @@ Service Key 사용시 인코딩된 Key를 사용하여야 에러가 안납니다
 
 @Log4j2 // Lombok을 사용한 로깅 기능 활성화
 @RestController // REST API 컨트롤러로 지정
-@RequestMapping("/tourapi") // "/tourapi" 경로로 들어오는 요청 처리
+@RequestMapping("/tourapi/v1") // "/tourapi" 경로로 들어오는 요청 처리
 @Tag(name = "Tour API", description = " 한국관광공사 반려동물 동반여행_서비스1.0.0 API 호출 컨트롤러")
 public class TourApiController {
 
