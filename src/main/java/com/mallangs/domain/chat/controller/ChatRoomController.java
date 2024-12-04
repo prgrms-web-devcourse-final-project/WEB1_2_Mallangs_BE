@@ -50,7 +50,7 @@ public class ChatRoomController {
     @Operation(summary = "채팅방 조회", description = "나와 관련된 채팅방을 조회합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "채팅방이 존재하지 않습니다.")
+            @ApiResponse(responseCode = "400", description = "채팅방이 존재하지 않습니다.")
     })
     public ResponseEntity<List<ParticipatedRoomListResponse>> getList(
             @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
@@ -75,7 +75,7 @@ public class ChatRoomController {
     @Operation(summary = "참여 채팅방 삭제", description = "참여 채팅방을 나갑니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "삭제 성공"),
-            @ApiResponse(responseCode = "404", description = "참여 채팅방이 존재하지 않습니다.")
+            @ApiResponse(responseCode = "400", description = "참여 채팅방이 존재하지 않습니다.")
     })
     public ResponseEntity<?> delete(@PathVariable("participatedRoomId") Long participatedRoomId,
                                     Authentication authentication) {
@@ -90,7 +90,7 @@ public class ChatRoomController {
     @Operation(summary = "채팅방 조회", description = "채팅방을 조회합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "채팅방이 존재하지 않습니다.")
+            @ApiResponse(responseCode = "400", description = "채팅방이 존재하지 않습니다.")
     })
     public ResponseEntity<ChatRoomResponse> changeStatus(@PathVariable Long participatedRoomId,
                                                          @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {

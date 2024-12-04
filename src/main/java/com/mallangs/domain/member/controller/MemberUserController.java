@@ -70,10 +70,11 @@ public class MemberUserController {
     @Operation(summary = "회원등록", description = "회원등록 요청 API")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "회원 등록 성공"),
-            @ApiResponse(responseCode = "404", description = "입력값이 잘못되었습니다.")
+            @ApiResponse(responseCode = "404", description = "회원을 찾을 수 없습니다."),
+            @ApiResponse(responseCode = "500", description = "서버에 문제가 발생했습니다.")
     })
-    public ResponseEntity<String> create(@Validated @RequestBody MemberCreateRequest memberCreateRequest) {
-        return ResponseEntity.ok(memberUserService.create(memberCreateRequest));
+    public ResponseEntity<MemberRegisterRequest> create(@Validated @RequestBody MemberCreateRequest memberCreateRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(memberUserService.create(memberCreateRequest));
     }
 
     @GetMapping("")
@@ -81,11 +82,12 @@ public class MemberUserController {
     @Operation(summary = "회원 프로필 조회", description = "회원 프로필 조회 요청 API")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "회원 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "회원조회에 실패하였습니다.")
+            @ApiResponse(responseCode = "404", description = "회원을 찾을 수 없습니다."),
+            @ApiResponse(responseCode = "406", description = "차단된 계정입니다.")
     })
     public ResponseEntity<MemberGetResponse> get(Authentication authentication) {
         String userId = authentication.getName();
-        return ResponseEntity.ok(memberUserService.get(userId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(memberUserService.get(userId));
     }
 
     @PutMapping("/{memberId}")
@@ -93,54 +95,57 @@ public class MemberUserController {
     @Operation(summary = "회원수정", description = "회원수정 요청 API")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "회원 수정 성공"),
-            @ApiResponse(responseCode = "404", description = "회원 수정 실패에 실패하였습니다.")
+            @ApiResponse(responseCode = "404", description = "회원을 찾을 수 없습니다."),
+            @ApiResponse(responseCode = "500", description = "서버에 문제가 발생했습니다.")
     })
-    public ResponseEntity<?> update(@Validated @RequestBody MemberUpdateRequest memberUpdateRequest,
-                                    @PathVariable("memberId") Long memberId) {
-        memberUserService.update(memberUpdateRequest, memberId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<MemberGetResponse> update(@Validated @RequestBody MemberUpdateRequest memberUpdateRequest,
+                                                    @PathVariable("memberId") Long memberId) {
+
+        return ResponseEntity.status(HttpStatus.CREATED).
+                body( memberUserService.update(memberUpdateRequest, memberId));
     }
 
     @PostMapping("/find-user-id")
     @Operation(summary = "아이디찾기", description = "아이디찾기 요청 API")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "아이디 찾기 요청 성공"),
-            @ApiResponse(responseCode = "404", description = "아이디 찾기 요청에 실패하였습니다.")
+            @ApiResponse(responseCode = "404", description = "회원을 찾을 수 없습니다."),
     })
     public ResponseEntity<String> findUserId(@Validated @RequestBody MemberFindUserIdRequest memberFindUserIdRequest) {
-        return ResponseEntity.ok(memberUserService.findUserId(memberFindUserIdRequest));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(memberUserService.findUserId(memberFindUserIdRequest));
     }
 
     @PostMapping("/find-password")
     @Operation(summary = "비밀번호찾기", description = "비밀번호찾기 요청 API")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "비밀번호 찾기 요청 성공"),
-            @ApiResponse(responseCode = "404", description = "비밀번호 찾기 요청에 실패하였습니다.")
+            @ApiResponse(responseCode = "404", description = "회원을 찾을 수 없습니다."),
     })
-    public ResponseEntity<String> findPassword(@Validated @RequestBody MemberFindPasswordRequest memberFindPasswordRequest) throws MessagingException {
+    public ResponseEntity<MemberSendMailResponse> findPassword(@Validated @RequestBody MemberFindPasswordRequest memberFindPasswordRequest) throws MessagingException {
         MemberSendMailResponse mail = memberUserService.findPassword(memberFindPasswordRequest);
-        return ResponseEntity.ok(memberUserService.mailSend(mail));
+        return ResponseEntity.status(HttpStatus.CREATED).body(memberUserService.mailSend(mail));
     }
 
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @PostMapping("/check-password")
     @Operation(summary = "비밀번호 확인", description = "비밀번호 확인 요청 API")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "비밀번호 요청 성공"),
-            @ApiResponse(responseCode = "404", description = "비밀번호 요청에 실패하였습니다.")
+            @ApiResponse(responseCode = "201", description = "비밀번호 확인요청 성공"),
+            @ApiResponse(responseCode = "404", description = "회원을 찾을 수 없습니다.")
     })
-    public ResponseEntity<?> checkPassword(@Validated @RequestBody PasswordDTO passwordDTO
+    public ResponseEntity<MemberCheckPasswordResponse> checkPassword(@Validated @RequestBody PasswordDTO passwordDTO
             , Authentication authentication) {
         String userId = authentication.getName();
-        memberUserService.checkPassword(passwordDTO, userId);
-        return ResponseEntity.ok().build();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(memberUserService.checkPassword(passwordDTO, userId));
     }
 
     @PostMapping("/login")
     @Operation(summary = "로그인", description = "로그인 요청 API")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "로그인 요청 성공"),
-            @ApiResponse(responseCode = "404", description = "로그인에 실패했습니다.")
+            @ApiResponse(responseCode = "401", description = "로그인에 실패했습니다.")
     })
     public ResponseEntity<?> login(@Validated @RequestBody LoginRequest loginRequest) {
         // 인증 토큰 생성
@@ -208,7 +213,7 @@ public class MemberUserController {
     @Operation(summary = "로그아웃", description = "로그아웃 요청 API")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "로그아웃 요청 성공"),
-            @ApiResponse(responseCode = "403", description = "토큰이 없습니다.")
+            @ApiResponse(responseCode = "401", description = "토큰이 없습니다.")
     })
     public ResponseEntity<?> loginOut(HttpServletRequest request, HttpServletResponse response) {
         log.info("커스텀 로그아웃 실행");
@@ -265,7 +270,7 @@ public class MemberUserController {
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
 
-        return ResponseEntity.ok("LOGOUT SUCCESSFUL");
+        return ResponseEntity.status(HttpStatus.CREATED).body("LOGOUT SUCCESSFUL");
     }
 
     // 리프레시 토큰 꺼내기
@@ -287,7 +292,7 @@ public class MemberUserController {
     @Operation(summary = "관리자로 권한변환", description = "관리자로 권한 변환 API")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "관리자로 권한 병환 성공"),
-            @ApiResponse(responseCode = "404", description = "관리자로 권한 병환 실패.")
+            @ApiResponse(responseCode = "400", description = "관리자로 권한 병환 실패.")
     })
     public ResponseEntity<?> changeMemberRole(@AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
         String userId = customMemberDetails.getUserId();
@@ -296,7 +301,7 @@ public class MemberUserController {
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
         //권한 변경
         foundMember.changeRole(MemberRole.ROLE_ADMIN);
-        return ResponseEntity.ok(memberRepository.save(foundMember));
+        return ResponseEntity.status(HttpStatus.CREATED).body(memberRepository.save(foundMember));
     }
 
 }
