@@ -2,6 +2,7 @@ package com.mallangs.domain.image.entity;
 
 import com.mallangs.domain.article.entity.Article;
 import com.mallangs.domain.board.entity.Board;
+import com.mallangs.domain.chat.entity.ChatMessage;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.pet.entity.Pet;
 import com.mallangs.domain.review.entity.Review;
@@ -19,7 +20,6 @@ public class Image extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long imageId;
 
-    // 이미지가 필요한 도메인: Article, Board, Member, Pet, Review
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_id")
     private Article article;
@@ -40,8 +40,9 @@ public class Image extends BaseTimeEntity {
     @JoinColumn(name = "review_id")
     private Review review;
 
-    @Enumerated(EnumType.STRING)
-    private ImageOrder imageOrder;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "chat_message_id")
+    private ChatMessage chatMessage;
 
     @Column(nullable = false)
     private String originalFileName;
@@ -50,10 +51,13 @@ public class Image extends BaseTimeEntity {
     private String storedFileName;
 
     @Column(nullable = false)
-    private int fileSize;
+    private String filePath;
 
     @Column(nullable = false)
-    private String s3Url;
+    private String fileType;
+
+    @Column(nullable = false)
+    private Integer fileSize;
 
     @Column(nullable = false)
     private Integer width;
