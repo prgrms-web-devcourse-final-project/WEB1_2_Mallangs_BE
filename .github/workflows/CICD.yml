@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - 'CICD-test'
 
 
 jobs:
@@ -20,7 +21,7 @@ jobs:
 
       # application.yml 파일 생성
       - run: touch ./src/main/resources/application.properties
-      - run: echo "${{secrets.APPLICATION}}" > ./src/main/resources/application.properties
+      - run: echo "${{secrets.APPLICATION2}}" > ./src/main/resources/application.properties
       - run: echo "spring.cloud.aws.credentials.access-key=${{secrets.AWS_ACTION_ACCESS_KEY}}" >> ./src/main/resources/application.properties
       - run: echo "spring.cloud.aws.credentials.secret-key=${{secrets.AWS_ACTION_SECRET_ACCESS_KEY}}" >> ./src/main/resources/application.properties
 
@@ -56,8 +57,8 @@ jobs:
         with:
           aws_access_key: ${{ secrets.AWS_ACTION_ACCESS_KEY }}
           aws_secret_key: ${{ secrets.AWS_ACTION_SECRET_ACCESS_KEY }}
-          application_name: mallangs-web
-          environment_name: Mallangs-web-env
+          application_name: mallangs2-two
+          environment_name: Mallangs2-two-env
           version_label: github-action-${{ steps.current-time.outputs.time }}
           region: ap-northeast-2
           deployment_package: ${{ env.artifact }}
