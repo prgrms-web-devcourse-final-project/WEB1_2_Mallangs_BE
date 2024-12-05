@@ -9,6 +9,7 @@ import com.mallangs.domain.member.entity.embadded.UserId;
 import com.mallangs.domain.member.util.GeometryUtil;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -80,5 +81,13 @@ public class MemberCreateRequest {
                 .mountainYn(mountainYn)
                 .point(point)
                 .build();
+    }
+    @Builder
+    public MemberCreateRequest(String userId, String password, String nickname, String email, Boolean hasPet) {
+        this.userId = userId;
+        this.password = password;
+        this.nickname = nickname;
+        this.email = email;
+        this.hasPet = hasPet;
     }
 }
