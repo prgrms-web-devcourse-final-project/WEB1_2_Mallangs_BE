@@ -1,21 +1,15 @@
 package com.mallangs.domain.board.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class CommunityUpdateRequest {
-    @NotBlank(message = "제목을 입력하세요.")
-    @Size(max = 200, message = "제목은 200자를 초과할 수 없습니다.")
+    @NotBlank
     private String title;
 
-    @NotBlank(message = "내용을 입력하세요.")
+    @NotBlank
     private String content;
-
-    private Long imageId;
-    
 }
