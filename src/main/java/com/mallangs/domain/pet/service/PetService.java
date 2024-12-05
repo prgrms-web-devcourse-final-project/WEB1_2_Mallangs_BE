@@ -78,6 +78,18 @@ public class PetService {
         return new PetResponse(pet);
     }
 
+    //대표 말랑이(반려동물) ID로 조회
+    public PetResponse getRepresentativePet(Long memberId) {
+        Pet pet =petRepository.findRepresentativePetByMemberId(memberId).orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        if(!member.getIsActive()){
+            throw new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+
+        return new PetResponse(pet);
+    }
+
     //반려동물 등록
     public PetResponse createPet(PetCreateRequest petCreateRequest, CustomMemberDetails customMemberDetails) {
         Member member = getMember(customMemberDetails);

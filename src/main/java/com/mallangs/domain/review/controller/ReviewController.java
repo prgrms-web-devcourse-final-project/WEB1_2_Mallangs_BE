@@ -1,10 +1,7 @@
 package com.mallangs.domain.review.controller;
 
 
-import com.mallangs.domain.review.dto.PageRequest;
-import com.mallangs.domain.review.dto.ReviewCreateRequest;
-import com.mallangs.domain.review.dto.ReviewInfoResponse;
-import com.mallangs.domain.review.dto.ReviewUpdateRequest;
+import com.mallangs.domain.review.dto.*;
 import com.mallangs.domain.review.service.ReviewService;
 import com.mallangs.global.jwt.entity.CustomMemberDetails;
 import io.swagger.v3.oas.annotations.Operation;
@@ -74,36 +71,51 @@ public class ReviewController {
     // 장소에 달린 리뷰 목록 조회
     @GetMapping("/{placeArticleId}/reviews")
     @Operation(summary = "장소 리뷰 목록 조회", description = "특정 장소에 달린 리뷰 목록을 조회하는 API.")
-    public ResponseEntity<Page<ReviewInfoResponse>> getReviewsByPlaceArticleId(@PathVariable Long placeArticleId,
-                                                                               PageRequest pageRequest) {
-        Page<ReviewInfoResponse> response = reviewService.getReviewsByPlaceArticleId(placeArticleId, pageRequest);
+    public ResponseEntity<ReviewPageResponse> getReviewsByPlaceArticleId(@PathVariable Long placeArticleId,
+                                                                         PageRequest pageRequest) {
+        Page<ReviewInfoResponse> reviewInfoResponses = reviewService.getReviewsByPlaceArticleId(placeArticleId, pageRequest);
+        // ReviewPageResponse 객체 생성 로직을 DTO 안으로 이동
+        ReviewPageResponse response = new ReviewPageResponse(reviewInfoResponses);
         return ResponseEntity.ok(response);
     }
 
     // 장소에 달린 내 리뷰 조회
     @GetMapping("/{placeArticleId}/reviews/my")
     @Operation(summary = "특정장소의 내 리뷰 목록 조회", description = "특정 장소에 달린 내 리뷰 목록을 조회하는 API.")
-    public ResponseEntity<Page<ReviewInfoResponse>> getMyReviewByPlaceArticleId(@AuthenticationPrincipal CustomMemberDetails customMemberDetails,
+    public ResponseEntity<ReviewPageResponse> getMyReviewByPlaceArticleId(@AuthenticationPrincipal CustomMemberDetails customMemberDetails,
                                                                                 @PathVariable Long placeArticleId,
                                                                                 PageRequest pageRequest) {
-        Page<ReviewInfoResponse> response = reviewService.getMyReviewByPlaceArticleId(customMemberDetails, placeArticleId, pageRequest);
+        Page<ReviewInfoResponse> reviewInfoResponses = reviewService.getMyReviewByPlaceArticleId(customMemberDetails, placeArticleId, pageRequest);
+        // ReviewPageResponse 객체 생성 로직을 DTO 안으로 이동
+        ReviewPageResponse response = new ReviewPageResponse(reviewInfoResponses);
         return ResponseEntity.ok(response);
     }
 
     // 내 리뷰 목록 조회
     @GetMapping(path = "/my-reviews")
     @Operation(summary = "내 전체 리뷰 목록 조회", description = "내가 작성한 모든 리뷰 목록을 조회하는 API.")
-    public ResponseEntity<Page<ReviewInfoResponse>> getMyReviews(@AuthenticationPrincipal CustomMemberDetails customMemberDetails,
+    public ResponseEntity<ReviewPageResponse> getMyReviews(@AuthenticationPrincipal CustomMemberDetails customMemberDetails,
                                                                  PageRequest pageRequest) {
-        Page<ReviewInfoResponse> response = reviewService.getMyReviews(customMemberDetails, pageRequest);
+        Page<ReviewInfoResponse> reviewInfoResponses = reviewService.getMyReviews(customMemberDetails, pageRequest);
+        // ReviewPageResponse 객체 생성 로직을 DTO 안으로 이동
+        ReviewPageResponse response = new ReviewPageResponse(reviewInfoResponses);
         return ResponseEntity.ok(response);
     }
 
     // 특정 장소의 평균 평점 계산
     @GetMapping("/{placeArticleId}/reviews/average-score")
-    @Operation(summary = "평균 평점 조회", description = "특정 장소의 평균 평점을 조회하는 API, 게시상태가 PUBLISH(공개) 상태인 것만.")
+    @Operation(summary = "평균 평점 조회", description = "특정 장소의 평균 평점을 조회하는 API, 게시상태가 PUBLISH(공개) 상태인 것만. (소수 둘째 자리에서 반올림)")
     public ResponseEntity<Double> getAverageScoreByPlaceArticleId(@PathVariable Long placeArticleId) {
         Double averageScore = reviewService.getAverageScoreByPlaceArticleId(placeArticleId);
         return ResponseEntity.ok(averageScore);
+    }
+
+    // 리뷰 조회 비회원 (리뷰 ID로)
+    @GetMapping("public/{placeArticleId}/reviews/{reviewId}")
+    @Operation(summary = "리뷰 조회", description = "리뷰 ID로 리뷰를 조회하는 API.")
+    public ResponseEntity<ReviewInfoResponse> getReviewById(@PathVariable Long placeArticleId,
+                                                            @PathVariable Long reviewId) {
+        ReviewInfoResponse response = reviewService.getReviewById(null, reviewId);
+        return ResponseEntity.ok(response);
     }
 }
