@@ -239,17 +239,15 @@ public class ImageService {
 
     private ImageDto.SimpleResponse toSimpleResponse(Image image) {
         return ImageDto.SimpleResponse.builder()
-                .url(image.getFilePath())
+                .imageId(image.getImageId())
                 .build();
     }
 
     private ImageDto.DetailResponse toDetailResponse(Image image) {
         return ImageDto.DetailResponse.builder()
-                .url(image.getFilePath())
+                .imageId(image.getImageId())
                 .width(image.getWidth())
                 .height(image.getHeight())
-                .originalFileName(image.getOriginalFileName())
-                .fileSize(image.getFileSize())
                 .build();
     }
 

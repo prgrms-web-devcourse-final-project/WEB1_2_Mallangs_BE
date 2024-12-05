@@ -1,5 +1,6 @@
 package com.mallangs.domain.image.dto;
 
+import com.mallangs.domain.image.entity.Image;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,18 +21,24 @@ public class ImageDto {
     @Builder
     @AllArgsConstructor
     public static class SimpleResponse {
-        private String url;
+        private Long imageId;
     }
 
     @Getter
     @Builder
     @AllArgsConstructor
     public static class DetailResponse {
-        private String url;
+        private Long imageId;
         private Integer width;
         private Integer height;
-        private String originalFileName;
-        private Integer fileSize;
+
+        public static DetailResponse from(Image image) {
+            return DetailResponse.builder()
+                    .imageId(image.getImageId())
+                    .width(image.getWidth())
+                    .height(image.getHeight())
+                    .build();
+        }
     }
 
     @Getter
