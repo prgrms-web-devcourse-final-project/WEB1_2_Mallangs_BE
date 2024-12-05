@@ -1,11 +1,15 @@
 package com.mallangs.domain.pet.entity;
 
+import com.mallangs.domain.image.entity.Image;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -57,6 +61,18 @@ public class Pet extends BaseTimeEntity {
     @Column(nullable = false)
     @Builder.Default
     private Boolean isActive = true; // 기본값은 true
+
+    @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Size(max = 4, message = "이미지는 최대 4장까지 업로드 가능합니다.")
+    private List<Image> images = new ArrayList<>();
+
+    public void addImage(Image image) {
+        this.images.add(image);
+    }
+
+    public void removeImage(Image image) {
+        this.images.remove(image);
+    }
 
     public void deactivate() {
         this.isActive = false;
