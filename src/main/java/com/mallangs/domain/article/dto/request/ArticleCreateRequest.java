@@ -34,11 +34,11 @@ import lombok.experimental.SuperBuilder;
 })
 public class ArticleCreateRequest {
 
-  @NotBlank(message = "글 타입은 필수입니다.", groups = ValidationGroups.CreateGroup.class)
+  @NotNull(message = "글 타입은 필수입니다.", groups = ValidationGroups.CreateGroup.class)
   @JsonProperty("type")
   private ArticleType articleType; // 글타래 종류
 
-  @NotBlank(message = "글 상태는 필수입니다.", groups = ValidationGroups.CreateGroup.class)
+  @NotNull(message = "글 상태는 필수입니다.", groups = ValidationGroups.CreateGroup.class)
   private BoardStatus articleStatus;
 
   @NotBlank(message = "제목은 필수입니다.", groups = ValidationGroups.CreateGroup.class)

@@ -6,6 +6,7 @@ import com.mallangs.domain.pet.entity.PetGender;
 import com.mallangs.domain.pet.entity.PetType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ import lombok.experimental.SuperBuilder;
 @Schema(description = "자식 클래스 DTO", allOf = ArticleCreateRequest.class)
 public class LostCreateRequest extends ArticleCreateRequest {
 
-  @NotBlank(message = "동물 타입은 필수입니다.", groups = ValidationGroups.CreateGroup.class)
+  @NotNull(message = "동물 타입은 필수입니다.", groups = ValidationGroups.CreateGroup.class)
   private PetType petType;
 
   private String breed;
@@ -43,7 +44,7 @@ public class LostCreateRequest extends ArticleCreateRequest {
 
   private String contact;
 
-  @NotBlank(message = "실종 상태는 필수입니다.", groups = ValidationGroups.CreateGroup.class)
+  @NotNull(message = "실종 상태는 필수입니다.", groups = ValidationGroups.CreateGroup.class)
   private CaseStatus lostStatus;
 
 
