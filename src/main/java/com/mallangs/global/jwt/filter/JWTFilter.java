@@ -31,7 +31,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
-import org.springframework.util.PathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Log4j2
@@ -59,41 +58,46 @@ public class JWTFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
         try {
+            //uri 확인
             String uri = request.getRequestURI();
+            // HTTP 메서드 확인
+            String method = request.getMethod();
 
             // PathVariable 포함 URI 매칭
-            if (pathMatcher.match("/api/v1/board/community/category/{categoryId}", uri) ||
-                    pathMatcher.match("/api/v1/comments/board/{boardId}", uri) ||
-                    pathMatcher.match("/api/v1/comments/article/{articleId}", uri) ||
-                    pathMatcher.match("/api/v1/board/sighting/category/{categoryId}", uri) ||
-                    pathMatcher.match("/api/v1/place-articles/{placeArticleId}/reviews/{reviewId}", uri) ||
-                    pathMatcher.match("/api/v1/pets/{petId}", uri)) {
+            if (("GET".equals(method) && pathMatcher.match("/api/v1/board/community/category/{categoryId}", uri)) ||
+                    ("GET".equals(method) && pathMatcher.match("/api/v1/comments/board/{boardId}", uri)) ||
+                    ("GET".equals(method) && pathMatcher.match("/api/v1/comments/article/{articleId}", uri)) ||
+                    ("GET".equals(method) && pathMatcher.match("/api/v1/board/sighting/category/{categoryId}", uri)) ||
+                    ("GET".equals(method) && pathMatcher.match("/api/v1/place-articles/{placeArticleId}/reviews/{reviewId}", uri)) ||
+                    ("GET".equals(method) && pathMatcher.match("/api/v1/place-articles/{placeArticleId}/reviews", uri)) ||
+                    ("GET".equals(method) && pathMatcher.match("/api/v1/place-articles/{placeArticleId}/reviews/average-score", uri)) ||
+                    ("GET".equals(method) && pathMatcher.match("/api/v1/pets/{petId}", uri))) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
             // 단순 경로 매칭 (PathVariable 제외)
-            if (uri.startsWith("/api/v1/member/register") ||
+            if (("POST".equals(method) && uri.startsWith("/api/v1/member/register")) ||
                     //회원
-                    uri.startsWith("/api/v1/member/find-user-id") ||
-                    uri.startsWith("/api/v1/member/login") ||
-                    uri.startsWith("/api/v1/member/find-password") ||
+                    ("POST".equals(method) && uri.startsWith("/api/v1/member/find-user-id")) ||
+                    ("POST".equals(method) && uri.startsWith("/api/v1/member/login")) ||
+                    ("POST".equals(method) && uri.startsWith("/api/v1/member/find-password")) ||
 
                     //게시판
-                    uri.startsWith("/api/v1/board/community") ||
-                    uri.startsWith("/api/v1/board/community/keyword") ||
-                    uri.startsWith("/api/v1/board/sighting") ||
-                    uri.startsWith("/api/v1/board/sighting/keyword") ||
+                    ("GET".equals(method) && uri.startsWith("/api/v1/board/community")) ||
+                    ("GET".equals(method) && uri.startsWith("/api/v1/board/community/keyword")) ||
+                    ("GET".equals(method) && uri.startsWith("/api/v1/board/sighting")) ||
+                    ("GET".equals(method) && uri.startsWith("/api/v1/board/sighting/keyword")) ||
 
                     //글타래
                     uri.startsWith("/api/v1/articles/public") ||
-                    uri.startsWith("/api/v1/place-articles/reviews/average-score") ||
 
                     //반려동물
-                    uri.startsWith("/api/v1/pets/nearby")) {
+                    ("GET".equals(method) && uri.startsWith("/api/v1/pets/nearby"))) {
                 filterChain.doFilter(request, response);
                 return;
             }
+
             //request 에서 Access Token 꺼내기
             String authorizationHeader = request.getHeader("Authorization");
             if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
@@ -115,7 +119,6 @@ public class JWTFilter extends OncePerRequestFilter {
                                     refreshTokenFromCookies);
                             String refreshTokenInRedis = refreshTokenService.readRefreshTokenInRedis(
                                     RefreshPayloadMap);
-
 
                             if (refreshTokenFromCookies.equals(refreshTokenInRedis)) {
 

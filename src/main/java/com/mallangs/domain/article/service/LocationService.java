@@ -73,7 +73,7 @@ public class LocationService {
 
     boolean isPublicData;
 
-    isPublicData = articleType.equalsIgnoreCase("publicPlace");
+    isPublicData = articleType.equalsIgnoreCase("place");
     // true 면 공공 데이터 검색
     // false 면 사용자 등록 정보 검색
 
