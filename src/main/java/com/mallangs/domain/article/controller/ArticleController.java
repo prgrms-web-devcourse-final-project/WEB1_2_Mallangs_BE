@@ -61,13 +61,13 @@ public class ArticleController {
   // 회원 visible + 자신의 글 조회 가능
   // 비회원 mapVisible 만 조회 가능
   @Operation(summary = "글타래 단건 조회", description = "글타래를 단건 조회합니다.")
-  @GetMapping("/public/{articleId}")
+  @GetMapping("/{articleId}")
   public ResponseEntity<ArticleResponse> getArticleByArticleId(
       @Parameter(description = "조회할 글타래 ID", required = true) @PathVariable Long articleId,
       @AuthenticationPrincipal CustomMemberDetails principal) {
 
-    String userRole = principal.getRole();
-    Long memberId = principal.getMemberId();
+    String userRole = (principal == null) ? "GUEST" : principal.getRole();
+    Long memberId = (principal == null) ? -1L : principal.getMemberId();
 
     ArticleResponse articleResponse = articleService.getArticleById(articleId, userRole, memberId);
 
@@ -101,16 +101,14 @@ public class ArticleController {
     return ResponseEntity.ok(articles);
   }
 
-  // 실종 페이지
+  // 실종 페이지 // list
   // map visible 만 보임
   @Operation(summary = "실종 글타래 전체 조회", description = "실종 글타래를 조회합니다.")
   @GetMapping("/public/lost")
-  public ResponseEntity<ArticlePageResponse> getLostArticles(
-      @PageableDefault(page = 0, size = 10)
-      @Parameter(description = "페이징 요청 정보", required = true) Pageable pageable,
+  public ResponseEntity<List<ArticleResponse>> getLostArticles(
       @RequestParam(value = "lostStatus", required = false) CaseStatus lostStatus) {
 
-    ArticlePageResponse articles = articleService.findLostArticles(pageable, lostStatus);
+    List<ArticleResponse> articles = articleService.findLostArticles(lostStatus);
 
     return ResponseEntity.ok(articles);
   }
@@ -161,29 +159,24 @@ public class ArticleController {
   // map visible 만 보임
   @Operation(summary = "글타래 검색", description = "글타래에서 검색합니다.")
   @GetMapping("/public/search")
-  public ResponseEntity<ArticlePageResponse> searchSightingPosts(
-      @PageableDefault(page = 0, size = 10)
-      @Parameter(description = "페이지 요청 정보", required = true) Pageable pageable,
+  public ResponseEntity<List<ArticleResponse>> searchSightingPosts(
       @RequestParam String keyword) {
 
-    ArticlePageResponse articles = articleService.findArticlesByKeyword(pageable, keyword);
+    List<ArticleResponse> articles = articleService.findArticlesByKeyword(keyword);
     return ResponseEntity.ok(articles);
   }
 
 
-  // 회원 자신이 작성한 글타래 목록 조회
+  // 회원 자신이 작성한 글타래 목록 조회 // list
   // is deleted false 안 보임
   @Operation(summary = "사용자가 작성한 전체 글타래 조회", description = "사용자가 자신이 작성한 글타래 목록을 조회합니다.")
   @PreAuthorize("hasAuthority('ROLE_USER')")
   @GetMapping("/myArticles")
-  public ResponseEntity<ArticlePageResponse> getArticlesByMemberId(
-      @PageableDefault(page = 0, size = 10)
-      @Parameter(description = "페이지 요청 정보", required = true) Pageable pageable,
+  public ResponseEntity<List<ArticleResponse>> getArticlesByMemberId(
       @Parameter(description = "현재 인증된 사용자 정보", required = true)
       @AuthenticationPrincipal CustomMemberDetails principal) {
 
-    ArticlePageResponse articles = articleService.findArticlesByMemberId(pageable,
-        principal.getMemberId());
+    List<ArticleResponse> articles = articleService.findArticlesByMemberId(principal.getMemberId());
     return ResponseEntity.ok(articles);
   }
 
