@@ -2,6 +2,7 @@ package com.mallangs.domain.article.controller;
 
 import com.mallangs.domain.article.dto.request.ArticleCreateRequest;
 import com.mallangs.domain.article.dto.request.MapBoundsRequest;
+import com.mallangs.domain.article.dto.response.ArticlePageResponse;
 import com.mallangs.domain.article.dto.response.ArticleResponse;
 import com.mallangs.domain.article.dto.response.MapBoundsResponse;
 import com.mallangs.domain.article.entity.CaseStatus;
@@ -14,8 +15,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -79,12 +80,13 @@ public class ArticleController {
   @Operation(summary = "관리자 글타래 전체 조회", description = "관리자가 글타래를 조회합니다.")
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   @GetMapping("/admin")
-  public ResponseEntity<Page<ArticleResponse>> getArticles(
+  public ResponseEntity<ArticlePageResponse> getArticles(
+      @PageableDefault(page = 0, size = 10)
       @Parameter(description = "페이징 요청 정보", required = true) Pageable pageable,
       @RequestParam(value = "articleType", required = false) String articleType, // 대분류
       @RequestParam(value = "placeCategory", required = false) String placeCategory) { // 소분류
 
-    Page<ArticleResponse> articles;
+    ArticlePageResponse articles;
 
     if (articleType == null || articleType.isEmpty()) {
       articles = articleService.findAllTypeArticles(pageable);
@@ -103,11 +105,12 @@ public class ArticleController {
   // map visible 만 보임
   @Operation(summary = "실종 글타래 전체 조회", description = "실종 글타래를 조회합니다.")
   @GetMapping("/public/lost")
-  public ResponseEntity<Page<ArticleResponse>> getLostArticles(
+  public ResponseEntity<ArticlePageResponse> getLostArticles(
+      @PageableDefault(page = 0, size = 10)
       @Parameter(description = "페이징 요청 정보", required = true) Pageable pageable,
       @RequestParam(value = "lostStatus", required = false) CaseStatus lostStatus) {
 
-    Page<ArticleResponse> articles = articleService.findLostArticles(pageable, lostStatus);
+    ArticlePageResponse articles = articleService.findLostArticles(pageable, lostStatus);
 
     return ResponseEntity.ok(articles);
   }
@@ -158,11 +161,12 @@ public class ArticleController {
   // map visible 만 보임
   @Operation(summary = "글타래 검색", description = "글타래에서 검색합니다.")
   @GetMapping("/public/search")
-  public ResponseEntity<Page<ArticleResponse>> searchSightingPosts(
+  public ResponseEntity<ArticlePageResponse> searchSightingPosts(
+      @PageableDefault(page = 0, size = 10)
       @Parameter(description = "페이지 요청 정보", required = true) Pageable pageable,
       @RequestParam String keyword) {
 
-    Page<ArticleResponse> articles = articleService.findArticlesByKeyword(pageable, keyword);
+    ArticlePageResponse articles = articleService.findArticlesByKeyword(pageable, keyword);
     return ResponseEntity.ok(articles);
   }
 
@@ -172,12 +176,13 @@ public class ArticleController {
   @Operation(summary = "사용자가 작성한 전체 글타래 조회", description = "사용자가 자신이 작성한 글타래 목록을 조회합니다.")
   @PreAuthorize("hasAuthority('ROLE_USER')")
   @GetMapping("/myArticles")
-  public ResponseEntity<Page<ArticleResponse>> getArticlesByMemberId(
+  public ResponseEntity<ArticlePageResponse> getArticlesByMemberId(
+      @PageableDefault(page = 0, size = 10)
       @Parameter(description = "페이지 요청 정보", required = true) Pageable pageable,
       @Parameter(description = "현재 인증된 사용자 정보", required = true)
       @AuthenticationPrincipal CustomMemberDetails principal) {
 
-    Page<ArticleResponse> articles = articleService.findArticlesByMemberId(pageable,
+    ArticlePageResponse articles = articleService.findArticlesByMemberId(pageable,
         principal.getMemberId());
     return ResponseEntity.ok(articles);
   }
