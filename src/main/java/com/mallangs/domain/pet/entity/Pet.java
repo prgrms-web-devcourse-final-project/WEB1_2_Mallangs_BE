@@ -1,15 +1,11 @@
 package com.mallangs.domain.pet.entity;
 
-import com.mallangs.domain.image.entity.Image;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
