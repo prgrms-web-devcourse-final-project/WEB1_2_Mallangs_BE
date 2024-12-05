@@ -89,11 +89,11 @@ public class ArticleController {
     ArticlePageResponse articles;
 
     if (articleType == null || articleType.isEmpty()) {
-      articles = articleService.findAllTypeArticles(pageable);
+      articles = articleService.findAllTypeArticles(pageable); // 전체
     } else {
-      if (placeCategory == null || placeCategory.isEmpty()) {
+      if (placeCategory == null || placeCategory.isEmpty()) { // 대분류
         articles = articleService.findArticlesByArticleType(pageable, articleType);
-      } else {
+      } else {                                               // 장소, 사용자 등록 위치 소분류
         articles = articleService.findPlaceArticlesByCategory(pageable, articleType, placeCategory);
       }
     }
@@ -170,7 +170,7 @@ public class ArticleController {
   // 회원 자신이 작성한 글타래 목록 조회 // list
   // is deleted false 안 보임
   @Operation(summary = "사용자가 작성한 전체 글타래 조회", description = "사용자가 자신이 작성한 글타래 목록을 조회합니다.")
-  @PreAuthorize("hasAuthority('ROLE_USER')")
+  @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN')")
   @GetMapping("/myArticles")
   public ResponseEntity<List<ArticleResponse>> getArticlesByMemberId(
       @Parameter(description = "현재 인증된 사용자 정보", required = true)
