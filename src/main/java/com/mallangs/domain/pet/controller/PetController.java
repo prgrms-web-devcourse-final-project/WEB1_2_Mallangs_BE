@@ -24,12 +24,13 @@ public class PetController {
     //유저 본인 반려동물 전체 조회
     @Operation(summary = "유저 본인의 반려동물 페이지 조회", description = "유저 본인의 말랑이 목록을 페이지로 조회할때 사용하는 API")
     @GetMapping
-    public ResponseEntity<Page<PetResponse>> getAllMyPets(
+    public ResponseEntity<PetPageResponse> getAllMyPets(
             @ModelAttribute PageRequest pageRequestDTO,
             @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
 
         Page<PetResponse> pets = petService.getAllMyPets(pageRequestDTO, customMemberDetails);
-        return ResponseEntity.ok(pets);
+        PetPageResponse response = new PetPageResponse(pets);
+        return ResponseEntity.ok(response);
     }
 
     //반려동물 조회
@@ -93,11 +94,12 @@ public class PetController {
     //근처 반려동물 조회
     @GetMapping("/nearby")
     @Operation(summary = "근처의 반려동물 목록을 조회", description = "클라이언트로부터 위도 경도 ,시/군/구 등의 데이터를 받았을때 위도 경도를 기준으로 거리를 계산하여 반경내(20km)의 반려동물 목록을 조회")
-    public ResponseEntity<Page<PetNearbyResponse>> getNearbyPets(
+    public ResponseEntity<PetNearbyPageResponse> getNearbyPets(
             @ModelAttribute PetLocationRequest petLocationDTO,
             @ModelAttribute PageRequest pageRequestDTO) {
         Page<PetNearbyResponse> pets = petService.getNearbyPets(petLocationDTO, pageRequestDTO);
-        return ResponseEntity.ok(pets);
+        PetNearbyPageResponse response = new PetNearbyPageResponse(pets); // 추가
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{petId}/delete")
