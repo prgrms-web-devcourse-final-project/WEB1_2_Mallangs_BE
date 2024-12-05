@@ -62,18 +62,36 @@ public class JWTFilter extends OncePerRequestFilter {
             String uri = request.getRequestURI();
             // HTTP 메서드 확인
             String method = request.getMethod();
+            //패턴 매처
+            AntPathMatcher pathMatcher = new AntPathMatcher();
+
+            Map<String, String> patternVariableMap = new HashMap<>();
+            patternVariableMap.put("/api/v1/board/community/category/{categoryId}", "categoryId");
+            patternVariableMap.put("/api/v1/comments/board/{boardId}", "boardId");
+            patternVariableMap.put("/api/v1/comments/article/{articleId}", "articleId");
+            patternVariableMap.put("/api/v1/board/sighting/category/{categoryId}", "categoryId");
+            patternVariableMap.put("/api/v1/place-articles/{placeArticleId}/reviews", "placeArticleId");
+            patternVariableMap.put("/api/v1/place-articles/{placeArticleId}/reviews/average-score", "placeArticleId");
 
             // PathVariable 포함 URI 매칭
-            if (("GET".equals(method) && pathMatcher.match("/api/v1/board/community/category/{categoryId}", uri)) ||
-                    ("GET".equals(method) && pathMatcher.match("/api/v1/comments/board/{boardId}", uri)) ||
-                    ("GET".equals(method) && pathMatcher.match("/api/v1/comments/article/{articleId}", uri)) ||
-                    ("GET".equals(method) && pathMatcher.match("/api/v1/board/sighting/category/{categoryId}", uri)) ||
-                    ("GET".equals(method) && pathMatcher.match("/api/v1/place-articles/{placeArticleId}/reviews/{reviewId}", uri)) ||
-                    ("GET".equals(method) && pathMatcher.match("/api/v1/place-articles/{placeArticleId}/reviews", uri)) ||
-                    ("GET".equals(method) && pathMatcher.match("/api/v1/place-articles/{placeArticleId}/reviews/average-score", uri)) ||
-                    ("GET".equals(method) && pathMatcher.match("/api/v1/pets/{petId}", uri))) {
-                filterChain.doFilter(request, response);
-                return;
+            for (Map.Entry<String, String> entry : patternVariableMap.entrySet()) {
+                String pattern = entry.getKey();
+                String variableName = entry.getValue();
+
+                if ("GET".equals(method) && pathMatcher.match(pattern, uri)) {
+                    Map<String, String> pathVariables = pathMatcher.extractUriTemplateVariables(pattern, uri);
+                    String variableValue = pathVariables.get(variableName);
+
+                    if (isNumeric(variableValue)) {
+                        // 숫자일 경우 필터 체인 진행
+                        filterChain.doFilter(request, response);
+                        return;
+                    } else {
+                        // 숫자가 아닐 경우 처리
+                        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "유효하지 않은 " + variableName + " 입니다.");
+                        return;
+                    }
+                }
             }
 
             // 단순 경로 매칭 (PathVariable 제외)
@@ -93,6 +111,7 @@ public class JWTFilter extends OncePerRequestFilter {
                     uri.startsWith("/api/v1/articles/public") ||
 
                     //반려동물
+                    ("GET".equals(method) && uri.startsWith("/api/v1/pets/representative")) ||
                     ("GET".equals(method) && uri.startsWith("/api/v1/pets/nearby"))) {
                 filterChain.doFilter(request, response);
                 return;
@@ -254,5 +273,13 @@ public class JWTFilter extends OncePerRequestFilter {
         cookie.setHttpOnly(true);
         return cookie;
     }
-
+    //숫자인지 아닌지 확인하는 코드
+    private boolean isNumeric(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 }
