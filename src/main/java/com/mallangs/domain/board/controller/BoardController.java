@@ -8,26 +8,18 @@ import com.mallangs.domain.board.service.BoardService;
 import com.mallangs.global.jwt.entity.CustomMemberDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.Set;
+import java.util.List;
 
 @Tag(name = "커뮤니티 & 실종신고-목격제보 API", description = "커뮤니티/실종신고-목격제보 관련 API")
 @RestController
@@ -47,42 +39,37 @@ public class BoardController {
         return ResponseEntity.created(URI.create("/api/board/community/" + boardId)).body(boardId);
     }
 
-    @Operation(summary = "커뮤니티 전체 게시글 조회", description = "커뮤니티 게시판의 게시글 전체를 조회합니다.")
     @GetMapping("/community/")
-    public ResponseEntity<Page<CommunityListResponse>> getAllCommunity(@RequestParam(defaultValue = "1") int page) {
+    public ResponseEntity<PageResponse<CommunityListResponse>> getAllCommunity(@RequestParam(defaultValue = "1") int page) {
         PageRequest pageRequest = PageRequest.of(page - 1, 10);
-        return ResponseEntity.ok(boardService.getAllCommunitiyBoard(pageRequest));
+        return ResponseEntity.ok(PageResponse.from(boardService.getAllCommunityBoard(pageRequest)));
     }
 
-    @Operation(summary = "커뮤니티 게시글 키워드로 검색", description = "키워드로 커뮤니티 게시글을 검색합니다.")
     @GetMapping("/community/keyword")
-    public ResponseEntity<Page<CommunityListResponse>> searchCommunityPosts(
+    public ResponseEntity<PageResponse<CommunityListResponse>> searchCommunityPosts(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "1") int page
     ) {
-
         PageRequest pageRequest = PageRequest.of(page - 1, 10);
-        return ResponseEntity.ok(boardService.searchCommunityBoards(keyword, pageRequest));
+        return ResponseEntity.ok(PageResponse.from(boardService.searchCommunityBoards(keyword, pageRequest)));
     }
 
-    @Operation(summary = "커뮤니티 게시글 회원으로 조회", description = "특정 회원이 작성한 커뮤니티 게시글 목록을 조회합니다.")
     @GetMapping("/community/member/{memberId}")
-    public ResponseEntity<Page<CommunityListResponse>> getMemberCommunityPosts(
+    public ResponseEntity<PageResponse<CommunityListResponse>> getMemberCommunityPosts(
             @PathVariable Long memberId,
             @RequestParam(defaultValue = "1") int page
     ) {
         PageRequest pageRequest = PageRequest.of(page - 1, 10);
-        return ResponseEntity.ok(boardService.getMemberCommunityBoards(memberId, pageRequest));
+        return ResponseEntity.ok(PageResponse.from(boardService.getMemberCommunityBoards(memberId, pageRequest)));
     }
 
-    @Operation(summary = "커뮤니티 카테고리별 게시글 목록 조회", description = "특정 카테고리의 커뮤니티 게시글 목록을 조회합니다.")
     @GetMapping("/community/category/{categoryId}")
-    public ResponseEntity<Page<CommunityListResponse>> getCommunityPostByCategory(
+    public ResponseEntity<PageResponse<CommunityListResponse>> getCommunityPostByCategory(
             @PathVariable Long categoryId,
             @RequestParam(defaultValue = "1") int page
     ) {
         PageRequest pageRequest = PageRequest.of(page - 1, 10);
-        return ResponseEntity.ok(boardService.getCommunityBoardsByCategory(categoryId, pageRequest));
+        return ResponseEntity.ok(PageResponse.from(boardService.getCommunityBoardsByCategory(categoryId, pageRequest)));
     }
 
     @Operation(summary = "커뮤니티 게시글 상세 조회", description = "특정 커뮤니티 게시글의 상세 내용을 조회합니다.")
@@ -115,41 +102,37 @@ public class BoardController {
         return ResponseEntity.created(URI.create("/api/board/sighting/" + boardId)).body(boardId);
     }
 
-    @Operation(summary = "실종신고-목격제보 전체 게시글 조회", description = "실종신고-목격제보 게시판의 게시글 전체를 조회합니다.")
-    @GetMapping("/sighting/")
-    public ResponseEntity<Page<SightingListResponse>> getAllSighting(@RequestParam(defaultValue = "1") int page) {
+    @GetMapping("/sighting")
+    public ResponseEntity<PageResponse<SightingListResponse>> getAllSighting(@RequestParam(defaultValue = "1") int page) {
         PageRequest pageRequest = PageRequest.of(page - 1, 10);
-        return ResponseEntity.ok(boardService.getAllSightingBoard(pageRequest));
+        return ResponseEntity.ok(PageResponse.from(boardService.getAllSightingBoard(pageRequest)));
     }
 
-    @Operation(summary = "실종신고-목격제보 게시글 키워드로 검색", description = "키워드로 실종신고-목격제보 게시글을 검색합니다.")
     @GetMapping("/sighting/keyword")
-    public ResponseEntity<Page<SightingListResponse>> searchSightingPosts(
+    public ResponseEntity<PageResponse<SightingListResponse>> searchSightingPosts(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "1") int page
     ) {
         PageRequest pageRequest = PageRequest.of(page - 1, 10);
-        return ResponseEntity.ok(boardService.searchSightingBoards(keyword, pageRequest));
+        return ResponseEntity.ok(PageResponse.from(boardService.searchSightingBoards(keyword, pageRequest)));
     }
 
-    @Operation(summary = "실종신고-목격제보 게시글 회원으로 조회", description = "특정 회원이 작성한 실종신고-목격제보 게시글 목록을 조회합니다.")
     @GetMapping("/sighting/member/{memberId}")
-    public ResponseEntity<Page<SightingListResponse>> getMemberSightingPosts(
+    public ResponseEntity<PageResponse<SightingListResponse>> getMemberSightingPosts(
             @PathVariable Long memberId,
             @RequestParam(defaultValue = "1") int page
     ) {
         PageRequest pageRequest = PageRequest.of(page - 1, 10);
-        return ResponseEntity.ok(boardService.getMemberSightingBoards(memberId, pageRequest));
+        return ResponseEntity.ok(PageResponse.from(boardService.getMemberSightingBoards(memberId, pageRequest)));
     }
 
-    @Operation(summary = "실종신고-목격제보 카테고리별 목격 게시글 목록 조회", description = "특정 카테고리의 실종신고-목격제보 게시글 목록을 조회합니다.")
     @GetMapping("/sighting/category/{categoryId}")
-    public ResponseEntity<Page<SightingListResponse>> getSightingPostsByCategory(
+    public ResponseEntity<PageResponse<SightingListResponse>> getSightingPostsByCategory(
             @PathVariable Long categoryId,
             @RequestParam(defaultValue = "1") int page
     ) {
         PageRequest pageRequest = PageRequest.of(page - 1, 10);
-        return ResponseEntity.ok(boardService.getSightingBoardsByCategory(categoryId, pageRequest));
+        return ResponseEntity.ok(PageResponse.from(boardService.getSightingBoardsByCategory(categoryId, pageRequest)));
     }
 
     @Operation(summary = "실종신고-목격제보 게시글 상세 조회", description = "특정 실종신고-목격제보 게시글의 상세 내용을 조회합니다.")

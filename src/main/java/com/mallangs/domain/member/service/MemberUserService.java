@@ -16,24 +16,12 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.apache.catalina.User;
-import org.eclipse.angus.mail.util.logging.MailHandler;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
 
 /*
     예외처리 수정 필요
@@ -53,20 +41,29 @@ public class MemberUserService {
     private String from;
 
     //회원가입
-    public String create(MemberCreateRequest memberCreateRequest) {
+    public MemberRegisterRequest create(MemberCreateRequest memberCreateRequest) {
+        if (memberRepository.existsByUserId(new UserId(memberCreateRequest.getUserId()))) {
+            throw new MallangsCustomException(ErrorCode.DUPLICATE_USER_ID);
+        }
+        if (memberRepository.existsByEmail(new Email(memberCreateRequest.getEmail()))) {
+            throw new MallangsCustomException(ErrorCode.DUPLICATE_EMAIL);
+        }
+
         try {
             Member member = memberCreateRequest.toEntityMember();
             member.changePassword(new Password(memberCreateRequest.getPassword(), passwordEncoder));
-            memberRepository.save(member);
+
             Address address = memberCreateRequest.toEntityAddress();
             address.addMember(member);
-            addressRepository.save(address);
+
             member.addAddress(address);
             memberRepository.save(member);
-            return member.getNickname().getValue();
+            addressRepository.save(address);
+
+            return new MemberRegisterRequest(member);
         } catch (Exception e) {
-            log.error("회원가입에 실패하였습니다. {}", e.getMessage());
-            throw e;
+            log.error("회원가입 도중 DB 저장에 실패하였습니다.");
+            throw new MallangsCustomException(ErrorCode.DATABASE_ERROR);
         }
     }
 
@@ -81,10 +78,11 @@ public class MemberUserService {
     }
 
     //회원정보 수정
-    public void update(MemberUpdateRequest memberUpdateRequest, Long memberId) {
+    public MemberGetResponse update(MemberUpdateRequest memberUpdateRequest, Long memberId) {
+        Member foundMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+
         try {
-            Member foundMember = memberRepository.findById(memberId)
-                    .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
 
             //회원 정보 수정
             foundMember.change(
@@ -94,10 +92,11 @@ public class MemberUserService {
                     memberUpdateRequest.getProfileImage(),
                     passwordEncoder
             );
-            memberRepository.save(foundMember);
+            Member save = memberRepository.save(foundMember);
+            return new MemberGetResponse(save);
         } catch (Exception e) {
-            log.error("회원수정에 실패하였습니다. {}", e.getMessage());
-            throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);
+            log.error("회원수정 도중 서버에 에러가 발생했습니다.");
+            throw new MallangsCustomException(ErrorCode.FAILURE);
         }
     }
 
@@ -116,28 +115,24 @@ public class MemberUserService {
 
     //회원 아이디 찾기
     public String findUserId(MemberFindUserIdRequest memberFindUserIdRequest) {
-        try {
-            Email email = new Email(memberFindUserIdRequest.getEmail());
-            Nickname nickname = new Nickname(memberFindUserIdRequest.getNickname());
+        Email email = new Email(memberFindUserIdRequest.getEmail());
+        Nickname nickname = new Nickname(memberFindUserIdRequest.getNickname());
 
-            Member foundMember = memberRepository.findByEmailAndNickname(email, nickname)
-                    .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+        Member foundMember = memberRepository.findByEmailAndNickname(email, nickname)
+                .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
 
-            return foundMember.getUserId().getValue();
-        } catch (Exception e) {
-            log.error("회원 아이디찾기에 실패하였습니다. {}", e.getMessage());
-            throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);
-        }
+        return foundMember.getUserId().getValue();
     }
 
     //비밀번호 확인
-    public void checkPassword(PasswordDTO passwordDTO, String userId) {
+    public MemberCheckPasswordResponse checkPassword(PasswordDTO passwordDTO, String userId) {
         Member foundMember = memberRepository.findByUserId(new UserId(userId)).orElseThrow(
                 () -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
         //패스워드 인코더 매치 사용해서 해시 암호화된 비밀번호 비교
-        if (!passwordEncoder.matches(passwordDTO.getPassword(),foundMember.getPassword().getValue())){
+        if (!passwordEncoder.matches(passwordDTO.getPassword(), foundMember.getPassword().getValue())) {
             throw new MallangsCustomException(ErrorCode.UNMATCHED_PASSWORD);
         }
+        return new MemberCheckPasswordResponse(foundMember);
     }
 
     //회원 비밀번호 찾기 -> 임시비밀번호 변경, 메일 메세지 생성
@@ -177,7 +172,7 @@ public class MemberUserService {
     }
 
     //메일 전송
-    public String mailSend(MemberSendMailResponse memberSendMailResponse) throws MessagingException {
+    public MemberSendMailResponse mailSend(MemberSendMailResponse memberSendMailResponse) throws MessagingException {
         try {
             //MimeMessageHelper 로 message + multi file 전송
             MimeMessage message = emailSender.createMimeMessage();
@@ -193,10 +188,10 @@ public class MemberUserService {
             //파일등록
 //            helper.addAttachment(Objects.requireNonNull(file.getOriginalFilename()), file);
             emailSender.send(message);
-            return memberSendMailResponse.getEmail();
+            return memberSendMailResponse;
         } catch (Exception e) {
             log.error("메세지 전송에 실패하였습니다. {}", e.getMessage());
-            throw e;
+            throw new MallangsCustomException(ErrorCode.FAILURE);
         }
     }
 }

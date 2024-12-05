@@ -28,6 +28,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Log4j2
@@ -40,6 +41,7 @@ public class JWTFilter extends OncePerRequestFilter {
   private final Long accessRefreshTokenValidity;
   private final AccessTokenBlackList accessTokenBlackList;
   private final MemberRepository memberRepository;
+  private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
   // favicon.ico 요청은 필터링하지 않음
   @Override
@@ -54,12 +56,38 @@ public class JWTFilter extends OncePerRequestFilter {
       FilterChain filterChain)
       throws ServletException, IOException {
     try {
-      //등록된 URI 필터 제외
-      if (request.getRequestURI().startsWith("/api/member/register") ||
-          request.getRequestURI().startsWith("/api/member/find-user-id") ||
-          request.getRequestURI().startsWith("/api/member/login") ||
-          request.getRequestURI().startsWith("/api/member/find-password") ||
-          request.getRequestURI().startsWith("/api/articles/public")) {
+      String uri = request.getRequestURI();
+
+      // PathVariable 포함 URI 매칭
+      if (pathMatcher.match("/api/v1/board/community/category/{categoryId}", uri) ||
+          pathMatcher.match("/api/v1/comments/board/{boardId}", uri) ||
+          pathMatcher.match("/api/v1/comments/article/{articleId}", uri) ||
+          pathMatcher.match("/api/v1/board/sighting/category/{categoryId}", uri) ||
+          pathMatcher.match("/api/v1/place-articles/{placeArticleId}/reviews/{reviewId}", uri) ||
+          pathMatcher.match("/api/v1/pets/{petId}", uri)) {
+        filterChain.doFilter(request, response);
+        return;
+      }
+
+      // 단순 경로 매칭 (PathVariable 제외)
+      if (uri.startsWith("/api/v1/member/register") ||
+          //회원
+          uri.startsWith("/api/v1/member/find-user-id") ||
+          uri.startsWith("/api/v1/member/login") ||
+          uri.startsWith("/api/v1/member/find-password") ||
+
+          //게시판
+          uri.startsWith("/api/v1/board/community") ||
+          uri.startsWith("/api/v1/board/community/keyword") ||
+          uri.startsWith("/api/v1/board/sighting") ||
+          uri.startsWith("/api/v1/board/sighting/keyword") ||
+
+          //글타래
+          uri.startsWith("/api/v1/articles/public") ||
+          uri.startsWith("/api/v1/place-articles/reviews/average-score") ||
+
+          //반려동물
+          uri.startsWith("/api/v1/pets/nearby")) {
         filterChain.doFilter(request, response);
         return;
       }
@@ -219,6 +247,5 @@ public class JWTFilter extends OncePerRequestFilter {
     cookie.setHttpOnly(true);
     return cookie;
   }
-
 
 }

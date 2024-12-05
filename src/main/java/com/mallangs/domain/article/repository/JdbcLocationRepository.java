@@ -43,6 +43,7 @@ public class JdbcLocationRepository implements LocationRepository {
     );
   }
 
+  // 실종 구조
   @Override
   public List<MapBoundsResponse> findArticlesInBoundsByType(double southWestLat,
       double southWestLon, double northEastLat, double northEastLon, String type) {
@@ -73,6 +74,40 @@ public class JdbcLocationRepository implements LocationRepository {
     );
   }
 
+  // 장소 / 사용자 등록 위치
+  @Override
+  public List<MapBoundsResponse> findPlaceArticlesInBoundsByType(double southWestLat,
+      double southWestLon, double northEastLat, double northEastLon, boolean isPublicData) {
+
+    String query = String.format(
+        "SELECT a.article_id, a.type, a.title, ST_X(a.geography) AS latitude, " +
+            "ST_Y(a.geography) AS longitude, a.description " +
+            "FROM place_article p "
+            + "JOIN article a ON p.article_id = a.article_id "
+            + "WHERE MBRContains(ST_GeomFromText('POLYGON((%f %f, %f %f, %f %f, %f %f, %f %f))', 4326), a.geography) "
+            + "AND p.is_public_data = %b",
+        southWestLat, southWestLon,
+        southWestLat, northEastLon,
+        northEastLat, northEastLon,
+        northEastLat, southWestLon,
+        southWestLat, southWestLon,
+        isPublicData);
+
+    log.info(query);
+
+    return jdbcTemplate.query(query, (rs, rowNum) ->
+        new MapBoundsResponse(
+            rs.getLong("article_id"),
+            rs.getString("type"),
+            rs.getString("title"),
+            rs.getDouble("latitude"), // geography의 x 값
+            rs.getDouble("longitude"),  // geography의 y 값
+            rs.getString("description")
+        )
+    );
+  }
+
+
   @Override
   public List<MapBoundsResponse> findPlaceArticlesInBoundsByCategory(double southWestLat,
       double southWestLon, double northEastLat, double northEastLon,
@@ -81,10 +116,10 @@ public class JdbcLocationRepository implements LocationRepository {
     String query = String.format(
         "SELECT a.article_id, a.type, a.title, ST_X(a.geography) AS latitude, " +
             "ST_Y(a.geography) AS longitude, a.description " +
-            "FROM place p "
-            + "JOIN article a ON p.article_id = a.article_id" +
-            "WHERE MBRContains(ST_GeomFromText('POLYGON((%f %f, %f %f, %f %f, %f %f, %f %f))', 4326), a.geography) "
-            + "AND p.place_category = '%s' AND p.is_public_data = %b",
+            "FROM place_article p "
+            + "JOIN article a ON p.article_id = a.article_id "
+            + "WHERE MBRContains(ST_GeomFromText('POLYGON((%f %f, %f %f, %f %f, %f %f, %f %f))', 4326), a.geography) "
+            + "AND p.category = '%s' AND p.is_public_data = %b",
         southWestLat, southWestLon,
         southWestLat, northEastLon,
         northEastLat, northEastLon,

@@ -40,8 +40,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     // 관리자용 - 상태별 게시글 조회
     @Query("""
-            SELECT b FROM Board b WHERE (:boardStatus IS NULL OR b.boardStatus = :boardStatus
-            ) ORDER BY b.createdAt DESC
+            SELECT b FROM Board b WHERE (:boardStatus IS NULL OR b.boardStatus = :boardStatus) ORDER BY b.createdAt DESC
             """)
     Page<Board> findByStatus(@Param("boardStatus") BoardStatus boardStatus, Pageable pageable);
 

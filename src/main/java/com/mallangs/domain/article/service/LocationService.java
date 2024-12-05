@@ -3,6 +3,7 @@ package com.mallangs.domain.article.service;
 import com.mallangs.domain.article.dto.response.MapBoundsResponse;
 import com.mallangs.domain.article.repository.LocationRepository;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,15 @@ public class LocationService {
     log.info(String.valueOf(northEastLat));
     log.info(String.valueOf(northEastLon));
 
+    // 장소 public, user 구분
+    if (Objects.equals(type, "place") || Objects.equals(type, "user")) {
+      boolean isPublicData = Objects.equals(type, "place"); // place 면 true
+
+      return locationRepository.findPlaceArticlesInBoundsByType(southWestLat,
+          southWestLon, northEastLat, northEastLon, isPublicData);
+    }
+
+    // 실종, 구조
     return locationRepository.findArticlesInBoundsByType(
         southWestLat, southWestLon,
         northEastLat, northEastLon,
@@ -63,7 +73,7 @@ public class LocationService {
 
     boolean isPublicData;
 
-    isPublicData = articleType.equalsIgnoreCase("publicPlace");
+    isPublicData = articleType.equalsIgnoreCase("place");
     // true 면 공공 데이터 검색
     // false 면 사용자 등록 정보 검색
 
