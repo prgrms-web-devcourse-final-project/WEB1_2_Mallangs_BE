@@ -101,9 +101,18 @@ public class ReviewController {
 
     // 특정 장소의 평균 평점 계산
     @GetMapping("/{placeArticleId}/reviews/average-score")
-    @Operation(summary = "평균 평점 조회", description = "특정 장소의 평균 평점을 조회하는 API, 게시상태가 PUBLISH(공개) 상태인 것만.")
+    @Operation(summary = "평균 평점 조회", description = "특정 장소의 평균 평점을 조회하는 API, 게시상태가 PUBLISH(공개) 상태인 것만. (소수 둘째 자리에서 반올림)")
     public ResponseEntity<Double> getAverageScoreByPlaceArticleId(@PathVariable Long placeArticleId) {
         Double averageScore = reviewService.getAverageScoreByPlaceArticleId(placeArticleId);
         return ResponseEntity.ok(averageScore);
+    }
+
+    // 리뷰 조회 비회원 (리뷰 ID로)
+    @GetMapping("public/{placeArticleId}/reviews/{reviewId}")
+    @Operation(summary = "리뷰 조회", description = "리뷰 ID로 리뷰를 조회하는 API.")
+    public ResponseEntity<ReviewInfoResponse> getReviewById(@PathVariable Long placeArticleId,
+                                                            @PathVariable Long reviewId) {
+        ReviewInfoResponse response = reviewService.getReviewById(null, reviewId);
+        return ResponseEntity.ok(response);
     }
 }

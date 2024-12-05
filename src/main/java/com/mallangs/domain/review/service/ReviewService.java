@@ -5,7 +5,7 @@ import com.mallangs.domain.article.repository.PlaceArticleRepository;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.embadded.UserId;
 import com.mallangs.domain.member.repository.MemberRepository;
-import com.mallangs.domain.pet.dto.PetResponse;
+
 import com.mallangs.domain.review.dto.PageRequest;
 import com.mallangs.domain.review.dto.ReviewCreateRequest;
 import com.mallangs.domain.review.dto.ReviewInfoResponse;
@@ -16,7 +16,7 @@ import com.mallangs.domain.review.repository.ReviewRepository;
 import com.mallangs.global.exception.ErrorCode;
 import com.mallangs.global.exception.MallangsCustomException;
 import com.mallangs.global.jwt.entity.CustomMemberDetails;
-import lombok.Data;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -25,6 +25,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Service
 @RequiredArgsConstructor
@@ -159,9 +162,16 @@ public class ReviewService {
         }
     }
 
-    //특정 장소의 평균 평점 계산
+    //특정 장소의 평균 평점 계산 (소수 둘째 자리에서 반올림)
     public Double getAverageScoreByPlaceArticleId(Long placeArticleId) {
-        return reviewRepository.getAverageScoreByPlaceArticleId(placeArticleId);
+        Double averageScore = reviewRepository.getAverageScoreByPlaceArticleId(placeArticleId);
+        if (averageScore == null) {
+            throw new MallangsCustomException(ErrorCode.REVIEW_NOT_FOUND);
+        }
+        // BigDecimal을 사용하여 소수 둘째 자리에서 반올림
+        BigDecimal bd = BigDecimal.valueOf(averageScore);
+        bd = bd.setScale(1, RoundingMode.HALF_UP); // 소수 첫째 자리까지 반올림
+        return bd.doubleValue();
     }
 
     private Member getMember(CustomMemberDetails customMemberDetails) {

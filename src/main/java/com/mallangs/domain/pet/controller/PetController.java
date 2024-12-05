@@ -109,4 +109,13 @@ public class PetController {
         return ResponseEntity.ok(pet);
     }
 
+    //반려동물 조회
+    @Operation(summary = "반려동물 정보조회", description = "반려동물의 정보를 조회하는 API")
+    @GetMapping("public/{petId}")
+    public ResponseEntity<PetResponse> getPet(
+            @PathVariable Long petId) {
+        PetResponse pet = petService.getPet(petId, null);
+        return ResponseEntity.ok(pet);
+    }
+
 }
