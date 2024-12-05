@@ -10,7 +10,6 @@ import com.mallangs.global.exception.ErrorCode;
 import com.mallangs.global.exception.MallangsCustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,14 +27,14 @@ public class CategoryService {
 
     // 활성화 상태의 카테고리 조회
     public List<CategoryResponse> getAllActiveCategories() {
-        if (isNotAdminRole()) throw new MallangsCustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+        if (isNotAdminRole()) throw new MallangsCustomException(ErrorCode.ADMIN_ACCESS_REQUIRED);
         List<Category> categories = categoryRepository.findAllCategories();
         return categories.stream().map(CategoryResponse::new).collect(Collectors.toList());
     }
 
     // 특정 카테고리 조회
     public CategoryResponse getCategoryById(Long categoryId) {
-        if (isNotAdminRole()) throw new MallangsCustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+        if (isNotAdminRole()) throw new MallangsCustomException(ErrorCode.ADMIN_ACCESS_REQUIRED);
         Category category = categoryRepository.findActiveCategoryById(categoryId)
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.CATEGORY_NOT_FOUND));
         return new CategoryResponse(category);
@@ -44,7 +43,7 @@ public class CategoryService {
     // 카테고리 생성
     @Transactional
     public CategoryResponse createCategory(CategoryCreateRequest request) {
-        if (isNotAdminRole()) throw new MallangsCustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+        if (isNotAdminRole()) throw new MallangsCustomException(ErrorCode.ADMIN_ACCESS_REQUIRED);
         Category parentCategory = null;
         if (request.getParentCategoryId() != null) {
             parentCategory = categoryRepository.findById(request.getParentCategoryId())
@@ -64,7 +63,7 @@ public class CategoryService {
     // 카테고리 수정
     @Transactional
     public CategoryResponse updateCategory(Long categoryId, CategoryUpdateRequest request) {
-        if (isNotAdminRole()) throw new MallangsCustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+        if (isNotAdminRole()) throw new MallangsCustomException(ErrorCode.ADMIN_ACCESS_REQUIRED);
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.CATEGORY_NOT_FOUND));
         Category parentCategory = null;
@@ -86,7 +85,7 @@ public class CategoryService {
     // 카테고리 상태 변경
     @Transactional
     public void changeCategoryStatus(Long categoryId, CategoryStatus status) {
-        if (isNotAdminRole()) throw new MallangsCustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+        if (isNotAdminRole()) throw new MallangsCustomException(ErrorCode.ADMIN_ACCESS_REQUIRED);
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.CATEGORY_NOT_FOUND));
         category.changeStatus(status);
@@ -95,7 +94,7 @@ public class CategoryService {
     // 카테고리 순서 변경
     @Transactional
     public void changeCategoryOrder(Long categoryId, int newOrder) {
-        if (isNotAdminRole()) throw new MallangsCustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+        if (isNotAdminRole()) throw new MallangsCustomException(ErrorCode.ADMIN_ACCESS_REQUIRED);
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.CATEGORY_NOT_FOUND));
         category.changeOrder(newOrder);
@@ -103,7 +102,7 @@ public class CategoryService {
 
     // 카테고리 이름으로 검색
     public List<CategoryResponse> searchCategoriesByName(String name) {
-        if (isNotAdminRole()) throw new MallangsCustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+        if (isNotAdminRole()) throw new MallangsCustomException(ErrorCode.ADMIN_ACCESS_REQUIRED);
         List<Category> categories = categoryRepository.findByNameContaining(name);
         return categories.stream().map(CategoryResponse::new).collect(Collectors.toList());
     }
