@@ -11,11 +11,15 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class ReviewCreateRequest {
 
     @NotNull(message = "평점을 입력해주세요")

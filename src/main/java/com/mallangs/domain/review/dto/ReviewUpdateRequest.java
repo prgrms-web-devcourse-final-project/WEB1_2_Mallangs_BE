@@ -2,11 +2,15 @@ package com.mallangs.domain.review.dto;
 
 import com.mallangs.domain.review.entity.ReviewStatus;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class ReviewUpdateRequest {
 
     @Min(value = 1, message = "평점은 1점 이상이어야 합니다.")
