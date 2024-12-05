@@ -4,6 +4,7 @@ import com.mallangs.domain.board.dto.response.BoardStatusCount;
 import com.mallangs.domain.board.entity.Board;
 import com.mallangs.domain.board.entity.BoardStatus;
 import com.mallangs.domain.board.entity.BoardType;
+import com.mallangs.domain.member.entity.embadded.UserId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,11 +21,11 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             """)
     Page<Board> findAllByBoardType(@Param("boardType") BoardType boardType, Pageable pageable);
 
-    // 카테고리별 게시글 목록 조회 (최신순으로 정렬)
+    // 카테고리 이름으로 게시글 조회
     @Query("""
-            SELECT b FROM Board b WHERE b.category.categoryId = :categoryId AND b.boardStatus = 'PUBLISHED' AND b.boardType = :boardType ORDER BY b.createdAt DESC
+            SELECT b FROM Board b WHERE b.category.name = :name AND b.boardStatus = 'PUBLISHED' AND b.boardType = :boardType ORDER BY b.createdAt DESC
             """)
-    Page<Board> findByCategoryId(@Param("categoryId") Long categoryId, BoardType boardType, Pageable pageable);
+    Page<Board> findByCategoryName(@Param("name") String name, BoardType boardType, Pageable pageable);
 
     // 키워드로 통합 검색 (제목 + 내용)
     @Query("""
@@ -32,11 +33,11 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             """)
     Page<Board> searchByTitleOrContent(@Param("keyword") String keyword, @Param("boardType") BoardType boardType, Pageable pageable);
 
-    // 특정 회원이 작성한 게시글 목록 조회
+    // 특정 회원이 작성한 게시글 회원 ID로 목록 조회
     @Query("""
-            SELECT b FROM Board b WHERE b.member.memberId = :memberId AND b.boardStatus = 'PUBLISHED' AND b.boardType = :boardType ORDER BY b.createdAt DESC
+            SELECT b FROM Board b WHERE b.member.userId = :userId AND b.boardStatus = 'PUBLISHED' AND b.boardType = :boardType ORDER BY b.createdAt DESC
             """)
-    Page<Board> findByMemberId(@Param("memberId") Long memberId, @Param("boardType") BoardType boardType, Pageable pageable);
+    Page<Board> findByUserId(@Param("userId") UserId userId, @Param("boardType") BoardType boardType, Pageable pageable);
 
     // 관리자용 - 상태별 게시글 조회
     @Query("""
