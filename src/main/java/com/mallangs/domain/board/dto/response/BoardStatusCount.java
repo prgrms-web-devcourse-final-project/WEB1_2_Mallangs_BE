@@ -1,18 +1,14 @@
 package com.mallangs.domain.board.dto.response;
 
+
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public class BoardStatusCount {
-    private final long totalCount;
-    private final long publicCount;
-    private final long hiddenCount;
-    private final long draftCount;
-
-    public BoardStatusCount(long totalCount, long publicCount, long hiddenCount, long draftCount) {
-        this.totalCount = totalCount;
-        this.publicCount = publicCount;
-        this.hiddenCount = hiddenCount;
-        this.draftCount = draftCount;
-    }
+    private long total;
+    private long published;
+    private long hidden;
+    private long draft;
 }

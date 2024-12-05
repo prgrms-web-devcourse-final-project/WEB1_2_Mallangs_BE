@@ -48,8 +48,7 @@ public class BoardService {
                 member,
                 category,
                 request.getTitle(),
-                request.getContent(),
-                request.getImageId()
+                request.getContent()
         );
 
         return boardRepository.save(board).getBoardId();
@@ -72,8 +71,7 @@ public class BoardService {
                 request.getLatitude(),
                 request.getLongitude(),
                 request.getAddress(),
-                request.getSightedAt(),
-                request.getImageId()
+                request.getSightedAt()
         );
 
         return boardRepository.save(board).getBoardId();
@@ -90,8 +88,7 @@ public class BoardService {
                 null,
                 null,
                 null,
-                null,
-                request.getImageId()
+                null
         );
     }
 
@@ -106,13 +103,12 @@ public class BoardService {
                 request.getLatitude(),
                 request.getLongitude(),
                 request.getAddress(),
-                request.getSightedAt(),
-                request.getImageId()
+                request.getSightedAt()
         );
     }
 
     // 커뮤니티 게시판 게시글 전체 조회
-    public Page<CommunityListResponse> getAllCommunitiyBoard(Pageable pageable) {
+    public Page<CommunityListResponse> getAllCommunityBoard(Pageable pageable) {
         return boardRepository.findAllByBoardType(BoardType.COMMUNITY, pageable).map(CommunityListResponse::new);
     }
 
@@ -256,7 +252,6 @@ public class BoardService {
         if (board.getBoardType() != boardType) {
             throw new MallangsCustomException(ErrorCode.INVALID_BOARD_TYPE);
         }
-
         return board;
     }
 
