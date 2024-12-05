@@ -102,7 +102,7 @@ public class ReviewService {
 
         // 비회원인 경우 공개된 정보만 반환
         if (customMemberDetails == null) {
-            if (!review.getStatus().equals(ReviewStatus.HIDDEN)) {
+            if (!review.getStatus().equals(ReviewStatus.PUBLISHED)) {
                 throw new MallangsCustomException(ErrorCode.REVIEW_NOT_OPEN);
             }
             return new ReviewInfoResponse(review); //
@@ -110,7 +110,7 @@ public class ReviewService {
         Member member = getMember(customMemberDetails);
 
         //본인꺼는 볼 수 있음
-        if (!review.getMember().equals(member) && review.getStatus().equals(ReviewStatus.HIDDEN)) {
+        if (!review.getMember().equals(member) && !review.getStatus().equals(ReviewStatus.PUBLISHED)) {
             throw new MallangsCustomException(ErrorCode.REVIEW_NOT_OPEN);
 
         }
