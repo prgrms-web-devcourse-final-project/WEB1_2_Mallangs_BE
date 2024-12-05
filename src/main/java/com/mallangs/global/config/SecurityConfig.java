@@ -90,43 +90,43 @@ public class SecurityConfig {
 //                        .failureHandler(customFailureHandler)
 //                );
 
-        // 경로별 인가 작업
-        http
-                .authorizeHttpRequests((auth) ->
-                        auth
-                                .requestMatchers("/favicon.ico").permitAll()
-                                .requestMatchers("/").permitAll()
-                                .requestMatchers("/api/v1/member/register", "/api/v1/member/login",
-                                        "/api/v1/member/logout", "/api/v1/member/find-user-id",
-                                        "/api/v1/member/find-password").permitAll() //회원가입,로그인,로그아웃,비번찾기,아이디찾기
+    // 경로별 인가 작업
+    http
+        .authorizeHttpRequests((auth) ->
+            auth
+                .requestMatchers("/favicon.ico").permitAll()
+                .requestMatchers("/").permitAll()
+                .requestMatchers("/api/v1/member/register", "/api/v1/member/login",
+                    "/api/v1/member/logout", "/api/v1/member/find-user-id",
+                    "/api/v1/member/find-password").permitAll() //회원가입,로그인,로그아웃,비번찾기,아이디찾기
 //                                .requestMatchers("/api/v1/member/oauth2/**").permitAll() //소셜로그인
-                                .requestMatchers("/api/v1/member/admin/**").hasRole("ADMIN") //관리자
-                                .requestMatchers("/api/v1/member/**").permitAll() //회원
-                                .requestMatchers("/api/v1/address/**").permitAll() //주소
-                                .requestMatchers("/api/v1/pets/**").permitAll() //반려동물
-                                .requestMatchers("/api/v1/chat-room/**").permitAll() //채팅방
-                                .requestMatchers("/api/v1/chat/**").permitAll() //채팅
-                                .requestMatchers("/api/v1/board/**").permitAll() //게시판
-                                .requestMatchers("/api/v1/articles/**").permitAll() //글타래
-                                .requestMatchers("/api/v1/place-articles/**").permitAll() //장소
-                                .requestMatchers("/api/v1/comments/**").permitAll() //댓글
-                                .requestMatchers("/tourapi/v1/**").permitAll() //공공데이터
+                .requestMatchers("/api/v1/member/admin/**").hasRole("ADMIN") //관리자
+                .requestMatchers("/api/v1/member/**").permitAll() //회원
+                .requestMatchers("/api/v1/address/**").permitAll() //주소
+                .requestMatchers("/api/v1/pets/**").permitAll() //반려동물
+                .requestMatchers("/api/v1/chat-room/**").permitAll() //채팅방
+                .requestMatchers("/api/v1/chat/**").permitAll() //채팅
+                .requestMatchers("/api/v1/board/**").permitAll() //게시판
+                .requestMatchers("/api/v1/articles/public/**").permitAll() //글타래
+                .requestMatchers("/api/v1/place-articles/**").permitAll() //장소
+                .requestMatchers("/api/v1/comments/**").permitAll() //댓글
+                .requestMatchers("/tourapi/v1/**").permitAll() //공공데이터
 
-                                // Swagger UI 관련 경로 허용
-                                .requestMatchers("/swagger-ui/**").permitAll()
-                                .requestMatchers("/v3/api-docs/**").permitAll()
-                                .requestMatchers("/swagger-resources/**").permitAll()
-                                .requestMatchers("/swagger-ui.html").permitAll()
-                                .anyRequest().authenticated());
-        // 필터
-        http
-                .sessionManagement((session) -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(new JWTFilter(jwtUtil, refreshTokenService, accessTokenValidity
-                                ,accessRefreshTokenValidity, accessTokenBlackList, memberRepository)
-                                ,UsernamePasswordAuthenticationFilter.class);
-        return http.build();
-    }
+                // Swagger UI 관련 경로 허용
+                .requestMatchers("/swagger-ui/**").permitAll()
+                .requestMatchers("/v3/api-docs/**").permitAll()
+                .requestMatchers("/swagger-resources/**").permitAll()
+                .requestMatchers("/swagger-ui.html").permitAll()
+                .anyRequest().authenticated());
+    // 필터
+    http
+        .sessionManagement((session) -> session
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .addFilterBefore(new JWTFilter(jwtUtil, refreshTokenService, accessTokenValidity
+                , accessRefreshTokenValidity, accessTokenBlackList, memberRepository)
+            , UsernamePasswordAuthenticationFilter.class);
+    return http.build();
+  }
 
 }
 
