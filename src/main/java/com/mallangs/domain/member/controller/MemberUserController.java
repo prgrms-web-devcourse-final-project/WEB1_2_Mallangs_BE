@@ -197,7 +197,7 @@ public class MemberUserController {
 
         //차단계정인지 확인
         if (!foundMember.getIsActive()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
                     .body(foundMember.getNickname().getValue() + "님은 " + foundMember.getReasonForBan() + " 이유로 "
                             + (foundMember.getExpiryDate().getDayOfYear() - LocalDateTime.now().getDayOfYear()) + "일간 웹서비스 이용 제한됩니다.");
         }

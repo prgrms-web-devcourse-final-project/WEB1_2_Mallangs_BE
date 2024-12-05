@@ -1,6 +1,5 @@
 package com.mallangs.domain.chat.dto.request;
 
-import com.mallangs.domain.image.entity.Image;
 import lombok.Getter;
 import lombok.ToString;
 import org.hibernate.validator.constraints.Length;
