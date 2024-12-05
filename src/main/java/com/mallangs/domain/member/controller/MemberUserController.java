@@ -40,6 +40,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -148,7 +149,8 @@ public class MemberUserController {
             @ApiResponse(responseCode = "201", description = "로그인 요청 성공"),
             @ApiResponse(responseCode = "401", description = "로그인에 실패했습니다.")
     })
-    public ResponseEntity<?> login(@Validated @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> login(HttpServletResponse response,
+                                   @Validated @RequestBody LoginRequest loginRequest) {
         try {
             // 인증 토큰 생성
             UsernamePasswordAuthenticationToken authToken =
@@ -199,10 +201,18 @@ public class MemberUserController {
 
             //차단계정인지 확인
             if (!foundMember.getIsActive()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
                         .body(foundMember.getNickname().getValue() + "님은 " + foundMember.getReasonForBan() + " 이유로 "
                                 + (foundMember.getExpiryDate().getDayOfYear() - LocalDateTime.now().getDayOfYear()) + "일간 웹서비스 이용 제한됩니다.");
             }
+
+            //토큰 전송
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            response.addHeader("Authorization", "Bearer " + accessToken);
+            response.addCookie(createCookie(refreshToken));
+            response.setStatus(HttpStatus.OK.value());
 
             // 응답 반환
             return ResponseEntity.ok(Map.of(
@@ -277,7 +287,7 @@ public class MemberUserController {
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("LOGOUT SUCCESSFUL");
+        return ResponseEntity.status(HttpStatus.CREATED).body("message : 로그아웃 성공");
     }
 
     // 리프레시 토큰 꺼내기
@@ -292,6 +302,16 @@ public class MemberUserController {
         }
         return null;
 
+    }
+
+    //쿠키 만들기
+    private Cookie createCookie(String refreshCookie) {
+        Cookie cookie = new Cookie("RefreshToken", refreshCookie);
+        cookie.setMaxAge(3*24 * 60 * 60);
+        // cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        return cookie;
     }
 
 
