@@ -1,12 +1,12 @@
 package com.mallangs.global.exception;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_ACCEPTABLE;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
-import static org.springframework.http.HttpStatus.CONFLICT;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -47,10 +47,12 @@ public enum ErrorCode {
   // Article
   ARTICLE_TYPE_NOT_FOUND(NOT_FOUND, "해당하는 글타래 타입을 찾을 수 없습니다."),
   ARTICLE_NOT_FOUND(NOT_FOUND, "글타래 정보를 찾을 수 없습니다."),
+  ARTICLE_NOT_VISIBLE(FORBIDDEN, "글타래 정보를 볼 권한이 없습니다."),
   UNAUTHORIZED_MODIFY(FORBIDDEN, "이 리소스를 수정할 권한이 없습니다."),
   UNAUTHORIZED_DELETE(FORBIDDEN, "이 리소스를 삭제할 권한이 없습니다."),
   RESOURCE_NOT_MODIFIABLE(FORBIDDEN, "이 리소스는 수정할 수 없습니다."),
   RESOURCE_NOT_DELETABLE(FORBIDDEN, "이 리소스는 삭제할 수 없습니다."),
+  INVALID_TYPE_CHANGE(BAD_REQUEST, "글타래 타입은 생성 시에 설정된 타입을 유지해야 합니다."),
 
   // Board
   CATEGORY_NOT_FOUND(NOT_FOUND, "카테고리 정보를 찾을 수 없습니다."),
@@ -90,9 +92,23 @@ public enum ErrorCode {
   COMMENT_NOT_MODIFIED(CONFLICT, "댓글 업데이트에 실패했습니다."),
   COMMENT_NOT_REMOVED(CONFLICT, "댓글 삭제에 실패했습니다."),
   FORBIDDEN_ACCESS(FORBIDDEN, "권한이 없습니다."),
-  POST_NOT_FOUND(NOT_FOUND, "해당 게시물을 찾을 수 없습니다.");
+
+  // Image
+  IMAGE_COUNT_EXCEEDED(BAD_REQUEST, "이미지 개수가 혀용치(4개)를 초과했습니다."),
+  IMAGE_SIZE_EXCEEDED(BAD_REQUEST, "이미지 크기가 허용치(3MB)를 초과했습니다."),
+  IMAGE_NOT_FOUND(NOT_FOUND, "이미지를 찾을 수 없습니다."),
+  INVAILD_IMAGE_FORMAT(BAD_REQUEST, "지원하지 않는 이미지 형식입니다."),
+  POST_NOT_FOUND(NOT_FOUND, "해당 게시물을 찾을 수 없습니다."),
+
+  // Notification
+  NOTIFICATION_NOT_FOUND(NOT_FOUND, "알림을 찾을 수 없습니다."),
+  NOTIFICATION_NOT_SEND(INTERNAL_SERVER_ERROR, "알림 전송에 실패했습니다."),
+  NOTIFICATION_NOT_UPDATE(CONFLICT, "알림 업데이트에 실패했습니다."),
+  INVALID_IMAGE_FORMAT(BAD_REQUEST, "지원하지 않는 이미지 형식입니다."),
+  IMAGE_FILE_IS_REQUIRED(BAD_REQUEST, "파일이 없습니다."),
+  IMAGE_UPLOAD_FAILED(INTERNAL_SERVER_ERROR, "업로드에 실패했습니다."),
+  IMAGE_PROCESSING_ERROR(INTERNAL_SERVER_ERROR,"이미지 처리 중 오류가 발생했습니다.");
 
   private final HttpStatus httpStatus;
   private final String message;
-
 }

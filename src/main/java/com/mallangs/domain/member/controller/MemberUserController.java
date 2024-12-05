@@ -33,6 +33,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -102,7 +103,7 @@ public class MemberUserController {
                                                     @PathVariable("memberId") Long memberId) {
 
         return ResponseEntity.status(HttpStatus.CREATED).
-                body( memberUserService.update(memberUpdateRequest, memberId));
+                body(memberUserService.update(memberUpdateRequest, memberId));
     }
 
     @PostMapping("/find-user-id")
@@ -148,65 +149,71 @@ public class MemberUserController {
             @ApiResponse(responseCode = "401", description = "로그인에 실패했습니다.")
     })
     public ResponseEntity<?> login(@Validated @RequestBody LoginRequest loginRequest) {
-        // 인증 토큰 생성
-        UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(loginRequest.getUserId(), loginRequest.getPassword());
+        try {
+            // 인증 토큰 생성
+            UsernamePasswordAuthenticationToken authToken =
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUserId(), loginRequest.getPassword());
 
-        // 인증 수행
-        Authentication authentication = authenticationManager.authenticate(authToken);
+            // 인증 수행
+            Authentication authentication = authenticationManager.authenticate(authToken);
 
-        ///customUserDetails에서 인증정보 꺼내기
-        CustomMemberDetails customMemberDetails = (CustomMemberDetails) authentication.getPrincipal();
-        Long memberId = customMemberDetails.getMemberId();
-        String userId = customMemberDetails.getUsername();
-        String nickname = customMemberDetails.getNickname();
-        String email = customMemberDetails.getEmail();
-        String role = authentication.getAuthorities().stream()
-                .findFirst()
-                .map(GrantedAuthority::getAuthority)
-                .orElse(null);
+            ///customUserDetails에서 인증정보 꺼내기
+            CustomMemberDetails customMemberDetails = (CustomMemberDetails) authentication.getPrincipal();
+            Long memberId = customMemberDetails.getMemberId();
+            String userId = customMemberDetails.getUsername();
+            String nickname = customMemberDetails.getNickname();
+            String email = customMemberDetails.getEmail();
+            String role = authentication.getAuthorities().stream()
+                    .findFirst()
+                    .map(GrantedAuthority::getAuthority)
+                    .orElse(null);
 
-        // Access 토큰 생성
-        Map<String, Object> AccessPayloadMap = new HashMap<>();
-        AccessPayloadMap.put("memberId", memberId);
-        AccessPayloadMap.put("userId", userId);
-        AccessPayloadMap.put("nickname", nickname);
-        AccessPayloadMap.put("email", email);
-        AccessPayloadMap.put("role", role);
-        AccessPayloadMap.put("category", TokenCategory.ACCESS_TOKEN.name());
-        String accessToken = jwtUtil.createAccessToken(AccessPayloadMap, accessTokenValidity);
+            // Access 토큰 생성
+            Map<String, Object> AccessPayloadMap = new HashMap<>();
+            AccessPayloadMap.put("memberId", memberId);
+            AccessPayloadMap.put("userId", userId);
+            AccessPayloadMap.put("nickname", nickname);
+            AccessPayloadMap.put("email", email);
+            AccessPayloadMap.put("role", role);
+            AccessPayloadMap.put("category", TokenCategory.ACCESS_TOKEN.name());
+            String accessToken = jwtUtil.createAccessToken(AccessPayloadMap, accessTokenValidity);
 
-        //리프레시 토큰 생성 ( 난수를 입력, 의미없는 토큰 생성 )
-        Map<String, Object> refreshPayloadMap = new HashMap<>();
-        refreshPayloadMap.put("userId", userId);
+            //리프레시 토큰 생성 ( 난수를 입력, 의미없는 토큰 생성 )
+            Map<String, Object> refreshPayloadMap = new HashMap<>();
+            refreshPayloadMap.put("userId", userId);
 
-        //식별 위한 UserID 입력
-        String randomUUID = UUID.randomUUID().toString();
-        refreshPayloadMap.put("randomUUID", randomUUID);
-        String refreshToken = jwtUtil.createRefreshToken(refreshPayloadMap, accessRefreshTokenValidity);
-        log.info("컨트롤러 로그인, 토큰만듬: {}, refresh: {}", accessToken, refreshToken);
+            //식별 위한 UserID 입력
+            String randomUUID = UUID.randomUUID().toString();
+            refreshPayloadMap.put("randomUUID", randomUUID);
+            String refreshToken = jwtUtil.createRefreshToken(refreshPayloadMap, accessRefreshTokenValidity);
+            log.info("컨트롤러 로그인, 토큰만듬: {}, refresh: {}", accessToken, refreshToken);
 
-        //리프레시 토큰 레디스에 저장하기
-        refreshTokenService.insertInRedis(refreshPayloadMap, refreshToken);
+            //리프레시 토큰 레디스에 저장하기
+            refreshTokenService.insertInRedis(refreshPayloadMap, refreshToken);
 
-        //로그인 시간 저장
-        Member foundMember = memberRepository.findByUserId(new UserId(userId))
-                .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
-        foundMember.recordLoginTime();
-        memberRepository.save(foundMember);
+            //로그인 시간 저장
+            Member foundMember = memberRepository.findByUserId(new UserId(userId))
+                    .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+            foundMember.recordLoginTime();
+            memberRepository.save(foundMember);
 
-        //차단계정인지 확인
-        if (!foundMember.getIsActive()) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
-                    .body(foundMember.getNickname().getValue() + "님은 " + foundMember.getReasonForBan() + " 이유로 "
-                            + (foundMember.getExpiryDate().getDayOfYear() - LocalDateTime.now().getDayOfYear()) + "일간 웹서비스 이용 제한됩니다.");
+            //차단계정인지 확인
+            if (!foundMember.getIsActive()) {
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+                        .body(foundMember.getNickname().getValue() + "님은 " + foundMember.getReasonForBan() + " 이유로 "
+                                + (foundMember.getExpiryDate().getDayOfYear() - LocalDateTime.now().getDayOfYear()) + "일간 웹서비스 이용 제한됩니다.");
+            }
+
+            // 응답 반환
+            return ResponseEntity.ok(Map.of(
+                    "AccessToken", accessToken,
+                    "RefreshToken", refreshToken
+            ));
+        } catch (AuthenticationException ex) {
+            // 인증 실패 시 401 반환
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "아이디 또는 비밀번호가 잘못되었습니다."));
         }
-
-        // 응답 반환
-        return ResponseEntity.ok(Map.of(
-                "AccessToken", accessToken,
-                "RefreshToken", refreshToken
-        ));
     }
 
     @PostMapping("/logout")

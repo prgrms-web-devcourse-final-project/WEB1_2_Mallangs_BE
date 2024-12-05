@@ -1,5 +1,7 @@
 package com.mallangs.domain.member.controller;
 
+import com.mallangs.domain.member.dto.AddressCreateSuccessResponse;
+import com.mallangs.domain.member.dto.AddressDeleteSuccessResponse;
 import com.mallangs.domain.member.dto.MemberAddressRequest;
 import com.mallangs.domain.member.dto.MemberAddressResponse;
 import com.mallangs.domain.member.entity.embadded.QUserId;
@@ -30,34 +32,37 @@ public class AddressController {
     @PostMapping
     @Operation(summary = "주소등록", description = "주소등록 요청 API")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "등록 성공"),
-            @ApiResponse(responseCode = "400", description = "주소입력을 잘못하였습니다.")
+            @ApiResponse(responseCode = "201", description = "주소 등록 성공"),
+            @ApiResponse(responseCode = "400", description = "주소입력을 확인해주세요.")
     })
-    public ResponseEntity<?> create(@Validated @RequestBody MemberAddressRequest memberAddressRequest,
-                                    Authentication authentication) {
+    public ResponseEntity<AddressCreateSuccessResponse> create(@Validated @RequestBody MemberAddressRequest memberAddressRequest,
+                                                               Authentication authentication) {
         String userId = authentication.getName();
-        addressService.create(userId, memberAddressRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(addressService.create(userId, memberAddressRequest));
     }
 
     @GetMapping
     @Operation(summary = "주소조회", description = "주소조회 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "즈소 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "즈소번호 입력을 확인해주세요.")
+    })
     public ResponseEntity<List<MemberAddressResponse>> get(@RequestParam("memberId") Long memberId) {
 
         List<MemberAddressResponse> addresses = addressService.get(memberId);
         if (addresses == null || addresses.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-        return ResponseEntity.ok(addresses);
+        return ResponseEntity.status(HttpStatus.CREATED).body(addresses);
     }
 
     @DeleteMapping("/{addressId}")
     @Operation(summary = "주소삭제", description = "주소삭제 요청 API")
-    public ResponseEntity<?> delete(@PathVariable("addressId") Long addressId) {
-        boolean result = addressService.delete(addressId);
-        if (!result) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-        return ResponseEntity.ok("삭제성공");
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "즈소 삭제 성공"),
+            @ApiResponse(responseCode = "400", description = "즈소번호 입력을 확인해주세요.")
+    })
+    public ResponseEntity<AddressDeleteSuccessResponse> delete(@PathVariable("addressId") Long addressId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(addressService.delete(addressId));
     }
 }

@@ -25,7 +25,7 @@ import java.util.List;
 
 @Tag(name = "카테고리 API", description = "카테고리 관리 API")
 @RestController
-@RequestMapping("/api/category")
+@RequestMapping("/api/v1/category")
 @RequiredArgsConstructor
 @Slf4j
 public class CategoryController {
