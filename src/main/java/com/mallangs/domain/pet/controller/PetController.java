@@ -44,10 +44,19 @@ public class PetController {
 
     //대표 말랑이(반려동물 조회)
     @GetMapping("/representative")
-    @Operation(summary = "대표 반려동물(말랑이) 정보조회", description = "대표 반려동물(말랑이) 정보를 조회하는 API")
+    @Operation(summary = "대표 반려동물(말랑이) 정보조회", description = "로그인된 사용자의 대표 반려동물(말랑이) 정보를 조회하는 API")
     public ResponseEntity<PetResponse> getRepresentativePet(
             @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
         PetResponse pet = petService.getRepresentativePet(customMemberDetails);
+        return ResponseEntity.ok(pet);
+    }
+
+    //대표 말랑이(반려동물 조회)
+    @GetMapping("/representative/{memberId}")
+    @Operation(summary = "대표 반려동물(말랑이) memberId로 정보조회", description = "대표 반려동물(말랑이) 정보를 memberId로 조회하는 API")
+    public ResponseEntity<PetResponse> getRepresentativePet(
+            @PathVariable Long memberId) {
+        PetResponse pet = petService.getRepresentativePet(memberId);
         return ResponseEntity.ok(pet);
     }
 
