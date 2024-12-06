@@ -106,11 +106,13 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/pets/**").permitAll() //반려동물
                 .requestMatchers("/api/v1/chat-room/**").permitAll() //채팅방
                 .requestMatchers("/api/v1/chat/**").permitAll() //채팅
+                .requestMatchers("/api/chat/**").permitAll() //채팅
                 .requestMatchers("/api/v1/board/**").permitAll() //게시판
                 .requestMatchers("/api/v1/articles/public/**").permitAll() //글타래
                 .requestMatchers("/api/v1/place-articles/**").permitAll() //장소
                 .requestMatchers("/api/v1/comments/**").permitAll() //댓글
                 .requestMatchers("/tourapi/v1/**").permitAll() //공공데이터
+                .requestMatchers("/api/v1/token").permitAll() //토큰
 
                 // Swagger UI 관련 경로 허용
                 .requestMatchers("/swagger-ui/**").permitAll()

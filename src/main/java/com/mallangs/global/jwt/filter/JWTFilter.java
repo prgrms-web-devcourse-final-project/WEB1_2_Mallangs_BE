@@ -110,6 +110,9 @@ public class JWTFilter extends OncePerRequestFilter {
                     //글타래
                     uri.startsWith("/api/v1/articles/public") ||
 
+                    //TOKEN
+                    ("POST".equals(method) && uri.startsWith("/api/v1/token")) ||
+
                     //반려동물
                     ("GET".equals(method) && uri.startsWith("/api/v1/pets/nearby"))) {
                 filterChain.doFilter(request, response);
@@ -157,30 +160,8 @@ public class JWTFilter extends OncePerRequestFilter {
                                     String newAccessToken = jwtUtil.createAccessToken(payloadMap,
                                             accessTokenValidity);
 
-                                    //Refresh Token 새로 만들기
-                                    Map<String, Object> refreshPayloadMap = new HashMap<>();
-                                    refreshPayloadMap.put("userId", foundMember.getUserId().getValue());
-
-                                    //식별 위한 UserID 입력
-                                    String randomUUID = UUID.randomUUID().toString();
-                                    refreshPayloadMap.put("randomUUID", randomUUID);
-                                    String newRefreshToken = jwtUtil.createRefreshToken(refreshPayloadMap,
-                                            accessRefreshTokenValidity);
-                                    refreshTokenService.insertInRedis(refreshPayloadMap, newRefreshToken);
-
-                                    //토큰 전송
-                                    response.setContentType("application/json");
-                                    response.setCharacterEncoding("UTF-8");
-                                    response.getWriter().write(
-                                            "{\"AccessToken\": \"" + newAccessToken + "\"," +
-                                                    " \"RefreshToken\": \"" + newRefreshToken + "\",");
-
-                                    response.addHeader("Authorization", "Bearer " + accessToken);
-                                    response.addCookie(createCookie(newRefreshToken));
-                                    response.setStatus(HttpStatus.OK.value());
-
                                     //SecurityContextHolder 에 회원 등록
-                                    log.info("필터, 리프레시 새로만듬: {}, refresh: {}", newAccessToken, newRefreshToken);
+                                    log.info("필터, 리프레시 새로만듬: {}, refresh: {}", newAccessToken, refreshTokenFromCookies);
                                     CustomMemberDetails customUserDetails = new CustomMemberDetails(foundMember);
                                     Authentication authToken = new UsernamePasswordAuthenticationToken(
                                             customUserDetails, null, customUserDetails.getAuthorities());
@@ -263,15 +244,6 @@ public class JWTFilter extends OncePerRequestFilter {
         return null;
     }
 
-    //쿠키 만들기
-    private Cookie createCookie(String refreshCookie) {
-        Cookie cookie = new Cookie("RefreshToken", refreshCookie);
-        cookie.setMaxAge(3 * 24 * 60 * 60);
-        // cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        return cookie;
-    }
     //숫자인지 아닌지 확인하는 코드
     private boolean isNumeric(String str) {
         try {

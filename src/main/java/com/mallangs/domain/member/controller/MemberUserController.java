@@ -211,7 +211,6 @@ public class MemberUserController {
             response.setCharacterEncoding("UTF-8");
 
             response.addHeader("Authorization", "Bearer " + accessToken);
-            response.addCookie(createCookie(refreshToken));
             response.setStatus(HttpStatus.OK.value());
 
             // 응답 반환
@@ -303,17 +302,6 @@ public class MemberUserController {
         return null;
 
     }
-
-    //쿠키 만들기
-    private Cookie createCookie(String refreshCookie) {
-        Cookie cookie = new Cookie("RefreshToken", refreshCookie);
-        cookie.setMaxAge(3*24 * 60 * 60);
-        // cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        return cookie;
-    }
-
 
     @PutMapping("/member-role")
     @Operation(summary = "관리자로 권한변환", description = "관리자로 권한 변환 API")
