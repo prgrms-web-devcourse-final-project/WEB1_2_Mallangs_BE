@@ -113,6 +113,9 @@ public class JWTFilter extends OncePerRequestFilter {
                     //TOKEN
                     ("POST".equals(method) && uri.startsWith("/api/v1/token")) ||
 
+                    //회원
+                    ("GET".equals(method) && uri.startsWith("api/v1/member/other/*")) ||
+
                     //반려동물
                     ("GET".equals(method) && uri.startsWith("/api/v1/pets/nearby"))) {
                 filterChain.doFilter(request, response);

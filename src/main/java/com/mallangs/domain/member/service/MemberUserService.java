@@ -77,6 +77,13 @@ public class MemberUserService {
         return new MemberGetResponse(foundMember);
     }
 
+    //회원조회(타인)
+    public MemberGetResponse getByOther(String userId) {
+        Member foundMember = memberRepository.findByUserIdForProfile(new UserId(userId))
+                .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+        return new MemberGetResponse(foundMember);
+    }
+
     //회원정보 수정
     public MemberGetResponse update(MemberUpdateRequest memberUpdateRequest, Long memberId) {
         Member foundMember = memberRepository.findById(memberId)
