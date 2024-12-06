@@ -1,6 +1,7 @@
 package com.mallangs.domain.member.service;
 
 import com.mallangs.domain.member.dto.*;
+import com.mallangs.domain.member.dto.response.MemberGetByOtherResponse;
 import com.mallangs.domain.member.entity.Address;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.embadded.Email;
@@ -77,6 +78,18 @@ public class MemberUserService {
         return new MemberGetResponse(foundMember);
     }
 
+    //회원조회(타인)
+    public MemberGetByOtherResponse getByOther(String userId) {
+        Member foundMember = memberRepository.findByUserIdForProfile(new UserId(userId))
+                .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        if (foundMember.getIsActive().equals(false)) {
+            throw new MallangsCustomException(ErrorCode.BANNED_MEMBER);
+        }
+
+        return new MemberGetByOtherResponse(foundMember);
+    }
+
     //회원정보 수정
     public MemberGetResponse update(MemberUpdateRequest memberUpdateRequest, Long memberId) {
         Member foundMember = memberRepository.findById(memberId)
@@ -89,7 +102,6 @@ public class MemberUserService {
                     memberUpdateRequest.getNickname(),
                     memberUpdateRequest.getPassword(),
                     memberUpdateRequest.getEmail(),
-                    memberUpdateRequest.getProfileImage(),
                     passwordEncoder
             );
             Member save = memberRepository.save(foundMember);
@@ -137,7 +149,6 @@ public class MemberUserService {
 
     //회원 비밀번호 찾기 -> 임시비밀번호 변경, 메일 메세지 생성
     public MemberSendMailResponse findPassword(MemberFindPasswordRequest memberFindPasswordRequest) {
-        try {
             Email email = new Email(memberFindPasswordRequest.getEmail());
             UserId userId = new UserId(memberFindPasswordRequest.getUserId());
 
@@ -145,6 +156,8 @@ public class MemberUserService {
             Member foundMember = memberRepository.findByEmailAndUserId(email, userId)
                     .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
 
+        try {
+            log.info("회우너정보{}",foundMember);
             //임시비밀번호 만들기
             String tempPassword = PasswordGenerator.generatePassword();
 
@@ -156,7 +169,7 @@ public class MemberUserService {
             return writeMessage(email.getValue(), tempPassword);
         } catch (Exception e) {
             log.error("회원 비밀번호 찾기에 실패하였습니다. {}", e.getMessage());
-            throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);
+            throw new MallangsCustomException(ErrorCode.DATABASE_ERROR);
         }
     }
 
