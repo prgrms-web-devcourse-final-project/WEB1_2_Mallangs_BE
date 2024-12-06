@@ -11,6 +11,9 @@ import com.mallangs.global.exception.MallangsCustomException;
 import com.mallangs.global.jwt.entity.TokenCategory;
 import com.mallangs.global.jwt.service.RefreshTokenService;
 import com.mallangs.global.jwt.util.JWTUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +36,11 @@ public class TokenController {
     private final MemberRepository memberRepository;
 
     @PostMapping
+    @Operation(summary = "토큰 받아가는 API- Access 토큰은 재발행되고, Refresh 토큰은 확인 후 전달", description = "토큰 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "전달 성공"),
+            @ApiResponse(responseCode = "400", description = "토큰 전달 실패.")
+    })
     public ResponseEntity<TokensResponse> getTokens(@RequestBody TokensRequest tokensRequest){
 
         log.info("refreshToken {}", tokensRequest.getRefreshToken());
