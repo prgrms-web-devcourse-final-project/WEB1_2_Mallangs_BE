@@ -132,7 +132,7 @@ public class PetService {
         Pet pet = petRepository.findById(petId).orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
         Member member = getMember(customMemberDetails);
 
-        //반려동물 수정시도시 예외 던짐
+        //타인의 반려동물 수정시도시 예외 던짐
         if (!pet.getMember().getMemberId().equals(member.getMemberId())) {
             throw new MallangsCustomException(ErrorCode.PET_NOT_OWNED);
         }
@@ -162,11 +162,12 @@ public class PetService {
     //반려동물 삭제 (비활성화)
     public PetResponse deletePet(Long petId, CustomMemberDetails customMemberDetails) {
         Member member = getMember(customMemberDetails);
-        try {
+
             Pet pet = petRepository.findById(petId).orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
             if (!pet.getMember().getMemberId().equals(member.getMemberId())) {
                 throw new MallangsCustomException(ErrorCode.PET_NOT_OWNED);
             }
+        try {
             pet.deactivate();
             petRepository.save(pet);
             return new PetResponse(pet);
@@ -179,11 +180,12 @@ public class PetService {
     //반려동물 복원 (활성화)
     public PetResponse restorePet(Long petId, CustomMemberDetails customMemberDetails) {
         Member member = getMember(customMemberDetails);
-        try {
+
             Pet pet = petRepository.findById(petId).orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
             if (!pet.getMember().getMemberId().equals(member.getMemberId())) {
                 throw new MallangsCustomException(ErrorCode.PET_NOT_OWNED);
             }
+        try {
             pet.activate();
             petRepository.save(pet);
             return new PetResponse(pet);

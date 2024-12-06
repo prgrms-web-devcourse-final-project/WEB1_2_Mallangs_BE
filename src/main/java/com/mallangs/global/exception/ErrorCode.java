@@ -84,8 +84,8 @@ public enum ErrorCode {
   PET_NOT_REPRESENTATIVE(HttpStatus.INTERNAL_SERVER_ERROR, "대표 말랑이(반려동물) 등록에 실패하였습니다."),
 
   //Location
-  LOCATION_INVALIDE_PARAMS(HttpStatus.INTERNAL_SERVER_ERROR, "입력된 데이터가 유효하지 않습니다."),
-  LOCATION_INVALIDE_RANGE(HttpStatus.INTERNAL_SERVER_ERROR, "유효하지 않은 위치 범위입니다."),
+  LOCATION_INVALIDE_PARAMS(BAD_REQUEST, "입력된 데이터가 유효하지 않습니다."),
+  LOCATION_INVALIDE_RANGE(BAD_REQUEST, "유효하지 않은 위치 범위입니다."),
 
   // Comment
   COMMENT_NOT_FOUND(NOT_FOUND, "댓글을 찾을 수 없습니다."),
