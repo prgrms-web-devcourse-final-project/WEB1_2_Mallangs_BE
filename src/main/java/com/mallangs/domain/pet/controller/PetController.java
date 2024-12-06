@@ -93,7 +93,7 @@ public class PetController {
     }
     //근처 반려동물 조회
     @GetMapping("/nearby")
-    @Operation(summary = "근처의 반려동물 목록을 조회", description = "클라이언트로부터 위도 경도 ,시/군/구 등의 데이터를 받았을때 위도 경도를 기준으로 거리를 계산하여 반경내(20km)의 반려동물 목록을 조회")
+    @Operation(summary = "근처의 반려동물 목록을 조회", description = "클라이언트로부터 위도 경도 ,시/군/구 등의 데이터를 받았을때 위도 경도를 기준으로 거리를 계산하여 최대 반경내(50km)의 반려동물 목록을 조회")
     public ResponseEntity<PetNearbyPageResponse> getNearbyPets(
             @ModelAttribute PetLocationRequest petLocationDTO,
             @ModelAttribute PageRequest pageRequestDTO) {
