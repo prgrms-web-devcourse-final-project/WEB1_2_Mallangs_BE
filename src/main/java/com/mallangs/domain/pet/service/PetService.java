@@ -196,9 +196,9 @@ public class PetService {
     //반경 내 반려동물 조회
     public Page<PetNearbyResponse> getNearbyPets(PetLocationRequest petLocationRequest,
                                            PageRequest pageRequest) {
-        try {
-            validateLocationSearch(petLocationRequest);
 
+            validateLocationSearch(petLocationRequest);
+        try {
             Sort sort = Sort.by("pet_Id").descending();
             Pageable pageable = pageRequest.getPageable(sort);
 
@@ -243,7 +243,7 @@ public class PetService {
 
         if (y < -90 || y > 90 || //북위는 양수로 남위는 음수로 표현
                 x < -180 || x > 180 || //동경은 양수로 서경은 음수로 표현
-                petLocationRequest.getRadius() <= 0 || petLocationRequest.getRadius() > 20) { // 최대 반경 20km
+                petLocationRequest.getRadius() <= 0 || petLocationRequest.getRadius() > 50) { // 최대 반경 50km
             throw new MallangsCustomException(ErrorCode.LOCATION_INVALIDE_RANGE);
         }
     }

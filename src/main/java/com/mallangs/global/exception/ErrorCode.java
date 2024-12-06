@@ -85,7 +85,7 @@ public enum ErrorCode {
 
   //Location
   LOCATION_INVALIDE_PARAMS(HttpStatus.INTERNAL_SERVER_ERROR, "입력된 데이터가 유효하지 않습니다."),
-  LOCATION_INVALIDE_RANGE(HttpStatus.INTERNAL_SERVER_ERROR, "유효하지 않은 범위입니다."),
+  LOCATION_INVALIDE_RANGE(HttpStatus.INTERNAL_SERVER_ERROR, "유효하지 않은 위치 범위입니다."),
 
   // Comment
   COMMENT_NOT_FOUND(NOT_FOUND, "댓글을 찾을 수 없습니다."),
