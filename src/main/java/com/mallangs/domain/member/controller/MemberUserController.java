@@ -2,6 +2,7 @@ package com.mallangs.domain.member.controller;
 
 import com.mallangs.domain.member.dto.*;
 import com.mallangs.domain.member.dto.request.LoginRequest;
+import com.mallangs.domain.member.dto.response.MemberGetByOtherResponse;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.MemberRole;
 import com.mallangs.domain.member.entity.embadded.UserId;
@@ -90,6 +91,16 @@ public class MemberUserController {
     public ResponseEntity<MemberGetResponse> get(Authentication authentication) {
         String userId = authentication.getName();
         return ResponseEntity.status(HttpStatus.CREATED).body(memberUserService.get(userId));
+    }
+    @GetMapping("/other/{userId}")
+    @Operation(summary = "(타인)회원 프로필 조회", description = "(타인)회원 프로필 조회 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "회원 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "회원을 찾을 수 없습니다."),
+            @ApiResponse(responseCode = "406", description = "차단된 계정입니다.")
+    })
+    public ResponseEntity<MemberGetByOtherResponse> getByOther(@PathVariable("userId") String userId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(memberUserService.getByOther(userId));
     }
 
     @PutMapping("/{memberId}")

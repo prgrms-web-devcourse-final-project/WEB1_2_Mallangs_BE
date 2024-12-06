@@ -106,6 +106,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/member/**").permitAll() //회원
                                 .requestMatchers("/api/v1/address/**").permitAll() //주소
                                 .requestMatchers("/api/v1/pets/**").permitAll() //반려동물
+                                .requestMatchers("/api/v1/image/**").permitAll() //이미지
                                 .requestMatchers("/api/v1/chat-room/**").permitAll() //채팅방
                                 .requestMatchers("/api/v1/chat/**").permitAll() //채팅
                                 .requestMatchers("/api/chat/**").permitAll() //채팅

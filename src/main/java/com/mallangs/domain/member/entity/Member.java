@@ -91,11 +91,10 @@ public class Member extends BaseTimeEntity {
     }
 
     //수정
-    public void change(String nickname,String password, String email, String profileImage, PasswordEncoder passwordEncoder){
+    public void change(String nickname,String password, String email, PasswordEncoder passwordEncoder){
         this.nickname = new Nickname(nickname);
         this.password = new Password(password, passwordEncoder);
         this.email = new Email(email);
-        this.profileImage = profileImage;
     }
 
     public void changeIsActive(Boolean isActive){
