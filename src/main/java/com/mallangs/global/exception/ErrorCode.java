@@ -112,7 +112,8 @@ public enum ErrorCode {
 
   //Token
   FAILED_TO_CHECK_TOKENS(UNAUTHORIZED, "토큰이 존재하지 않습니다."),
-  REFRESH_TOKEN_EXPIRED(NOT_FOUND, "리프레시 토큰이 만료되었습니다."),
+  REFRESH_TOKEN_EXPIRED(UNAUTHORIZED, "리프레시 토큰이 만료되었습니다."),
+  TOKEN_EXPIRED(UNAUTHORIZED, "토큰이 만료되었습니다."),
   TOKEN_IS_BLOCKED(UNAUTHORIZED, "토큰이 차단되었습니다."),
   REFRESH_TOKEN_MISSING(NOT_FOUND, "리프레시 토큰이 존재하지 않습니다.");
 
