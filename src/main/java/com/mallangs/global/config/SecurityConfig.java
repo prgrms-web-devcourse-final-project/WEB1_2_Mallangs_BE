@@ -116,8 +116,8 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/comments/**").permitAll() //댓글
                                 .requestMatchers("/tourapi/v1/**").permitAll() //공공데이터
                                 .requestMatchers("/api/v1/token").permitAll() //토큰
-                                .requestMatchers("/webjars/").permitAll() //웹소켓
-                                .requestMatchers("/ws-stomp/").permitAll() //웹소켓
+                                .requestMatchers("/webjars/**").permitAll() //웹소켓
+                                .requestMatchers("/ws-stomp/**").permitAll() //웹소켓
                                 .requestMatchers("/chat-rooms/**").permitAll() // 웹소켓
                                 .requestMatchers("/api/chat/websocket-test").permitAll() //웹소켓
 
