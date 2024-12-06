@@ -53,6 +53,7 @@ public class ArticleService {
     return factory.createResponse(savedArticle);
   }
 
+
   // 글타래 단건 조회
   // 사용자는 map visiblie 인 경우
   public ArticleResponse getArticleById(Long articleId, String userRole, Long memberId) {
@@ -63,24 +64,26 @@ public class ArticleService {
     ArticleFactory factory = factoryManager.getFactory(
         foundArticle.getArticleType().getDescription());
 
-    if ("ADMIN".equals(userRole)) {
-      log.info("단건 조회 ADMIN" + userRole);
+    if (MemberRole.ROLE_ADMIN.name().equals(userRole)) {
+      log.info("단건 조회 ADMIN{}", userRole);
       return factory.createResponse(foundArticle);
     }
 
-    if ("USER".equals(userRole)) { // 논리 삭제하지 않은 자신의 글이거나 mapVisible
+    if (MemberRole.ROLE_USER.name().equals(userRole)) { // 논리 삭제하지 않은 자신의 글이거나 mapVisible
       if (Objects.equals(foundArticle.getMember().getMemberId(), memberId)
           && !foundArticle.getIsDeleted()
           || foundArticle.getMapVisibility() == MapVisibility.VISIBLE) {
         return factory.createResponse(foundArticle);
       }
-      log.info("단건 조회 USER ACCESS DENIED" + userRole);
+      log.info("단건 조회 USER ACCESS DENIED{}", userRole);
     }
 
     // 비회원
-    if (foundArticle.getMapVisibility() == MapVisibility.VISIBLE) {
-      log.info("단건 조회 NOT MEMBER" + userRole);
+    if ("ROLE_GUEST".equals(userRole) && foundArticle.getMapVisibility() == MapVisibility.VISIBLE) {
+      log.info("단건 조회 NOT MEMBER{}", userRole);
       return factory.createResponse(foundArticle);
+    } else {
+      log.error("비회원 조회 불가");
     }
 
     log.info("단건 조회 OTHER" + userRole);

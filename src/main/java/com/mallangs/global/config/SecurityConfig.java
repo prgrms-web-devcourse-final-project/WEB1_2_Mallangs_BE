@@ -108,6 +108,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/chat/**").permitAll() //채팅
                 .requestMatchers("/api/chat/**").permitAll() //채팅
                 .requestMatchers("/api/v1/board/**").permitAll() //게시판
+                .requestMatchers("/api/v1/category/**").permitAll() //카테고리
                 .requestMatchers("/api/v1/articles/public/**").permitAll() //글타래
                 .requestMatchers("/api/v1/place-articles/**").permitAll() //장소
                 .requestMatchers("/api/v1/comments/**").permitAll() //댓글
