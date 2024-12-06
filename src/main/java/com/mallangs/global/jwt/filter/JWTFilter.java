@@ -135,46 +135,47 @@ public class JWTFilter extends OncePerRequestFilter {
                 String accessToken = authorizationHeader.substring(7);
                 Map<String, Object> claims = jwtUtil.validateToken(accessToken);
 
-                //블랙리스트에 있는지 확인
-                if (accessTokenBlackList.checkBlackList(accessToken)) {
-                    handleException(response, new Exception("ACCESS TOKEN IS BLOCKED"));
-                    return;
-                }
+//                //블랙리스트에 있는지 확인
+//                if (accessTokenBlackList.checkBlackList(accessToken)) {
+//                    handleException(response, new Exception("ACCESS TOKEN IS BLOCKED"));
+//                    return;
+//                }
                 //Access Token 만료 확인
                 if (jwtUtil.isExpired(accessToken)) {
-                    String refreshTokenFromCookies = getRefreshTokenFromCookies(request);
+                    throw new MallangsCustomException(ErrorCode.TOKEN_EXPIRED);
+//                    String refreshTokenFromCookies = getRefreshTokenFromCookies(request);
 
-                    if (refreshTokenFromCookies != null) {
-                        try {
-                            Map<String, Object> RefreshPayloadMap = jwtUtil.validateRefreshToken(
-                                    refreshTokenFromCookies);
-                            String refreshTokenInRedis = refreshTokenService.readRefreshTokenInRedis(
-                                    RefreshPayloadMap);
-
-                            if ((refreshTokenFromCookies.equals(refreshTokenInRedis)
-                                    && (!jwtUtil.isExpired(refreshTokenFromCookies)))) {
-
-                                //userId로 맴버 찾기
-                                Member foundMember = memberRepository.findByUserId(new UserId((String) RefreshPayloadMap.get("userId")))
-                                        .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
-
-                                //SecurityContextHolder 에 회원 등록
-                                CustomMemberDetails customUserDetails = new CustomMemberDetails(foundMember);
-                                Authentication authToken = new UsernamePasswordAuthenticationToken(
-                                        customUserDetails, null, customUserDetails.getAuthorities());
-                                SecurityContextHolder.getContext().setAuthentication(authToken);
-
-                                filterChain.doFilter(request, response);
-                            } else {
-                                handleException(response, new Exception("INVALID REFRESH TOKEN"));
-                            }
-                        } catch (Exception e) {
-                            handleException(response, new Exception("REFRESH TOKEN VALIDATION FAILED"));
-                        }
-                    } else {
-                        handleException(response, new Exception("REFRESH TOKEN NOT FOUND"));
-                    }
-                    filterChain.doFilter(request, response);
+//                    if (refreshTokenFromCookies != null) {
+//                        try {
+//                            Map<String, Object> RefreshPayloadMap = jwtUtil.validateRefreshToken(
+//                                    refreshTokenFromCookies);
+//                            String refreshTokenInRedis = refreshTokenService.readRefreshTokenInRedis(
+//                                    RefreshPayloadMap);
+//
+//                            if ((refreshTokenFromCookies.equals(refreshTokenInRedis)
+//                                    && (!jwtUtil.isExpired(refreshTokenFromCookies)))) {
+//
+//                                //userId로 맴버 찾기
+//                                Member foundMember = memberRepository.findByUserId(new UserId((String) RefreshPayloadMap.get("userId")))
+//                                        .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+//
+//                                //SecurityContextHolder 에 회원 등록
+//                                CustomMemberDetails customUserDetails = new CustomMemberDetails(foundMember);
+//                                Authentication authToken = new UsernamePasswordAuthenticationToken(
+//                                        customUserDetails, null, customUserDetails.getAuthorities());
+//                                SecurityContextHolder.getContext().setAuthentication(authToken);
+//
+//                                filterChain.doFilter(request, response);
+//                            } else {
+//                                handleException(response, new Exception("INVALID REFRESH TOKEN"));
+//                            }
+//                        } catch (Exception e) {
+//                            handleException(response, new Exception("REFRESH TOKEN VALIDATION FAILED"));
+//                        }
+//                    } else {
+//                        handleException(response, new Exception("REFRESH TOKEN NOT FOUND"));
+//                    }
+//                    filterChain.doFilter(request, response);
                 } else {
                     log.info("Claims: {}", claims);
                     if (claims.get("category") == null || !(claims.get("category")).equals(
