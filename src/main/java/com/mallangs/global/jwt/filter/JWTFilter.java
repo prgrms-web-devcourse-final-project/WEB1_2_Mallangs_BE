@@ -118,6 +118,11 @@ public class JWTFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
                 return;
             }
+            // 웹소켓 경로 매칭
+            if (uri.startsWith("api/chat/websocket-test")) {
+                filterChain.doFilter(request, response);
+                return;
+            }
 
             //request 에서 Access Token 꺼내기
             String authorizationHeader = request.getHeader("Authorization");
