@@ -1,4 +1,4 @@
-package com.mallangs.domain.member.controller;
+package com.mallangs.global.jwt.dto;
 
 import lombok.Getter;
 import lombok.ToString;

@@ -1,4 +1,4 @@
-package com.mallangs.domain.member.dto;
+package com.mallangs.global.jwt.dto;
 
 import lombok.Builder;
 import lombok.Getter;

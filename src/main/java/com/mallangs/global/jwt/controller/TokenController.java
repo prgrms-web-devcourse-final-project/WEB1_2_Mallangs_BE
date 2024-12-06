@@ -1,6 +1,7 @@
-package com.mallangs.domain.member.controller;
+package com.mallangs.global.jwt.controller;
 
-import com.mallangs.domain.member.dto.TokensResponse;
+import com.mallangs.global.jwt.dto.TokensRequest;
+import com.mallangs.global.jwt.dto.TokensResponse;
 
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.embadded.UserId;
