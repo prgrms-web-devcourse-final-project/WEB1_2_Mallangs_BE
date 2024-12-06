@@ -44,7 +44,7 @@ public class AddressService {
             return new AddressCreateSuccessResponse(foundMember.getUserId().getValue());
         } catch (Exception e) {
             log.error("주소 추가에 실패하였습니다. {}", e.getMessage());
-            throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);
+            throw new MallangsCustomException(ErrorCode.FAILURE);
         }
     }
 

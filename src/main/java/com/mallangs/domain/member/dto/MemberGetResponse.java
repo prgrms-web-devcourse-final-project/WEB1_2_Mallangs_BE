@@ -27,6 +27,8 @@ public class MemberGetResponse {
     private String profileImage;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private List<MemberAddressResponse> addresses;
+
     private List<PetMemberProfileResponse> pets;
 
     public MemberGetResponse(Member member) {
@@ -37,6 +39,13 @@ public class MemberGetResponse {
         this.profileImage = member.getProfileImage();
         this.createdAt = member.getCreatedAt();
         this.updatedAt = member.getUpdatedAt();
+        if (!member.getAddresses().isEmpty()) {
+            this.addresses = member.getAddresses().stream()
+                    .map(MemberAddressResponse::new)
+                    .collect(Collectors.toList());
+        } else {
+            this.addresses = new ArrayList<>();
+        }
         if (!member.getPets().isEmpty()) {
             this.pets = member.getPets().stream()
                     .map(PetMemberProfileResponse::new)

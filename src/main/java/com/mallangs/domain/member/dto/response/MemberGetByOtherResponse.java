@@ -2,12 +2,15 @@ package com.mallangs.domain.member.dto.response;
 
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.pet.dto.PetMemberProfileResponse;
-
+import lombok.Getter;
+import lombok.ToString;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Getter
+@ToString
 public class MemberGetByOtherResponse {
 
     private Long memberId;
