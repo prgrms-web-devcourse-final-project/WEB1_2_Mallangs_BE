@@ -28,7 +28,7 @@ public class AccessTokenBlackList {
             Map<String, Object> payload = jwtUtil.validateToken(refreshToken);
             refreshTokenService.deleteRefreshTokenInRedis(payload);
             //5분 -> 300000밀리초 값비우기, 키는 유지
-            if (nowTime() > lastTime + Duration.ofMinutes(5).toMillis()) {
+            if (nowTime() > lastTime + Duration.ofMinutes(30).toMillis()) {
                 redisTemplate.delete(ACCESS_KEY);
             }
             redisTemplate.opsForSet().add(ACCESS_KEY, AccessToken);

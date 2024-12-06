@@ -58,9 +58,10 @@ public enum ErrorCode {
   CATEGORY_NOT_FOUND(NOT_FOUND, "카테고리 정보를 찾을 수 없습니다."),
   PARENT_CATEGORY_NOT_FOUND(NOT_FOUND, "부모 카테고리를 찾을 수 없습니다."),
   BOARD_NOT_FOUND(NOT_FOUND, "게시글을 찾을 수 없습니다."),
-  UNAUTHORIZED_ACCESS(FORBIDDEN, "관리자 권한이 필요합니다."),
   INVALID_BOARD_TYPE(BAD_REQUEST, "잘못된 게시판 타입입니다."),
   INVALID_BOARD_STATUS(BAD_REQUEST, "게시글을 볼 수 없는 상태입니다."),
+  ADMIN_ACCESS_REQUIRED(FORBIDDEN, "관리자 권한이 필요합니다."),
+  LOGIN_REQUIRED(UNAUTHORIZED, "로그인이 필요합니다."),
 
   //Review
   REVIEW_NOT_FOUND(NOT_FOUND, "리뷰 정보를 찾을 수 없습니다."),
@@ -107,7 +108,13 @@ public enum ErrorCode {
   INVALID_IMAGE_FORMAT(BAD_REQUEST, "지원하지 않는 이미지 형식입니다."),
   IMAGE_FILE_IS_REQUIRED(BAD_REQUEST, "파일이 없습니다."),
   IMAGE_UPLOAD_FAILED(INTERNAL_SERVER_ERROR, "업로드에 실패했습니다."),
-  IMAGE_PROCESSING_ERROR(INTERNAL_SERVER_ERROR,"이미지 처리 중 오류가 발생했습니다.");
+  IMAGE_PROCESSING_ERROR(INTERNAL_SERVER_ERROR,"이미지 처리 중 오류가 발생했습니다."),
+
+  //Token
+  FAILED_TO_CHECK_TOKENS(UNAUTHORIZED, "토큰이 존재하지 않습니다."),
+  REFRESH_TOKEN_EXPIRED(NOT_FOUND, "리프레시 토큰이 만료되었습니다."),
+  TOKEN_IS_BLOCKED(UNAUTHORIZED, "토큰이 차단되었습니다."),
+  REFRESH_TOKEN_MISSING(NOT_FOUND, "리프레시 토큰이 존재하지 않습니다.");
 
   private final HttpStatus httpStatus;
   private final String message;
