@@ -111,7 +111,6 @@ public class JWTFilter extends OncePerRequestFilter {
                     uri.startsWith("/api/v1/articles/public") ||
 
                     //반려동물
-                    ("GET".equals(method) && uri.startsWith("/api/v1/pets/representative")) ||
                     ("GET".equals(method) && uri.startsWith("/api/v1/pets/nearby"))) {
                 filterChain.doFilter(request, response);
                 return;
@@ -239,7 +238,7 @@ public class JWTFilter extends OncePerRequestFilter {
             }
         } catch (Exception e) {
             log.error("fail to check Tokens: {}", e.getMessage());
-            throw e;
+            throw new MallangsCustomException(ErrorCode.FAILED_TO_CHECK_TOKENS);
         }
     }
 

@@ -107,7 +107,10 @@ public enum ErrorCode {
   INVALID_IMAGE_FORMAT(BAD_REQUEST, "지원하지 않는 이미지 형식입니다."),
   IMAGE_FILE_IS_REQUIRED(BAD_REQUEST, "파일이 없습니다."),
   IMAGE_UPLOAD_FAILED(INTERNAL_SERVER_ERROR, "업로드에 실패했습니다."),
-  IMAGE_PROCESSING_ERROR(INTERNAL_SERVER_ERROR,"이미지 처리 중 오류가 발생했습니다.");
+  IMAGE_PROCESSING_ERROR(INTERNAL_SERVER_ERROR,"이미지 처리 중 오류가 발생했습니다."),
+
+  //Token
+  FAILED_TO_CHECK_TOKENS(UNAUTHORIZED, "토큰이 존재하지 않습니다.");
 
   private final HttpStatus httpStatus;
   private final String message;
