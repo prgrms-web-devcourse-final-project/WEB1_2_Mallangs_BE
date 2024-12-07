@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -146,16 +147,21 @@ public class ArticleController {
 
     List<MapBoundsResponse> articlesInBounds;
 
+    log.info("지도에서 글타래 조회");
+
     // 대분류 소분류
     // 대분류 null 인경우 전체 조회
     // 대분류 존재하는 경우 해당 값 조회 // 시설/위치 ---구조 ---목격 ---사용자 등록 정보
     // 시설/위치는 소분류도 존재
     // 사용자 등록 정보는?
-    if (articleType == null || articleType.isEmpty()) { // 대분류 null 전체 조회
+    if (Objects.equals(articleType, "all") || articleType == null
+        || articleType.isEmpty()) { // 대분류 null 전체 조회
+      log.info("전체 조회");
       articlesInBounds = locationService.findArticlesInBounds(
           southWestLat, southWestLon,
           northEastLat, northEastLon);
     } else { // 대준류 null 아님
+      log.info("대분류 조회");
       if (placeCategory == null || placeCategory.isEmpty()) { // 소분류 없는 경우 // 글타래 타입 기준 조회
         articlesInBounds = locationService.findArticlesInBoundsByType(
             southWestLat, southWestLon,
@@ -165,8 +171,8 @@ public class ArticleController {
             southWestLat, southWestLon,
             northEastLat, northEastLon, articleType, placeCategory);
       }
-
     }
+
     return ResponseEntity.ok(articlesInBounds);
   }
 
