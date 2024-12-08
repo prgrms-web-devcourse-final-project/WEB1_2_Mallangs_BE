@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="/webjars/sockjs-client/1.1.2/sockjs.min.js"></script>
     <script src="/webjars/stomp-websocket/2.3.3-1/stomp.min.js"></script>
-    <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
 <div>
@@ -32,6 +31,10 @@
     var ws = Stomp.over(sock);
     var isConnected = false;
 
+    // Heart-beat 설정: 보내기 10초, 받기 10초
+    ws.heartbeat.outgoing = 10000;  // 클라이언트 -> 서버
+    ws.heartbeat.incoming = 20000;  // 서버 -> 클라이언트
+
     // DOM 요소 가져오기
     var tokenInput = document.getElementById("token");
     var sendButton = document.getElementById("send-button");
@@ -49,12 +52,37 @@
     // 버튼 클릭 이벤트
     sendButton.addEventListener("click", function () {
         //토큰 하드 코딩
-        var token = "eyJhbGciOiJIUzI1NiIsInR5cGUiOiJKV1QifQ.eyJyb2xlIjoiUk9MRV9BRE1JTiIsIm5pY2tuYW1lIjoi6rmA64-Z7ZiEIiwiY2F0ZWdvcnkiOiJBQ0NFU1NfVE9LRU4iLCJ1c2VySWQiOiJ0ZXN0MTIzNCIsImVtYWlsIjoidGVzdC5lbWFpbDIwMjRAcHJvdmlkZXIubmV0IiwibWVtYmVySWQiOjEsImlhdCI6MTczMzQ1ODIxNCwiZXhwIjoxNzMzNDc2MjE0fQ.fhiu_rkKD0Vr8fAfe-fKd15_M-GzIGeIWi7zbr4GXTU";
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cGUiOiJKV1QifQ.eyJyb2xlIjoiUk9MRV9BRE1JTiIsIm5pY2tuYW1lIjoi6rmA64-Z7ZiEIiwiY2F0ZWdvcnkiOiJBQ0NFU1NfVE9LRU4iLCJ1c2VySWQiOiJ0ZXN0MTIzNDEyMyIsImVtYWlsIjoidGVzdC5lbWFpbDEyMjExMzI0QHByb3ZpZGVyLm5ldCIsIm1lbWJlcklkIjo3LCJpYXQiOjE3MzM2ODk1MjAsImV4cCI6MTczMzcwNzUyMH0.Fl6t0YN_fxo_XWcdkN_AjjnqmSvtVSSEfoOw02vXDfM";
         var message = messageInput.value.trim();
 
         if (!token) {
             alert("Please enter a token.");
             return;
+        }
+
+        // 연결 끊김 감지
+        sock.onclose = function () {
+            console.warn("WebSocket closed.");
+            connectionStatus.textContent = "Disconnected";
+            isConnected = false;
+            reconnectWebSocket(token);  // 연결 끊김 시 재연결
+        };
+
+        // 에러 감지
+        sock.onerror = function (error) {
+            console.error("WebSocket error: ", error);
+            connectionStatus.textContent = "Error";
+            isConnected = false;
+            reconnectWebSocket(token);  // 에러 발생 시 재연결
+        };
+
+        //재연결 함수
+        function reconnectWebSocket(token) {
+            if (isConnected) return;  // 이미 연결된 경우 방지
+            console.log("Attempting to reconnect...");
+            setTimeout(() => {
+                connectWebSocket(token);  // 재연결 시도
+            }, 5000);  // 5초 대기 후 재연결
         }
 
         if (!isConnected) {
@@ -71,6 +99,7 @@
             }, function (error) {
                 console.error("Connection failed: ", error);
                 connectionStatus.textContent = "Disconnected";
+                reconnectWebSocket(token);
             });
         }
 
