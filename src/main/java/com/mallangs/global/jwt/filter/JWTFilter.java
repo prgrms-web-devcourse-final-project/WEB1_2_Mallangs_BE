@@ -66,10 +66,8 @@ public class JWTFilter extends OncePerRequestFilter {
             AntPathMatcher pathMatcher = new AntPathMatcher();
 
             Map<String, String> patternVariableMap = new HashMap<>();
-            patternVariableMap.put("/api/v1/board/community/category/{categoryId}", "categoryId");
             patternVariableMap.put("/api/v1/comments/board/{boardId}", "boardId");
             patternVariableMap.put("/api/v1/comments/article/{articleId}", "articleId");
-            patternVariableMap.put("/api/v1/board/sighting/category/{categoryId}", "categoryId");
             patternVariableMap.put("/api/v1/place-articles/{placeArticleId}/reviews", "placeArticleId");
             patternVariableMap.put("/api/v1/place-articles/{placeArticleId}/reviews/average-score", "placeArticleId");
 
@@ -104,6 +102,7 @@ public class JWTFilter extends OncePerRequestFilter {
                     //게시판
                     ("GET".equals(method) && uri.startsWith("/api/v1/board/community")) ||
                     ("GET".equals(method) && uri.startsWith("/api/v1/board/community/keyword")) ||
+                    ("GET".equals(method) && uri.startsWith("/api/v1/board/community/category")) ||
                     ("GET".equals(method) && uri.startsWith("/api/v1/board/sighting")) ||
                     ("GET".equals(method) && uri.startsWith("/api/v1/board/sighting/keyword")) ||
 
