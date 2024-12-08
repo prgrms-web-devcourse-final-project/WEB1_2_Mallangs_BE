@@ -3,6 +3,7 @@ package com.mallangs.domain.comment.service;
 import com.mallangs.domain.article.entity.Article;
 import com.mallangs.domain.article.repository.ArticleRepository;
 import com.mallangs.domain.board.entity.Board;
+import com.mallangs.domain.board.entity.BoardType;
 import com.mallangs.domain.board.repository.BoardRepository;
 import com.mallangs.domain.comment.dto.request.CommentArticleRequest;
 import com.mallangs.domain.comment.dto.request.CommentBoardRequest;
@@ -50,58 +51,69 @@ public class CommentService {
                 member.getMemberId(), (board != null ? board.getBoardId() : "N/A"),
                 (article != null ? article.getId() : "N/A"));
 
-        Comment comment = Comment.builder()
-                .member(member)
-                .content(content)
-                .board(board)
-                .article(article)
-                .build();
-
-        commentRepository.save(comment);
-        log.info("Comment saved successfully: {}", comment);
-
-        Long postMemberId = null;
-        String notificationMessage = "";
-        String notificationUrl = "";
-
-        if (board != null) {
-            postMemberId = board.getMember().getMemberId();
-            notificationMessage = "[" + board.getTitle() + "] 새로운 댓글";
-            notificationUrl = "/board/" + board.getBoardId();
+        if (content.length() > 200) { // 길이 초과 체크 추가
+            throw new IllegalArgumentException("댓글 내용은 200자 이하로 입력해야 합니다.");
         }
 
-        if (article != null) {
-            postMemberId = article.getMember().getMemberId();
-            notificationMessage = "[" + article.getTitle() + "] 새로운 댓글";
-            notificationUrl = "/article/" + article.getId();
-        }
-
-        if (postMemberId != null && !postMemberId.equals(member.getMemberId())) {
-            NotificationSendDTO notificationSendDTO = NotificationSendDTO.builder()
-                    .memberId(postMemberId)
-                    .message(notificationMessage)
-                    .notificationType(NotificationType.COMMENT)
-                    .url(notificationUrl)
+        try {
+            Comment comment = Comment.builder()
+                    .member(member)
+                    .content(content)
+                    .board(board)
+                    .article(article)
                     .build();
-            notificationService.send(notificationSendDTO);
-        }
 
+            commentRepository.save(comment);
+            log.info("Comment saved successfully: {}", comment);
 
-        String emitterId = postMemberId + "_";
-        SseEmitter emitter = sseEmitters.findSingleEmitter(emitterId);
-        log.info("Found emitter for memberId: {}", emitterId);
+            Long postMemberId = null;
+            String notificationMessage = "";
+            String notificationUrl = "";
 
-        if (emitter == null) {
-            try {
-                emitter.send(new CommentResponse(comment));
-                log.info("Sent comment response to emitter for memberId: {}", emitterId);
-            } catch (Exception e) {
-                log.error("Error sending comment response to emitter: {}", e.getMessage());
-                sseEmitters.delete(emitterId);
+            if (board != null) {
+                postMemberId = board.getMember().getMemberId();
+                notificationMessage = "[" + board.getTitle() + "] 새로운 댓글";
+                if (board.getBoardType() == BoardType.COMMUNITY) {
+                    notificationUrl = "/api/v1/board/community/" + board.getBoardId();
+                } else if (board.getBoardType() == BoardType.SIGHTING) {
+                    notificationUrl = "/api/v1/board/sighting/" + board.getBoardId();
+                }
             }
-        }
 
-        return new CommentResponse(comment);
+            if (article != null) {
+                postMemberId = article.getMember().getMemberId();
+                notificationMessage = "[" + article.getTitle() + "] 새로운 댓글";
+                notificationUrl = "/api/v1/articles/public/" + article.getId();
+            }
+
+            if (postMemberId != null && !postMemberId.equals(member.getMemberId())) {
+                NotificationSendDTO notificationSendDTO = NotificationSendDTO.builder()
+                        .memberId(postMemberId)
+                        .message(notificationMessage)
+                        .notificationType(NotificationType.COMMENT)
+                        .url(notificationUrl)
+                        .build();
+                notificationService.send(notificationSendDTO);
+            }
+
+            String emitterId = postMemberId + "_";
+            SseEmitter emitter = sseEmitters.findSingleEmitter(emitterId);
+            log.info("Found emitter for memberId: {}", emitterId);
+
+            if (emitter != null) {
+                try {
+                    emitter.send(new CommentResponse(comment));
+                    log.info("Sent comment response to emitter for memberId: {}", emitterId);
+                } catch (Exception e) {
+                    log.error("Error sending comment response to emitter: {}", e.getMessage());
+                    sseEmitters.delete(emitterId);
+                }
+            }
+
+            return new CommentResponse(comment);
+        } catch (Exception e) {
+            throw new MallangsCustomException(ErrorCode.COMMENT_NOT_FOUND);
+        }
     }
 
     // 커뮤니티 댓글 생성
