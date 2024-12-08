@@ -51,7 +51,7 @@ public class ReviewService {
             return new ReviewInfoResponse(savedReview);
         }catch (DataAccessException e) {
             log.error("Failed to create review: {}" ,e.getMessage());
-            throw new MallangsCustomException(ErrorCode.ARTICLE_NOT_FOUND);
+            throw new MallangsCustomException(ErrorCode.REVIEW_NOT_CREATED);
         }
     }
 
