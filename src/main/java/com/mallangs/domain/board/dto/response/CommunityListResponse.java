@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class CommunityListResponse {
     private final Long boardId;
     private final String title;
+    private final String content;
     private final String writer;
     private final String categoryName;
     private final int viewCount;
@@ -21,6 +22,7 @@ public class CommunityListResponse {
     public CommunityListResponse(Board board) {
         this.boardId = board.getBoardId();
         this.title = board.getTitle();
+        this.content = board.getContent();
         this.writer = board.getMember().getNickname().getValue();
         this.categoryName = board.getCategory().getName();
         this.viewCount = board.getViewCnt();
