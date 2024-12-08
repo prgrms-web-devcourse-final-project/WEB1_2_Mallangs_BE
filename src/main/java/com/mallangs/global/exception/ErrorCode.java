@@ -75,7 +75,7 @@ public enum ErrorCode {
   PET_NOT_FOUND(NOT_FOUND, "반려동물 정보를 찾을 수 없습니다"),
   PET_NOT_ACTIVATE(HttpStatus.GONE, "반려동물이 비활성화(삭제) 상태입니다."),
   PET_NOT_PROFILE_OPEN(HttpStatus.FORBIDDEN, "반려동물 비공개 상태입니다."),
-  PET_NOT_CREATE(HttpStatus.BAD_REQUEST, "반려동물 등록에 실패하였습니다."),
+  PET_NOT_CREATE(HttpStatus.INTERNAL_SERVER_ERROR, "반려동물 등록에 실패하였습니다."),
   PET_NOT_UPDATE(HttpStatus.INTERNAL_SERVER_ERROR, "반려동물 수정에 실패하였습니다."),
   PET_NOT_DELETE(HttpStatus.INTERNAL_SERVER_ERROR, "반려동물 삭제(비활성화)에 실패하였습니다."),
   PET_NOT_RESTORE(HttpStatus.INTERNAL_SERVER_ERROR, "반려동물 복원(활성화)에 실패하였습니다."),
@@ -84,8 +84,8 @@ public enum ErrorCode {
   PET_NOT_REPRESENTATIVE(HttpStatus.INTERNAL_SERVER_ERROR, "대표 말랑이(반려동물) 등록에 실패하였습니다."),
 
   //Location
-  LOCATION_INVALIDE_PARAMS(HttpStatus.INTERNAL_SERVER_ERROR, "입력된 데이터가 유효하지 않습니다."),
-  LOCATION_INVALIDE_RANGE(HttpStatus.INTERNAL_SERVER_ERROR, "유효하지 않은 범위입니다."),
+  LOCATION_INVALIDE_PARAMS(BAD_REQUEST, "입력된 데이터가 유효하지 않습니다."),
+  LOCATION_INVALIDE_RANGE(BAD_REQUEST, "유효하지 않은 위치 범위입니다."),
 
   // Comment
   COMMENT_NOT_FOUND(NOT_FOUND, "댓글을 찾을 수 없습니다."),
@@ -112,7 +112,8 @@ public enum ErrorCode {
 
   //Token
   FAILED_TO_CHECK_TOKENS(UNAUTHORIZED, "토큰이 존재하지 않습니다."),
-  REFRESH_TOKEN_EXPIRED(NOT_FOUND, "리프레시 토큰이 만료되었습니다."),
+  REFRESH_TOKEN_EXPIRED(UNAUTHORIZED, "리프레시 토큰이 만료되었습니다."),
+  TOKEN_EXPIRED(UNAUTHORIZED, "토큰이 만료되었습니다."),
   TOKEN_IS_BLOCKED(UNAUTHORIZED, "토큰이 차단되었습니다."),
   REFRESH_TOKEN_MISSING(NOT_FOUND, "리프레시 토큰이 존재하지 않습니다.");
 

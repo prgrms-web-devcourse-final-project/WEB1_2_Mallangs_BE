@@ -2,6 +2,7 @@ package com.mallangs.domain.member.controller;
 
 import com.mallangs.domain.member.dto.*;
 import com.mallangs.domain.member.dto.request.LoginRequest;
+import com.mallangs.domain.member.dto.response.MemberGetByOtherResponse;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.MemberRole;
 import com.mallangs.domain.member.entity.embadded.UserId;
@@ -90,6 +91,16 @@ public class MemberUserController {
     public ResponseEntity<MemberGetResponse> get(Authentication authentication) {
         String userId = authentication.getName();
         return ResponseEntity.status(HttpStatus.CREATED).body(memberUserService.get(userId));
+    }
+    @GetMapping("/other/{userId}")
+    @Operation(summary = "(타인)회원 프로필 조회", description = "(타인)회원 프로필 조회 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "회원 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "회원을 찾을 수 없습니다."),
+            @ApiResponse(responseCode = "406", description = "차단된 계정입니다.")
+    })
+    public ResponseEntity<MemberGetByOtherResponse> getByOther(@PathVariable("userId") String userId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(memberUserService.getByOther(userId));
     }
 
     @PutMapping("/{memberId}")
@@ -180,18 +191,18 @@ public class MemberUserController {
             AccessPayloadMap.put("category", TokenCategory.ACCESS_TOKEN.name());
             String accessToken = jwtUtil.createAccessToken(AccessPayloadMap, accessTokenValidity);
 
-            //리프레시 토큰 생성 ( 난수를 입력, 의미없는 토큰 생성 )
-            Map<String, Object> refreshPayloadMap = new HashMap<>();
-            refreshPayloadMap.put("userId", userId);
-
-            //식별 위한 UserID 입력
-            String randomUUID = UUID.randomUUID().toString();
-            refreshPayloadMap.put("randomUUID", randomUUID);
-            String refreshToken = jwtUtil.createRefreshToken(refreshPayloadMap, accessRefreshTokenValidity);
-            log.info("컨트롤러 로그인, 토큰만듬: {}, refresh: {}", accessToken, refreshToken);
-
-            //리프레시 토큰 레디스에 저장하기
-            refreshTokenService.insertInRedis(refreshPayloadMap, refreshToken);
+//            //리프레시 토큰 생성 ( 난수를 입력, 의미없는 토큰 생성 )
+//            Map<String, Object> refreshPayloadMap = new HashMap<>();
+//            refreshPayloadMap.put("userId", userId);
+//
+//            //식별 위한 UserID 입력
+//            String randomUUID = UUID.randomUUID().toString();
+//            refreshPayloadMap.put("randomUUID", randomUUID);
+//            String refreshToken = jwtUtil.createRefreshToken(refreshPayloadMap, accessRefreshTokenValidity);
+//            log.info("컨트롤러 로그인, 토큰만듬: {}, refresh: {}", accessToken, refreshToken);
+//
+//            //리프레시 토큰 레디스에 저장하기
+//            refreshTokenService.insertInRedis(refreshPayloadMap, refreshToken);
 
             //로그인 시간 저장
             Member foundMember = memberRepository.findByUserId(new UserId(userId))
@@ -215,8 +226,8 @@ public class MemberUserController {
 
             // 응답 반환
             return ResponseEntity.ok(Map.of(
-                    "AccessToken", accessToken,
-                    "RefreshToken", refreshToken
+                    "AccessToken", accessToken
+//                    "RefreshToken", refreshToken
             ));
         } catch (AuthenticationException ex) {
             // 인증 실패 시 401 반환
@@ -233,59 +244,62 @@ public class MemberUserController {
     })
     public ResponseEntity<?> loginOut(HttpServletRequest request, HttpServletResponse response) {
         log.info("커스텀 로그아웃 실행");
+//
+//        // Refresh Token 없다면 오류
+//        String refreshTokenFromCookies = getRefreshTokenFromCookies(request);
+//        log.info("refreshTokenFromCookies : {}", refreshTokenFromCookies);
+//        if (refreshTokenFromCookies == null || refreshTokenFromCookies.trim().isEmpty()) {
+//            log.warn("No refresh token found");
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//                    .body(Map.of("error", "Refresh token is missing"));
+//        }
+//
+//        // Access Token 없다면 오류
+//        String authorizationHeader = request.getHeader("Authorization");
+//        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+//            log.warn("No access token found");
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//                    .body(Map.of("error", "Access token is missing"));
+//        }
+//
+//        String accessToken = authorizationHeader.substring(7);
+//        // 블랙리스트 등록
+//        try {
+//            if (!jwtUtil.isExpired(accessToken)) {
+//                if (!jwtUtil.isExpired(refreshTokenFromCookies)) {
+//                    accessTokenBlackList.registerBlackList(accessToken, refreshTokenFromCookies);
+//                    log.info("Tokens are registered to BlackList");
+//                } else {
+//                    log.info("RefreshToken is expired");
+//                }
+//            } else {
+//                log.info("AccessToken is expired");
+//
+//            }
+//            // 리프레시 토큰 삭제
+//            Map<String, Object> payloadMap = jwtUtil.validateRefreshToken(refreshTokenFromCookies);
+//            refreshTokenService.deleteRefreshTokenInRedis(payloadMap);
+//
+//        } catch (Exception e) {
+//            log.error("토큰 블랙리스트 처리에 실패하였습니다 : {}", e.getMessage());
+//            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(Map.of("error", "Token processing failed"));
+//        }
+//
+//        // 쿠키 비우기
+//        Cookie cookie = new Cookie("refreshToken", null);
+////        cookie.setSecure(true); // HTTPS 환경에서만 전송
+//        cookie.setPath("/");
+//        cookie.setHttpOnly(true);
+//        cookie.setMaxAge(0);
+//        response.addCookie(cookie);
+//
+//
+//        response.addHeader("accessToken",null);
+//        response.setStatus(HttpServletResponse.SC_OK);
+//        response.setContentType("application/json");
 
-        // Refresh Token 없다면 오류
-        String refreshTokenFromCookies = getRefreshTokenFromCookies(request);
-        log.info("refreshTokenFromCookies : {}", refreshTokenFromCookies);
-        if (refreshTokenFromCookies == null || refreshTokenFromCookies.trim().isEmpty()) {
-            log.warn("No refresh token found");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Refresh token is missing"));
-        }
-
-        // Access Token 없다면 오류
-        String authorizationHeader = request.getHeader("Authorization");
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            log.warn("No access token found");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Access token is missing"));
-        }
-
-        String accessToken = authorizationHeader.substring(7);
-        // 블랙리스트 등록
-        try {
-            if (!jwtUtil.isExpired(accessToken)) {
-                if (!jwtUtil.isExpired(refreshTokenFromCookies)) {
-                    accessTokenBlackList.registerBlackList(accessToken, refreshTokenFromCookies);
-                    log.info("Tokens are registered to BlackList");
-                } else {
-                    log.info("RefreshToken is expired");
-                }
-            } else {
-                log.info("AccessToken is expired");
-
-            }
-            // 리프레시 토큰 삭제
-            Map<String, Object> payloadMap = jwtUtil.validateRefreshToken(refreshTokenFromCookies);
-            refreshTokenService.deleteRefreshTokenInRedis(payloadMap);
-
-        } catch (Exception e) {
-            log.error("토큰 블랙리스트 처리에 실패하였습니다 : {}", e.getMessage());
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Token processing failed"));
-        }
-
-        // 쿠키 비우기
-        Cookie cookie = new Cookie("refreshToken", null);
-//        cookie.setSecure(true); // HTTPS 환경에서만 전송
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
-
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setContentType("application/json");
-
+        response.setHeader("accessToken", null);
         return ResponseEntity.status(HttpStatus.CREATED).body("message : 로그아웃 성공");
     }
 

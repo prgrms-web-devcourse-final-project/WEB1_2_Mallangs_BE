@@ -7,6 +7,8 @@ import com.mallangs.domain.member.entity.embadded.Nickname;
 import com.mallangs.domain.member.entity.embadded.Password;
 import com.mallangs.domain.member.entity.embadded.UserId;
 import com.mallangs.domain.member.util.GeometryUtil;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
@@ -51,7 +53,9 @@ public class MemberCreateRequest {
     private String buildingName;
     private String zoneNo;
     private String mountainYn;
+    @Min(-90)@Max(90)
     private Double latitude;
+    @Min(-90)@Max(90)
     private Double longitude;
 
 

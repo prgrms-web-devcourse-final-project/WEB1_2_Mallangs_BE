@@ -15,9 +15,6 @@ public class MemberUpdateRequest {
     private String nickname;
     @Pattern(regexp = Email.REGEX, message = Email.ERR_MSG)
     private String email;
-    @Pattern(regexp = "([^\\s]+(\\.(?i)(jpg|jpeg|png|gif|bmp|tiff|webp|svg|ico|heic|heif|avif))$)",
-            message = "유효한 이미지 파일을 업로드해주세요. (jpg, jpeg, png, gif, bmp, tiff, webp, svg, ico, heic, heif, avif)")
-    private String profileImage;
     @Pattern(regexp = Password.REGEX, message = Password.ERR_MSG)
     private String password;
 }

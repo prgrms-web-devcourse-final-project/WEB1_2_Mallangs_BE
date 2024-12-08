@@ -12,6 +12,7 @@ import com.mallangs.global.jwt.entity.CustomMemberDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -84,8 +85,15 @@ public class BoardController {
             @PathVariable String categoryName,
             @RequestParam(defaultValue = "1") int page
     ) {
+        log.info("=== Request received - category: {}, page: {}", categoryName, page);
+
         PageRequest pageRequest = PageRequest.of(page - 1, 10);
-        return ResponseEntity.ok(PageResponse.from(boardService.getCommunityBoardsByCategory(categoryName, pageRequest)));
+
+        var result = boardService.getCommunityBoardsByCategory(categoryName, pageRequest);
+        log.info("=== Request processed successfully");
+
+        return ResponseEntity.ok(PageResponse.from(result));
+//        return ResponseEntity.ok(PageResponse.from(boardService.getCommunityBoardsByCategory(categoryName, pageRequest)));
     }
 
     @Operation(summary = "커뮤니티 특정 게시글 수정", description = "특정 커뮤니티 게시글을 수정합니다.")

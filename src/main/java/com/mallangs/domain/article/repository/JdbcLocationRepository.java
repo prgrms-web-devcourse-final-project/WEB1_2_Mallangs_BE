@@ -22,7 +22,8 @@ public class JdbcLocationRepository implements LocationRepository {
         "SELECT a.article_id, a.type, a.title, ST_X(a.geography) AS latitude, " +
             "ST_Y(a.geography) AS longitude, a.description " +
             "FROM article a " +
-            "WHERE MBRContains(ST_GeomFromText('POLYGON((%f %f, %f %f, %f %f, %f %f, %f %f))', 4326), a.geography)",
+            "WHERE MBRContains(ST_GeomFromText('POLYGON((%f %f, %f %f, %f %f, %f %f, %f %f))', 4326), a.geography) "
+            + "AND a.map_visibility = 'VISIBLE'",
         southWestLat, southWestLon,
         southWestLat, northEastLon,
         northEastLat, northEastLon,
@@ -52,7 +53,8 @@ public class JdbcLocationRepository implements LocationRepository {
         "SELECT a.article_id, a.type, a.title, ST_X(a.geography) AS latitude, " +
             "ST_Y(a.geography) AS longitude, a.description " +
             "FROM article a " +
-            "WHERE MBRContains(ST_GeomFromText('POLYGON((%f %f, %f %f, %f %f, %f %f, %f %f))', 4326), a.geography) AND a.type = '%s'",
+            "WHERE MBRContains(ST_GeomFromText('POLYGON((%f %f, %f %f, %f %f, %f %f, %f %f))', 4326), a.geography) "
+            + "AND a.type = '%s' AND a.map_visibility = 'VISIBLE'",
         southWestLat, southWestLon,
         southWestLat, northEastLon,
         northEastLat, northEastLon,
@@ -85,7 +87,7 @@ public class JdbcLocationRepository implements LocationRepository {
             "FROM place_article p "
             + "JOIN article a ON p.article_id = a.article_id "
             + "WHERE MBRContains(ST_GeomFromText('POLYGON((%f %f, %f %f, %f %f, %f %f, %f %f))', 4326), a.geography) "
-            + "AND p.is_public_data = %b",
+            + "AND p.is_public_data = %b AND a.map_visibility = 'VISIBLE'",
         southWestLat, southWestLon,
         southWestLat, northEastLon,
         northEastLat, northEastLon,
@@ -119,7 +121,7 @@ public class JdbcLocationRepository implements LocationRepository {
             "FROM place_article p "
             + "JOIN article a ON p.article_id = a.article_id "
             + "WHERE MBRContains(ST_GeomFromText('POLYGON((%f %f, %f %f, %f %f, %f %f, %f %f))', 4326), a.geography) "
-            + "AND p.category = '%s' AND p.is_public_data = %b",
+            + "AND p.category = '%s' AND p.is_public_data = %b AND a.map_visibility = 'VISIBLE'",
         southWestLat, southWestLon,
         southWestLat, northEastLon,
         northEastLat, northEastLon,

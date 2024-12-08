@@ -31,8 +31,8 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
 
     //반경 내 반려동물 조회
     @Query(value = """
-        SELECT p.* FROM Pet p \
-        JOIN Member m ON p.member_id = m.member_id \
+        SELECT p.* FROM pet p \
+        JOIN member m ON p.member_id = m.member_id \
         JOIN address a ON a.member_id = m.member_id \
         WHERE p.is_open_profile = true \
         AND p.is_active = true \
