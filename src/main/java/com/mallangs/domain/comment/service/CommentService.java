@@ -190,10 +190,6 @@ public class CommentService {
             throw new MallangsCustomException(ErrorCode.POST_NOT_FOUND);
         }
 
-        if (comments.isEmpty()) {
-            throw new MallangsCustomException(ErrorCode.COMMENT_NOT_FOUND);
-        }
-
         return comments.map(CommentResponse::new);
     }
 
@@ -203,9 +199,6 @@ public class CommentService {
         Pageable pageable = commentPageRequest.getPageable(sort);
         Page<Comment> comments = commentRepository.findCommentsByMemberId(memberId, pageable);
 
-        if (comments.isEmpty()) {
-            throw new MallangsCustomException(ErrorCode.COMMENT_NOT_FOUND);
-        }
 
         return comments.map(CommentResponse::new);
     }
