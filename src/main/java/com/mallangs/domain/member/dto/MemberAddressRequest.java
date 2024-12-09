@@ -2,6 +2,8 @@ package com.mallangs.domain.member.dto;
 
 import com.mallangs.domain.member.entity.Address;
 import com.mallangs.domain.member.util.GeometryUtil;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.ToString;
@@ -28,7 +30,9 @@ public class MemberAddressRequest {
     private String buildingName;
     private String zoneNo;
     private String mountainYn;
+    @Min(-90)@Max(90)
     private Double longitude;
+    @Min(-90)@Max(90)
     private Double latitude; //y
 
 

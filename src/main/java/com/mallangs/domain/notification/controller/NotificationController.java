@@ -20,7 +20,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/notification")
+@RequestMapping("/api/v1/notification")
 @Tag(name = "알림", description = "알림 CRUD")
 public class NotificationController {
     private final NotificationService notificationService;
