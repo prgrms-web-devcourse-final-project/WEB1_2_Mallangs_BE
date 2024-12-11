@@ -83,65 +83,17 @@
   
 <summary>API 명세서</summary> 
 
+
 ## 프로젝트 협업 규칙
 
+<details>
+<summary>Convention </summary>
 
 
-### [협업 방식]
-
-## 📅 주기적인 팀 일정
-**<월~금>**  
-
-- 🕘 **오전 팀장 미팅:** 9:00am  
-- 🕔 **오후 전체 미팅:** 5:00pm  
-
-
-## 🤝 협업 툴  
-
-- Notion  
-- GitHub  
-- Zoom  
-- Figma  
-- Discord  
-
-
-## 📋 API 문서화 프로세스  
-
-### API 설계 단계  
-
-- **Notion을 활용한 초기 API 명세서 작성**  
-  - Endpoint 정의  
-  - Request/Response 스키마  
-
-### 배포 및 연동 단계  
-
-- **Swagger/OpenAPI를 통한 자동화된 문서 관리**  
-  - API 변경사항 실시간 반영  
-  - Request/Response 스키마 동기화  
-  - Status Code 자동화  
-  - 필수 파라미터 및 제약 조건 자동화  
-
-### API 연동 방식  
-
-1. **로컬 개발 환경 연동**  
-   - 백엔드 프로젝트 빌드 파일 로컬 다운로드  
-   - 로컬 환경에서 API 서버 구동  
-
-2. **AWS 프리티어 계정 활용**  
-   - 개인 AWS 계정으로 API 서버 배포  
-
-3. **IAM 계정 연동**  
-   - 그렙 IAM 계정 발급 후 사용  
-
-
-## 🔀 깃 전략  
-
-### 프론트와 백엔드 분리된 GitHub 저장소 운영  
+### 깃 전략  
 
 #### Feature-Branch 전략(GitHub Flow)  
 ![image](https://github.com/user-attachments/assets/96903560-e01e-4d17-8219-2cf187dea064)
-
-
 
 ### Branch 관리  
 
@@ -166,20 +118,6 @@
 - `feature` 브랜치: 1명 이상 승인 시  
 - `develop` 브랜치: 모든 팀원 승인 시  
 
-### 코드 리뷰  
-
-- 최소 2일에 한 번 코드 리뷰  
-- 모든 팀원이 참여  
-
-
-## 🧪 테스트 일정  
-
-- **프론트 공개 테스트:** 최소 1회  
-- **백엔드 공개 테스트:** 최소 1회  
-- **프론트 + 백엔드 중간/최종 테스트:** 각 1회  
-
-
-## 📚 Git / 코드 컨벤션  
 
 ### Git Convention  
 
@@ -206,25 +144,425 @@
 - `docs:` 문서 작업  
 - `refactor:` 코드 리팩토링  
 - `merge:` 브랜치 병합  
-- `comment:` 주석 추가 및 변경  
+- `comment:` 주석 추가 및 변경
 
+### Code Convention
+```
+//도메인 지정
+private Long memberId;
 
-### 패키지 구조
-````
-domain
-├── member
-│ ├── dto
-│ ├── entity
-│ ├── service
-│ ├── controller
-│ └── repository
-├── pet
-├── article
-├── review
-├── comment
-├── report
-└── notification
-````
+private Long userId; 
+
+//엔티티 수정 메서드 : chanegeMethod
+public void changeName(String name){
+    this.name = name;
+}
+
+//엔티티 수정 메서드 : chanegeMethod
+public void changeWeight(Integer weight){
+    this.weight = weight;
+}
+
+domainId로 통일
+```
+
+  </details>
+
+<details>
+  <summary> 패키지 구조 </summary>
+  
+```
+📦 
+├─ .gitattributes
+├─ .github
+│  ├─ ISSUE_TEMPLATE
+│  │  └─ 📋-general-issue.md
+│  ├─ PULL_REQUEST_TEMPLATE
+│  └─ workflows
+│     ├─ CICD.yml
+│     └─ CICDdevelop.yml
+├─ .gitignore
+├─ README.md
+├─ build.gradle
+├─ gradle
+│  └─ wrapper
+│     ├─ gradle-wrapper.jar
+│     └─ gradle-wrapper.properties
+├─ gradlew
+├─ gradlew.bat
+├─ settings.gradle
+├─ src
+│  ├─ main
+│  │  ├─ java
+│  │  │  └─ com
+│  │  │     └─ mallangs
+│  │  │        ├─ MallangsApplication.java
+│  │  │        ├─ domain
+│  │  │        │  ├─ article
+│  │  │        │  │  ├─ controller
+│  │  │        │  │  │  ├─ ArticleController.java
+│  │  │        │  │  │  └─ TourApiController.java
+│  │  │        │  │  ├─ dto
+│  │  │        │  │  │  ├─ request
+│  │  │        │  │  │  │  ├─ ArticleCreateRequest.java
+│  │  │        │  │  │  │  ├─ LostCreateRequest.java
+│  │  │        │  │  │  │  ├─ MapBoundsRequest.java
+│  │  │        │  │  │  │  ├─ PlaceCreateRequest.java
+│  │  │        │  │  │  │  └─ RescueCreateRequest.java
+│  │  │        │  │  │  └─ response
+│  │  │        │  │  │     ├─ ArticlePageResponse.java
+│  │  │        │  │  │     ├─ ArticleResponse.java
+│  │  │        │  │  │     ├─ LostResponse.java
+│  │  │        │  │  │     ├─ MapBoundsResponse.java
+│  │  │        │  │  │     ├─ PlaceResponse.java
+│  │  │        │  │  │     └─ RescueResponse.java
+│  │  │        │  │  ├─ entity
+│  │  │        │  │  │  ├─ Article.java
+│  │  │        │  │  │  ├─ ArticleType.java
+│  │  │        │  │  │  ├─ CaseStatus.java
+│  │  │        │  │  │  ├─ LostArticle.java
+│  │  │        │  │  │  ├─ MapVisibility.java
+│  │  │        │  │  │  ├─ PlaceArticle.java
+│  │  │        │  │  │  └─ RescueArticle.java
+│  │  │        │  │  ├─ factory
+│  │  │        │  │  │  ├─ ArticleFactory.java
+│  │  │        │  │  │  ├─ ArticleFactoryManager.java
+│  │  │        │  │  │  ├─ LostArticleFactory.java
+│  │  │        │  │  │  ├─ PlaceArticleFactory.java
+│  │  │        │  │  │  └─ RescueArticleFactory.java
+│  │  │        │  │  ├─ repository
+│  │  │        │  │  │  ├─ ArticleRepository.java
+│  │  │        │  │  │  ├─ JdbcLocationRepository.java
+│  │  │        │  │  │  ├─ LocationRepository.java
+│  │  │        │  │  │  └─ PlaceArticleRepository.java
+│  │  │        │  │  ├─ service
+│  │  │        │  │  │  ├─ ArticleService.java
+│  │  │        │  │  │  ├─ LocationService.java
+│  │  │        │  │  │  └─ PlaceArticleCsvService.java
+│  │  │        │  │  └─ validation
+│  │  │        │  │     └─ ValidationGroups.java
+│  │  │        │  ├─ board
+│  │  │        │  │  ├─ controller
+│  │  │        │  │  │  ├─ BoardController.java
+│  │  │        │  │  │  └─ CategoryController.java
+│  │  │        │  │  ├─ dto
+│  │  │        │  │  │  ├─ request
+│  │  │        │  │  │  │  ├─ AdminBoardStatusRequest.java
+│  │  │        │  │  │  │  ├─ CategoryCreateRequest.java
+│  │  │        │  │  │  │  ├─ CategoryUpdateRequest.java
+│  │  │        │  │  │  │  ├─ CommunityCreateRequest.java
+│  │  │        │  │  │  │  ├─ CommunityUpdateRequest.java
+│  │  │        │  │  │  │  ├─ SightingCreateRequest.java
+│  │  │        │  │  │  │  └─ SightingUpdateRequest.java
+│  │  │        │  │  │  └─ response
+│  │  │        │  │  │     ├─ AdminBoardResponse.java
+│  │  │        │  │  │     ├─ AdminBoardsResponse.java
+│  │  │        │  │  │     ├─ AdminCategoryResponse.java
+│  │  │        │  │  │     ├─ BoardStatusCount.java
+│  │  │        │  │  │     ├─ CategoryResponse.java
+│  │  │        │  │  │     ├─ CommunityDetailResponse.java
+│  │  │        │  │  │     ├─ CommunityListResponse.java
+│  │  │        │  │  │     ├─ PageResponse.java
+│  │  │        │  │  │     ├─ SightingDetailResponse.java
+│  │  │        │  │  │     └─ SightingListResponse.java
+│  │  │        │  │  ├─ entity
+│  │  │        │  │  │  ├─ Board.java
+│  │  │        │  │  │  ├─ BoardStatus.java
+│  │  │        │  │  │  ├─ BoardType.java
+│  │  │        │  │  │  ├─ Category.java
+│  │  │        │  │  │  └─ CategoryStatus.java
+│  │  │        │  │  ├─ repository
+│  │  │        │  │  │  ├─ BoardRepository.java
+│  │  │        │  │  │  └─ CategoryRepository.java
+│  │  │        │  │  └─ service
+│  │  │        │  │     ├─ BoardService.java
+│  │  │        │  │     └─ CategoryService.java
+│  │  │        │  ├─ chat
+│  │  │        │  │  ├─ controller
+│  │  │        │  │  │  ├─ ChatMessageController.java
+│  │  │        │  │  │  ├─ ChatRoomController.java
+│  │  │        │  │  │  ├─ WebSocketDocumentationController.java
+│  │  │        │  │  │  └─ test
+│  │  │        │  │  │     ├─ ChatViewControllerTest.java
+│  │  │        │  │  │     └─ WebSocketControllerTest.java
+│  │  │        │  │  ├─ dto
+│  │  │        │  │  │  ├─ request
+│  │  │        │  │  │  │  ├─ ChatMessageRequest.java
+│  │  │        │  │  │  │  ├─ ChatRoomChangeNameRequest.java
+│  │  │        │  │  │  │  └─ UpdateChatMessageRequest.java
+│  │  │        │  │  │  └─ response
+│  │  │        │  │  │     ├─ ChatMessageDeleteSuccessResponse.java
+│  │  │        │  │  │     ├─ ChatMessageListResponse.java
+│  │  │        │  │  │     ├─ ChatMessageResponse.java
+│  │  │        │  │  │     ├─ ChatMessageSuccessResponse.java
+│  │  │        │  │  │     ├─ ChatMessageToDTOResponse.java
+│  │  │        │  │  │     ├─ ChatRoomResponse.java
+│  │  │        │  │  │     └─ ParticipatedRoomListResponse.java
+│  │  │        │  │  ├─ entity
+│  │  │        │  │  │  ├─ ChatMessage.java
+│  │  │        │  │  │  ├─ ChatRoom.java
+│  │  │        │  │  │  ├─ MessageType.java
+│  │  │        │  │  │  └─ ParticipatedRoom.java
+│  │  │        │  │  ├─ redis
+│  │  │        │  │  │  └─ RedisSubscriber.java
+│  │  │        │  │  ├─ repository
+│  │  │        │  │  │  ├─ ChatMessageRepository.java
+│  │  │        │  │  │  ├─ ChatRoomRepository.java
+│  │  │        │  │  │  └─ ParticipatedRoomRepository.java
+│  │  │        │  │  └─ service
+│  │  │        │  │     ├─ ChatMessageService.java
+│  │  │        │  │     └─ ChatRoomService.java
+│  │  │        │  ├─ comment
+│  │  │        │  │  ├─ controller
+│  │  │        │  │  │  └─ CommentController.java
+│  │  │        │  │  ├─ dto
+│  │  │        │  │  │  ├─ request
+│  │  │        │  │  │  │  ├─ CommentArticleRequest.java
+│  │  │        │  │  │  │  ├─ CommentBoardRequest.java
+│  │  │        │  │  │  │  ├─ CommentDeleteRequest.java
+│  │  │        │  │  │  │  ├─ CommentPageRequest.java
+│  │  │        │  │  │  │  └─ CommentUpdateRequest.java
+│  │  │        │  │  │  └─ response
+│  │  │        │  │  │     └─ CommentResponse.java
+│  │  │        │  │  ├─ entity
+│  │  │        │  │  │  └─ Comment.java
+│  │  │        │  │  ├─ repository
+│  │  │        │  │  │  └─ CommentRepository.java
+│  │  │        │  │  └─ service
+│  │  │        │  │     └─ CommentService.java
+│  │  │        │  ├─ image
+│  │  │        │  │  ├─ controller
+│  │  │        │  │  │  └─ ImageController.java
+│  │  │        │  │  ├─ dto
+│  │  │        │  │  │  └─ ImageDto.java
+│  │  │        │  │  ├─ entity
+│  │  │        │  │  │  └─ Image.java
+│  │  │        │  │  ├─ repository
+│  │  │        │  │  │  └─ ImageRepository.java
+│  │  │        │  │  └─ service
+│  │  │        │  │     └─ ImageService.java
+│  │  │        │  ├─ member
+│  │  │        │  │  ├─ controller
+│  │  │        │  │  │  ├─ AddressController.java
+│  │  │        │  │  │  ├─ AuthController.java
+│  │  │        │  │  │  ├─ MemberAdminController.java
+│  │  │        │  │  │  ├─ MemberUserController.java
+│  │  │        │  │  │  ├─ Oauth2Controller.java
+│  │  │        │  │  │  └─ test
+│  │  │        │  │  │     └─ MemberFileTestPageController.java
+│  │  │        │  │  ├─ dto
+│  │  │        │  │  │  ├─ AddressCreateSuccessResponse.java
+│  │  │        │  │  │  ├─ AddressDeleteSuccessResponse.java
+│  │  │        │  │  │  ├─ MemberAddressRequest.java
+│  │  │        │  │  │  ├─ MemberAddressResponse.java
+│  │  │        │  │  │  ├─ MemberBanRequest.java
+│  │  │        │  │  │  ├─ MemberCheckPasswordResponse.java
+│  │  │        │  │  │  ├─ MemberCreateRequest.java
+│  │  │        │  │  │  ├─ MemberFindPasswordRequest.java
+│  │  │        │  │  │  ├─ MemberFindUserIdRequest.java
+│  │  │        │  │  │  ├─ MemberGetRequestByEmail.java
+│  │  │        │  │  │  ├─ MemberGetRequestByNickname.java
+│  │  │        │  │  │  ├─ MemberGetRequestByUserId.java
+│  │  │        │  │  │  ├─ MemberGetResponse.java
+│  │  │        │  │  │  ├─ MemberGetResponseOnlyMember.java
+│  │  │        │  │  │  ├─ MemberRegisterRequest.java
+│  │  │        │  │  │  ├─ MemberSendMailResponse.java
+│  │  │        │  │  │  ├─ MemberUpdateRequest.java
+│  │  │        │  │  │  ├─ PageRequestDTO.java
+│  │  │        │  │  │  ├─ PasswordDTO.java
+│  │  │        │  │  │  ├─ request
+│  │  │        │  │  │  │  └─ LoginRequest.java
+│  │  │        │  │  │  └─ response
+│  │  │        │  │  │     └─ MemberGetByOtherResponse.java
+│  │  │        │  │  ├─ entity
+│  │  │        │  │  │  ├─ Address.java
+│  │  │        │  │  │  ├─ Member.java
+│  │  │        │  │  │  ├─ MemberRole.java
+│  │  │        │  │  │  └─ embadded
+│  │  │        │  │  │     ├─ Email.java
+│  │  │        │  │  │     ├─ Nickname.java
+│  │  │        │  │  │     ├─ Password.java
+│  │  │        │  │  │     └─ UserId.java
+│  │  │        │  │  ├─ repository
+│  │  │        │  │  │  ├─ AddressRepository.java
+│  │  │        │  │  │  └─ MemberRepository.java
+│  │  │        │  │  ├─ service
+│  │  │        │  │  │  ├─ AddressService.java
+│  │  │        │  │  │  ├─ MemberAdminService.java
+│  │  │        │  │  │  └─ MemberUserService.java
+│  │  │        │  │  └─ util
+│  │  │        │  │     ├─ GeometryUtil.java
+│  │  │        │  │     └─ PasswordGenerator.java
+│  │  │        │  ├─ notification
+│  │  │        │  │  ├─ controller
+│  │  │        │  │  │  └─ NotificationController.java
+│  │  │        │  │  ├─ dto
+│  │  │        │  │  │  ├─ NotificationSendDTO.java
+│  │  │        │  │  │  ├─ request
+│  │  │        │  │  │  │  └─ NotificationRequest.java
+│  │  │        │  │  │  └─ response
+│  │  │        │  │  │     └─ NotificationResponse.java
+│  │  │        │  │  ├─ entity
+│  │  │        │  │  │  ├─ Notification.java
+│  │  │        │  │  │  └─ NotificationType.java
+│  │  │        │  │  ├─ repository
+│  │  │        │  │  │  └─ NotificationRepository.java
+│  │  │        │  │  └─ service
+│  │  │        │  │     └─ NotificationService.java
+│  │  │        │  ├─ pet
+│  │  │        │  │  ├─ controller
+│  │  │        │  │  │  └─ PetController.java
+│  │  │        │  │  ├─ dto
+│  │  │        │  │  │  ├─ PageRequest.java
+│  │  │        │  │  │  ├─ PetCreateRequest.java
+│  │  │        │  │  │  ├─ PetLocationRequest.java
+│  │  │        │  │  │  ├─ PetMemberProfileResponse.java
+│  │  │        │  │  │  ├─ PetNearbyPageResponse.java
+│  │  │        │  │  │  ├─ PetNearbyResponse.java
+│  │  │        │  │  │  ├─ PetPageResponse.java
+│  │  │        │  │  │  ├─ PetResponse.java
+│  │  │        │  │  │  └─ PetUpdateRequest.java
+│  │  │        │  │  ├─ entity
+│  │  │        │  │  │  ├─ Pet.java
+│  │  │        │  │  │  ├─ PetGender.java
+│  │  │        │  │  │  └─ PetType.java
+│  │  │        │  │  ├─ repository
+│  │  │        │  │  │  └─ PetRepository.java
+│  │  │        │  │  └─ service
+│  │  │        │  │     └─ PetService.java
+│  │  │        │  └─ review
+│  │  │        │     ├─ controller
+│  │  │        │     │  └─ ReviewController.java
+│  │  │        │     ├─ dto
+│  │  │        │     │  ├─ PageRequest.java
+│  │  │        │     │  ├─ ReviewCreateRequest.java
+│  │  │        │     │  ├─ ReviewInfoResponse.java
+│  │  │        │     │  ├─ ReviewPageResponse.java
+│  │  │        │     │  └─ ReviewUpdateRequest.java
+│  │  │        │     ├─ entity
+│  │  │        │     │  ├─ Review.java
+│  │  │        │     │  └─ ReviewStatus.java
+│  │  │        │     ├─ repository
+│  │  │        │     │  └─ ReviewRepository.java
+│  │  │        │     └─ service
+│  │  │        │        └─ ReviewService.java
+│  │  │        ├─ global
+│  │  │        │  ├─ advice
+│  │  │        │  │  └─ GlobalExceptionHandler.java
+│  │  │        │  ├─ common
+│  │  │        │  │  └─ BaseTimeEntity.java
+│  │  │        │  ├─ config
+│  │  │        │  │  ├─ EmbeddedRedisConfig.java
+│  │  │        │  │  ├─ GeometryConfig.java
+│  │  │        │  │  ├─ MvcConfig.java
+│  │  │        │  │  ├─ RedisCacheConfig.java
+│  │  │        │  │  ├─ RedisConfig.java
+│  │  │        │  │  ├─ RestTemplateConfig.java
+│  │  │        │  │  ├─ SecurityBeansConfig.java
+│  │  │        │  │  ├─ SecurityConfig.java
+│  │  │        │  │  ├─ SwaggerConfig.java
+│  │  │        │  │  └─ WebSocketConfig.java
+│  │  │        │  ├─ exception
+│  │  │        │  │  ├─ ErrorCode.java
+│  │  │        │  │  ├─ ErrorResponse.java
+│  │  │        │  │  └─ MallangsCustomException.java
+│  │  │        │  ├─ handler
+│  │  │        │  │  ├─ SseEmitters.java
+│  │  │        │  │  ├─ StompFileHandler.java
+│  │  │        │  │  └─ StompHandler.java
+│  │  │        │  ├─ jwt
+│  │  │        │  │  ├─ controller
+│  │  │        │  │  │  └─ TokenController.java
+│  │  │        │  │  ├─ dto
+│  │  │        │  │  │  ├─ TokensRequest.java
+│  │  │        │  │  │  └─ TokensResponse.java
+│  │  │        │  │  ├─ entity
+│  │  │        │  │  │  ├─ CustomMemberDetails.java
+│  │  │        │  │  │  └─ TokenCategory.java
+│  │  │        │  │  ├─ filter
+│  │  │        │  │  │  ├─ JWTFilter.java
+│  │  │        │  │  │  ├─ LoginFilter.java
+│  │  │        │  │  │  └─ LogoutFilter.java
+│  │  │        │  │  ├─ handler
+│  │  │        │  │  │  └─ CustomAuthenticationFailureHandler.java
+│  │  │        │  │  ├─ service
+│  │  │        │  │  │  ├─ AccessTokenBlackList.java
+│  │  │        │  │  │  ├─ CustomerMemberDetailService.java
+│  │  │        │  │  │  └─ RefreshTokenService.java
+│  │  │        │  │  └─ util
+│  │  │        │  │     └─ JWTUtil.java
+│  │  │        │  ├─ oauth2
+│  │  │        │  │  ├─ dto
+│  │  │        │  │  │  ├─ CustomOAuth2Member.java
+│  │  │        │  │  │  └─ MemberOAuth2DTO.java
+│  │  │        │  │  ├─ handler
+│  │  │        │  │  │  ├─ CustomFailureHandler.java
+│  │  │        │  │  │  └─ CustomSuccessHandler.java
+│  │  │        │  │  ├─ response
+│  │  │        │  │  │  ├─ GoogleResponse.java
+│  │  │        │  │  │  ├─ NaverResponse.java
+│  │  │        │  │  │  └─ OAuth2Response.java
+│  │  │        │  │  └─ service
+│  │  │        │  │     └─ CustomOAuth2MemberService.java
+│  │  │        │  ├─ s3
+│  │  │        │  │  ├─ S3Config.java
+│  │  │        │  │  ├─ S3Controller.java
+│  │  │        │  │  └─ S3Service.java
+│  │  │        │  └─ schedule
+│  │  │        │     └─ CustomTaskScheduler.java
+│  │  │        └─ web
+│  │  │           └─ HomeController.java
+│  │  └─ resources
+│  │     ├─ application-dev.properties
+│  │     ├─ messages.properties
+│  │     └─ templates
+│  │        └─ websocket_test.html
+│  └─ test
+│     └─ java
+│        └─ com
+│           └─ mallangs
+│              ├─ MallangsApplicationTests.java
+│              └─ domain
+│                 ├─ article
+│                 │  ├─ repository
+│                 │  │  └─ ArticleRepositoryTest.java
+│                 │  └─ service
+│                 │     └─ ArticleServiceTest.java
+│                 ├─ board
+│                 │  └─ repository
+│                 │     ├─ BoardRepositoryTest.java
+│                 │     └─ CategoryRepositoryTest.java
+│                 ├─ chat
+│                 │  ├─ repository
+│                 │  │  ├─ ChatRoomRepositoryTest.java
+│                 │  │  ├─ ChatRoomRepositoryTests.java
+│                 │  │  └─ ParticipatedRoomRepositoryTest.java
+│                 │  └─ service
+│                 │     ├─ ChatMessageServiceTests.java
+│                 │     └─ ChatRoomServiceTests.java
+│                 ├─ member
+│                 │  ├─ repository
+│                 │  │  ├─ AddressRepositoryTests.java
+│                 │  │  └─ MemberRepositoryTests.java
+│                 │  └─ service
+│                 │     ├─ AddressServiceTests.java
+│                 │     └─ MemberServiceTests.java
+│                 ├─ pet
+│                 │  ├─ repository
+│                 │  │  └─ PetRepositoryTest.java
+│                 │  └─ service
+│                 │     └─ PetServiceTest.java
+│                 └─ review
+│                    ├─ repository
+│                    │  └─ ReviewRepositoryTest.java
+│                    └─ service
+│                       └─ ReviewServiceTest.java
+└─ upload
+   ├─ baa22335-a605-4d1e-8735-ea775a4bd056_스크린샷 2024-08-07 165513.png
+   └─ s_baa22335-a605-4d1e-8735-ea775a4bd056_스크린샷 2024-08-07 165513.png
+
+```
+</details>
 
 
 
