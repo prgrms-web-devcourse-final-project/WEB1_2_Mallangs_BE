@@ -1,4 +1,5 @@
 <p align="center">
+
   <img src="https://github.com/user-attachments/assets/fb531d55-e879-4701-9838-02920ae65939" alt="이미지 설명" width="350">
 </p>
 
@@ -22,31 +23,31 @@
 
 ### Backend <br/>
 
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot%203.3.4-6DB33F?style=for-the-badge&logo=Spring%20Boot&logoColor=white)
-![Spring Data JPA](https://img.shields.io/badge/Spring%20Data%20JPA%203.3.2-6DB33F?style=for-the-badge&logo=&logoColor=white)
-![Spring Security](https://img.shields.io/badge/Spring%20Security-6DB33F?style=for-the-badge&logo=Spring%20Security&logoColor=white)
-![JUnit5](https://img.shields.io/badge/JUnit5-25A162?style=for-the-badge&logo=JUnit5&logoColor=white)
-![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON-Web-Tokens&logoColor=white)
-![Gradle](https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=Gradle&logoColor=white)
-![Socket.io](https://img.shields.io/badge/Socket.io-black?style=for-the-badge&logo=socket.io&badgeColor=010101)
-![Thymeleaf](https://img.shields.io/badge/Thymeleaf-%23005C0F.svg?style=for-the-badge&logo=Thymeleaf&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot%203.3.4-6DB33F?style=flat-square&logo=Spring%20Boot&logoColor=white)
+![Spring Data JPA](https://img.shields.io/badge/Spring%20Data%20JPA%203.3.2-6DB33F?style=flat-square&logo=&logoColor=white)
+![Spring Security](https://img.shields.io/badge/Spring%20Security-6DB33F?style=flat-square&logo=Spring%20Security&logoColor=white)
+![JUnit5](https://img.shields.io/badge/JUnit5-25A162?style=flat-square&logo=JUnit5&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-000000?style=flat-square&logo=JSON-Web-Tokens&logoColor=white)
+![Gradle](https://img.shields.io/badge/Gradle-02303A?style=flat-square&logo=Gradle&logoColor=white)
+![Socket.io](https://img.shields.io/badge/Socket.io-black?style=flat-square&logo=socket.io&badgeColor=010101)
+![Thymeleaf](https://img.shields.io/badge/Thymeleaf-%23005C0F.svg?style=flat-square&logo=Thymeleaf&logoColor=white)
 
 ### DB / Infra
-![MySQL](https://img.shields.io/badge/MySQL%208.0.39-4479A1?style=for-the-badge&logo=MySQL&logoColor=white)
-![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=Redis&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-0db7ed?style=for-the-badge&logo=Docker&logoColor=white)
-![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL%208.0.39-4479A1?style=flat-square&logo=MySQL&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=Redis&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-0db7ed?style=flat-square&logo=Docker&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=flat-square&logo=amazon-aws&logoColor=white)
 
 ### 성능테스트
-![Grafana](https://img.shields.io/badge/Grafana-F46800?style=for-the-badge&logo=Grafana&logoColor=white)
+![Grafana](https://img.shields.io/badge/Grafana-F46800?style=flat-square&logo=Grafana&logoColor=white)
 
 
 ### 문서/협업툴
-![Notion](https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=notion&logoColor=white)
-![Slack](https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=slack&logoColor=white)
-![IntelliJ IDEA](https://img.shields.io/badge/IntelliJ%20IDEA-4A154B?style=for-the-badge&logo=intellijidea&logoColor=white)
-![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=Swagger&logoColor=white)
-![Discord](https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)
+![Notion](https://img.shields.io/badge/Notion-000000?style=flat-square&logo=notion&logoColor=white)
+![Slack](https://img.shields.io/badge/Slack-4A154B?style=flat-square&logo=slack&logoColor=white)
+![IntelliJ IDEA](https://img.shields.io/badge/IntelliJ%20IDEA-4A154B?style=flat-square&logo=intellijidea&logoColor=white)
+![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=flat-square&logo=Swagger&logoColor=white)
+![Discord](https://img.shields.io/badge/Discord-5865F2?style=flat-square&logo=discord&logoColor=white)
 
 ## 구조
 
@@ -54,119 +55,6 @@
 
 
 전체 시스템 구조 - 관리자
-
-
-
-<summary>펫</summary>
-
-<summary>글타래</summary>
-
-<summary>커뮤니티</summary>
-
-<summary>게시판</summary>
-
-<summary>댓글</summary>
-
-<summary>리뷰</summary>
-
-<summary>알림</summary>
-
-<summary>채팅</summary>
-
-## 다이어그램
-
-<summary>ERD</summary>
-
-<summary>와이어 프레임</summary>
-
-<summary>유저 스토리</summary>
-  
-<summary>API 명세서</summary> 
-
-
-## 프로젝트 협업 규칙
-
-<details>
-<summary>Convention </summary>
-
-
-### 깃 전략  
-
-#### Feature-Branch 전략(GitHub Flow)  
-![image](https://github.com/user-attachments/assets/96903560-e01e-4d17-8219-2cf187dea064)
-
-### Branch 관리  
-
-#### Main Branch  
-- 배포 브랜치, 운영 서버  
-- 직접적인 PUSH **금지**  
-- `develop` → `main` Pull Request만 허용  
-
-#### Develop Branch  
-- 개발 통합 브랜치: 다음 배포 버전을 위한 개발 코드 통합  
-- 기능 개발이 완료된 `feature` 브랜치들의 병합 지점  
-- QA/테스트 진행 시 기본 브랜치  
-
-#### Feature Branch (branch명: feature/기능명)  
-- 기능 개발 작업용 브랜치  
-- **Issue 생성 → Branch 생성 → 개발 → PR 요청 → 코드 리뷰 → Merge**  
-
-
-### Merge 방식  
-
-- 마지막 승인자(Merge Approver)가 머지 수행  
-- `feature` 브랜치: 1명 이상 승인 시  
-- `develop` 브랜치: 모든 팀원 승인 시  
-
-
-### Git Convention  
-
-💡 **프로세스:**  
-- Issue 생성 → 브랜치 생성 → 해당 브랜치 이동 → `develop` Pull → 커밋 → PR 생성  
-
-🚨 **주의사항:**  
-- **커밋 메시지 템플릿**을 반드시 지킬 것  
-- **충돌 발생 주의**  
-- **main 브랜치에 직접 PR 금지** (`develop`으로만 PR 가능)  
-
-
-### [type] 커밋 메시지 형식  
-
-- `feat:` 새로운 기능 구현  
-- `mod:` 코드 및 파일 수정  
-- `add:` 라이브러리 추가 및 코드 추가  
-- `del:` 불필요한 코드/파일 삭제  
-- `fix:` 버그 및 오류 해결  
-- `ui:` UI 관련 작업  
-- `chore:` 작은 작업 (버전 관리 등)  
-- `hotfix:` 긴급 배포 수정  
-- `rename:` 파일 및 폴더명 수정  
-- `docs:` 문서 작업  
-- `refactor:` 코드 리팩토링  
-- `merge:` 브랜치 병합  
-- `comment:` 주석 추가 및 변경
-
-### Code Convention
-```
-//도메인 지정
-private Long memberId;
-
-private Long userId; 
-
-//엔티티 수정 메서드 : chanegeMethod
-public void changeName(String name){
-    this.name = name;
-}
-
-//엔티티 수정 메서드 : chanegeMethod
-public void changeWeight(Integer weight){
-    this.weight = weight;
-}
-
-domainId로 통일
-```
-
-  </details>
 
 <details>
   <summary> 패키지 구조 </summary>
@@ -565,6 +453,159 @@ domainId로 통일
 </details>
 
 
+<details> 
+<summary>펫</summary>
+</details>
+
+<details>
+<summary>글타래</summary>
+</details>
+
+<details>
+<summary>커뮤니티</summary>
+</details>
+
+<details>
+<summary>게시판</summary>
+</details>
+
+<details>
+<summary>댓글</summary>
+</details>
+
+<details>
+<summary>리뷰</summary>
+</details>
+
+<details>
+<summary>알림</summary>
+</details>
+
+<details>
+<summary>채팅</summary>
+</details>
+
+<details>
+<summary>서버 아키텍쳐 </summary>
+
+  ![image](https://github.com/user-attachments/assets/09f96ad4-88cb-411d-b80a-7facf78797c1)
+
+  
+</details>
+
+## 시스템 설계 및 다이어그램
+
+<details>
+<summary>ERD</summary>
+</details>
+
+<details>
+<summary>와이어 프레임</summary>
+</details>
+
+<details>
+<summary>유저 스토리</summary>
+  
+  ![image](https://github.com/user-attachments/assets/5948ab5e-8ffb-4892-ab95-ca0027405335)
+
+</details>
+
+<details>
+<summary>흐름도</summary>
+  
+  ![Untitled diagram-2024-12-11-014121](https://github.com/user-attachments/assets/e64847d1-7a45-4930-9115-a86d8ececd68)
+
+
+</details>
+
+
+## 프로젝트 협업 규칙
+
+<details>
+<summary>Convention </summary>
+
+
+### 깃 전략  
+
+#### Feature-Branch 전략(GitHub Flow)  
+![image](https://github.com/user-attachments/assets/96903560-e01e-4d17-8219-2cf187dea064)
+
+### Branch 관리  
+
+#### Main Branch  
+- 배포 브랜치, 운영 서버  
+- 직접적인 PUSH **금지**  
+- `develop` → `main` Pull Request만 허용  
+
+#### Develop Branch  
+- 개발 통합 브랜치: 다음 배포 버전을 위한 개발 코드 통합  
+- 기능 개발이 완료된 `feature` 브랜치들의 병합 지점  
+- QA/테스트 진행 시 기본 브랜치  
+
+#### Feature Branch (branch명: feature/기능명)  
+- 기능 개발 작업용 브랜치  
+- **Issue 생성 → Branch 생성 → 개발 → PR 요청 → 코드 리뷰 → Merge**  
+
+
+### Merge 방식  
+
+- 마지막 승인자(Merge Approver)가 머지 수행  
+- `feature` 브랜치: 1명 이상 승인 시  
+- `develop` 브랜치: 모든 팀원 승인 시  
+
+
+### Git Convention  
+
+💡 **프로세스:**  
+- Issue 생성 → 브랜치 생성 → 해당 브랜치 이동 → `develop` Pull → 커밋 → PR 생성  
+
+🚨 **주의사항:**  
+- **커밋 메시지 템플릿**을 반드시 지킬 것  
+- **충돌 발생 주의**  
+- **main 브랜치에 직접 PR 금지** (`develop`으로만 PR 가능)  
+
+
+### [type] 커밋 메시지 형식  
+
+- `feat:` 새로운 기능 구현  
+- `mod:` 코드 및 파일 수정  
+- `add:` 라이브러리 추가 및 코드 추가  
+- `del:` 불필요한 코드/파일 삭제  
+- `fix:` 버그 및 오류 해결  
+- `ui:` UI 관련 작업  
+- `chore:` 작은 작업 (버전 관리 등)  
+- `hotfix:` 긴급 배포 수정  
+- `rename:` 파일 및 폴더명 수정  
+- `docs:` 문서 작업  
+- `refactor:` 코드 리팩토링  
+- `merge:` 브랜치 병합  
+- `comment:` 주석 추가 및 변경
+
+### Code Convention
+
+```java
+//도메인 지정
+private Long memberId;
+
+private Long userId; 
+
+//엔티티 수정 메서드 : chanegeMethod
+public void changeName(String name){
+    this.name = name;
+}
+
+//엔티티 수정 메서드 : chanegeMethod
+public void changeWeight(Integer weight){
+    this.weight = weight;
+}
+
+domainId로 통일
+```
+
+  </details>
+
+
+
 
 ## 팀원 소개
 
@@ -605,9 +646,9 @@ domainId로 통일
   </tr>
   <tr>
     <td><b>글타래 <br /></b></td>
-    <td><b>커뮤니티, 이미지 <br />ngrok 스웨거</b></td>
+    <td><b>커뮤니티, 이미지 <br />명세서 관리</b></td>
     <td><b>채팅, 회원 <br /></b></td>
     <td><b>댓글, 알림 <br /></b></td>
-    <td><b>펫, 리뷰, 공공데이터<br />배포, S3</b></td>
+    <td><b>펫, 리뷰, 공공데이터 DB 적재</td>
   </tr>
 </table>
