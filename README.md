@@ -1,6 +1,7 @@
+<p align="center">
 
   <img src="https://github.com/user-attachments/assets/fb531d55-e879-4701-9838-02920ae65939" alt="이미지 설명" width="350">
-
+</p>
 
 ## 💡 서비스 소개  
 > '**말랑플레이스**' 는 반려동물을 키우는 반려인들을 위한 위치 기반 커뮤니티 서비스입니다.
