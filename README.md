@@ -55,13 +55,16 @@
 전체 시스템 구조 - 사용자
 <p align="center">
 
-  <img src="https://github.com/user-attachments/assets/dd35d0fc-340d-4a02-a218-62c12ef16f71" alt="이미지 설명" width="800">
+  <img src="https://github.com/user-attachments/assets/69aeda09-dc83-4db3-9ebf-1e764e9bff9b" alt="이미지 설명" width="800">
 </p>
 
 
 
-
 전체 시스템 구조 - 관리자
+<p align="center">
+
+  <img src="https://github.com/user-attachments/assets/dd35d0fc-340d-4a02-a218-62c12ef16f71" alt="이미지 설명" width="800">
+</p>
 
 <details>
   <summary> 패키지 구조 </summary>
