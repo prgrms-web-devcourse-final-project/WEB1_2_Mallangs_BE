@@ -23,6 +23,7 @@
 
 ### Backend <br/>
 
+![Java 17](https://img.shields.io/badge/Java%2017-007396?style=flat-square&logo=java&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot%203.3.4-6DB33F?style=flat-square&logo=Spring%20Boot&logoColor=white)
 ![Spring Data JPA](https://img.shields.io/badge/Spring%20Data%20JPA%203.3.2-6DB33F?style=flat-square&logo=&logoColor=white)
 ![Spring Security](https://img.shields.io/badge/Spring%20Security-6DB33F?style=flat-square&logo=Spring%20Security&logoColor=white)
@@ -649,6 +650,6 @@ domainId로 통일
     <td><b>커뮤니티, 이미지 <br />명세서 관리</b></td>
     <td><b>채팅, 회원 <br /></b></td>
     <td><b>댓글, 알림 <br /></b></td>
-    <td><b>펫, 리뷰, 공공데이터 DB 적재</td>
+    <td><b>펫, 리뷰, <br />공공데이터 DB 적재</b></td>
   </tr>
 </table>
