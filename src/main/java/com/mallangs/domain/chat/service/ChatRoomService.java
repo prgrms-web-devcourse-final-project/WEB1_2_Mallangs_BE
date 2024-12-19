@@ -1,6 +1,7 @@
 package com.mallangs.domain.chat.service;
 
 import com.mallangs.domain.chat.dto.request.ChatRoomChangeNameRequest;
+import com.mallangs.domain.chat.dto.response.ChatRoomResponse;
 import com.mallangs.domain.chat.dto.response.ParticipatedRoomListResponse;
 import com.mallangs.domain.chat.entity.ChatMessage;
 import com.mallangs.domain.chat.entity.ChatRoom;
@@ -10,8 +11,13 @@ import com.mallangs.domain.chat.repository.ChatRoomRepository;
 import com.mallangs.domain.chat.repository.ParticipatedRoomRepository;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.repository.MemberRepository;
+import com.mallangs.domain.notification.dto.NotificationSendDTO;
+import com.mallangs.domain.notification.entity.NotificationType;
+import com.mallangs.domain.notification.service.NotificationService;
 import com.mallangs.global.exception.ErrorCode;
 import com.mallangs.global.exception.MallangsCustomException;
+import com.mallangs.global.handler.SseEmitters;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -19,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Log4j2
 @Service
@@ -29,6 +36,9 @@ public class ChatRoomService {
     private final MemberRepository memberRepository;
     private final ParticipatedRoomRepository participatedRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
+
+    private final NotificationService notificationService;
+    private final SseEmitters sseEmitters;
 
     // 채팅방 생성
     public Long create(Long myId, Long partnerId) {
@@ -58,6 +68,33 @@ public class ChatRoomService {
                 .participant(partner).build();
         participatedRoomRepository.save(participatedRoom2);
 
+        // 알림 전송 - 상대방
+        NotificationSendDTO notificationSendDTO = NotificationSendDTO.builder()
+                .memberId(partnerId)
+                .message("[" + me.getNickname().getValue() + "]님이 새로운 채팅방을 개설")
+                .notificationType(NotificationType.CHAT)
+                .url("/chat-room/" + savedChatRoom.getChatRoomId())
+                .build();
+        notificationService.send(notificationSendDTO);
+
+        String emitterId = partnerId + "_";
+        SseEmitter emitter = sseEmitters.findSingleEmitter(emitterId);
+
+        if (emitter != null) {
+            try {
+                ChatRoomResponse chatRoomResponse = ChatRoomResponse.builder()
+                        .chatRoomName(partner.getNickname().getValue())
+                        .memberNickname(me.getNickname().getValue())
+                        .memberProfileUrl(me.getProfileImage())
+                        .changedIsRead(0)
+                        .build();
+                emitter.send(chatRoomResponse);
+            } catch (IOException e) {
+                log.error("Error sending chat room notification to client via SSE: {}", e.getMessage());
+                sseEmitters.delete(emitterId);
+            }
+        }
+
         return savedChatRoom.getChatRoomId();
     }
 
@@ -69,7 +106,8 @@ public class ChatRoomService {
         List<ParticipatedRoom> rooms = participatedRoomRepository.findByMemberId(memberId);
         for (ParticipatedRoom room : rooms) {
 
-            List<ChatMessage> messages = chatMessageRepository.findMessageByChatRoomId(room.getChatRoom().getChatRoomId());
+            List<ChatMessage> messages = chatMessageRepository.findMessageByChatRoomId(
+                    room.getChatRoom().getChatRoomId());
 
             List<ChatMessage> unreadMessages = new ArrayList<>();
             for (ChatMessage message : messages) {
@@ -120,7 +158,9 @@ public class ChatRoomService {
 
         if (partRoom.getParticipant().getUserId().getValue().equals(userId)) {
             participatedRoomRepository.deleteById(participatedRoomId);
-        } else throw new MallangsCustomException(ErrorCode.FAILED_DELETE_CHATROOM);
+        } else {
+            throw new MallangsCustomException(ErrorCode.FAILED_DELETE_CHATROOM);
+        }
     }
 
 }
