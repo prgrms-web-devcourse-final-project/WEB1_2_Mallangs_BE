@@ -1,24 +1,23 @@
 package com.mallangs.global.config;
 
+import com.mallangs.domain.member.repository.MemberRepository;
 import com.mallangs.global.jwt.filter.JWTFilter;
-import com.mallangs.global.jwt.filter.LoginFilter;
-import com.mallangs.global.jwt.filter.LogoutFilter;
 import com.mallangs.global.jwt.service.AccessTokenBlackList;
-import com.mallangs.global.jwt.service.CustomerMemberDetailService;
 import com.mallangs.global.jwt.service.RefreshTokenService;
 import com.mallangs.global.jwt.util.JWTUtil;
 import com.mallangs.global.oauth2.handler.CustomFailureHandler;
-import com.mallangs.domain.member.repository.MemberRepository;
 import com.mallangs.global.oauth2.handler.CustomSuccessHandler;
 import com.mallangs.global.oauth2.service.CustomOAuth2MemberService;
+
+import java.util.Arrays;
+import java.util.Collections;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,10 +28,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 @Configuration
 @EnableWebSecurity
 @Log4j2
@@ -40,6 +35,7 @@ import java.util.List;
 @RequiredArgsConstructor
 
 public class SecurityConfig {
+
     // 토큰 만료 시간
     @Value("${spring.jwt.access-token-validity-in-minutes}")
     private Long accessTokenValidity;
@@ -56,7 +52,8 @@ public class SecurityConfig {
     private final CustomFailureHandler customFailureHandler;
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
+            throws Exception {
         return configuration.getAuthenticationManager();
     }
 
@@ -66,8 +63,9 @@ public class SecurityConfig {
         http
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(request -> {
                     CorsConfiguration configuration = new CorsConfiguration();
-                    configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:8080",
-                            "http://localhost:5173",  "https://*.ngrok-free.app"));
+                    configuration.setAllowedOrigins(
+                            Arrays.asList("http://localhost:3000", "http://localhost:8080",
+                                    "http://localhost:5173", "https://*.ngrok-free.app"));
                     configuration.setAllowedMethods(Collections.singletonList("*"));
                     configuration.setAllowCredentials(true);
                     configuration.setAllowedHeaders(Collections.singletonList("*"));
@@ -84,34 +82,47 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable);
-        // oauth2
-        http
-                .oauth2Login((oauth2) -> oauth2
-                        .loginPage("/login").permitAll()
-                        .userInfoEndpoint((userInfo) -> userInfo
-                                .userService(customOAuth2MemberService))
-                        .successHandler(customSuccessHandler)
-                        .failureHandler(customFailureHandler)
-                );
+
+//        // oauth2
+//        http
+//                .oauth2Login((oauth2) -> oauth2
+//                        .loginPage("/login")
+//                        .userInfoEndpoint((userInfo) -> userInfo
+//                                .userService(customOAuth2MemberService))
+//                        .successHandler(customSuccessHandler)
+//                        .failureHandler(customFailureHandler)
+//                );
 
         // 경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) ->
                         auth
-                                .requestMatchers("/api/member/register", "/api/member/login",
-                                        "/api/member/logout", "/api/member/find-user-id",
-                                        "/api/member/find-password").permitAll() //회원가입,로그인,로그아웃,비번찾기,아이디찾기
-                                .requestMatchers("/login","/error","/success","/api/auth/**").permitAll()
-                                .requestMatchers("/api/member/oauth2/**").permitAll() //소셜로그인
-                                .requestMatchers("/api/member/admin/**").hasRole("ADMIN") //관리자
-                                .requestMatchers("/api/chat/websocket-test").permitAll() //웹소켓 테스터
-                                .requestMatchers("/webjars/**").permitAll() //웹소켓 테스터
-                                .requestMatchers("/ws-stomp/**").permitAll() //웹소켓 테스터
-                                .requestMatchers("/chat-rooms/**").permitAll() // 웹소켓 테스터2
-                                .requestMatchers("/api/member/**").hasAnyRole("USER", "ADMIN") //회원
-                                .requestMatchers("/api/chat-room/**").hasAnyRole("USER", "ADMIN") //채팅방
-                                .requestMatchers("/api/address/**").permitAll() //주소
-                                .requestMatchers("/api/member-file-test").permitAll() //파일,이미지업로드
+                                .requestMatchers("/favicon.ico").permitAll()
+                                .requestMatchers("/").permitAll()
+                                .requestMatchers("/api/v1/member/register", "/api/v1/member/login",
+                                        "/api/v1/member/logout", "/api/v1/member/find-user-id",
+                                        "/api/v1/member/find-password").permitAll() //회원가입,로그인,로그아웃,비번찾기,아이디찾기
+//                                .requestMatchers("/api/v1/member/oauth2/**").permitAll() //소셜로그인
+                                .requestMatchers("/api/v1/member/admin/**").hasRole("ADMIN") //관리자
+                                .requestMatchers("/api/v1/member/**").permitAll() //회원
+                                .requestMatchers("/api/v1/address/**").permitAll() //주소
+                                .requestMatchers("/api/v1/pets/**").permitAll() //반려동물
+                                .requestMatchers("/api/v1/image/**").permitAll() //이미지
+                                .requestMatchers("/api/v1/chat-room/**").permitAll() //채팅방
+                                .requestMatchers("/api/v1/chat/**").permitAll() //채팅
+                                .requestMatchers("/api/chat/**").permitAll() //채팅
+                                .requestMatchers("/api/v1/board/**").permitAll() //게시판
+                                .requestMatchers("/api/v1/category/**").permitAll() //카테고리
+                                .requestMatchers("/api/v1/articles/public/**").permitAll() //글타래
+                                .requestMatchers("/api/v1/place-articles/**").permitAll() //장소
+                                .requestMatchers("/api/v1/comments/**").permitAll() //댓글
+                                .requestMatchers("/tourapi/v1/**").permitAll() //공공데이터
+                                .requestMatchers("/api/v1/token").permitAll() //토큰
+                                .requestMatchers("/webjars/**").permitAll() //웹소켓
+                                .requestMatchers("/ws-stomp/**").permitAll() //웹소켓
+                                .requestMatchers("/chat-rooms/**").permitAll() // 웹소켓
+                                .requestMatchers("/api/chat/websocket-test").permitAll() //웹소켓
+
                                 // Swagger UI 관련 경로 허용
                                 .requestMatchers("/swagger-ui/**").permitAll()
                                 .requestMatchers("/v3/api-docs/**").permitAll()
@@ -123,9 +134,10 @@ public class SecurityConfig {
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(new JWTFilter(jwtUtil, refreshTokenService, accessTokenValidity
-                                ,accessRefreshTokenValidity, accessTokenBlackList, memberRepository)
-                                ,UsernamePasswordAuthenticationFilter.class);
+                                , accessRefreshTokenValidity, accessTokenBlackList, memberRepository)
+                        , UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+
 }
 

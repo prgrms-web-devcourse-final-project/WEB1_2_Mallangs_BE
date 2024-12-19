@@ -1,8 +1,7 @@
 package com.mallangs.domain.board.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.mallangs.domain.board.entity.Board;
-import com.mallangs.domain.board.entity.BoardStatus;
-import com.mallangs.domain.member.entity.embadded.Nickname;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -10,30 +9,24 @@ import java.time.LocalDateTime;
 @Getter
 public class CommunityDetailResponse {
     private final Long boardId;
-    private final String categoryName;
     private final String title;
     private final String content;
-    private final Nickname writerNickname;
-    private final Long writerId;
+    private final String writer;
+    private final String categoryName;
+    private final int viewCnt;
+    private final int commentCnt;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private final LocalDateTime createdAt;
-    private final int viewCount;
-    private final int commentCount;
-    private final int likeCount;
-    private final Long imageId;
-    private final BoardStatus status;
 
     public CommunityDetailResponse(Board board) {
         this.boardId = board.getBoardId();
-        this.categoryName = board.getCategory().getName();
         this.title = board.getTitle();
         this.content = board.getContent();
-        this.writerNickname = board.getMember().getNickname();
-        this.writerId = board.getMember().getMemberId();
+        this.writer = board.getMember().getNickname().getValue();
+        this.categoryName = board.getCategory().getName();
+        this.viewCnt = board.getViewCnt();
+        this.commentCnt = board.getCommentCnt();
         this.createdAt = board.getCreatedAt();
-        this.viewCount = board.getViewCnt();
-        this.commentCount = board.getCommentCnt();
-        this.likeCount = board.getLikeCnt();
-        this.imageId = board.getImageId();
-        this.status = board.getBoardStatus();
     }
 }

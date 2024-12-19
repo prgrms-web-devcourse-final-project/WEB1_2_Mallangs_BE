@@ -24,6 +24,7 @@ public class PetResponse {
     private String image;
     private LocalDate birthdate;
     private PetGender gender;
+    private Boolean isActive;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime createdAt;
@@ -40,6 +41,7 @@ public class PetResponse {
         this.petType = pet.getPetType();
         this.image = pet.getImage();
         this.gender = pet.getGender();
+        this.isActive = pet.getIsActive();
         this.createdAt = pet.getCreatedAt();
         this.updatedAt = pet.getUpdatedAt();
     }

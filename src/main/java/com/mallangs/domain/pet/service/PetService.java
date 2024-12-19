@@ -45,6 +45,18 @@ public class PetService {
     //반려동물 조회
     public PetResponse getPet(Long petId, CustomMemberDetails customMemberDetails) {
         Pet pet = petRepository.findById(petId).orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
+
+        // 비회원인 경우 공개된 정보만 반환
+        if (customMemberDetails == null) {
+            if (!pet.getIsOpenProfile()) {
+                throw new MallangsCustomException(ErrorCode.PET_NOT_PROFILE_OPEN);
+            }
+            if (!pet.getIsActive()) {
+                throw new MallangsCustomException(ErrorCode.PET_NOT_ACTIVATE);
+            }
+            return new PetResponse(pet); //
+        }
+
         Member member = getMember(customMemberDetails);
         //타인의 비활성화 반려동물 조회시 예외 던짐
         if (!pet.getIsActive() && !pet.getMember().getMemberId().equals(member.getMemberId())) {
@@ -62,6 +74,18 @@ public class PetService {
     public PetResponse getRepresentativePet(CustomMemberDetails customMemberDetails) {
         Member member = getMember(customMemberDetails);
         Pet pet =petRepository.findRepresentativePetByMemberId(member.getMemberId()).orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
+
+        return new PetResponse(pet);
+    }
+
+    //대표 말랑이(반려동물) ID로 조회
+    public PetResponse getRepresentativePet(Long memberId) {
+        Pet pet =petRepository.findRepresentativePetByMemberId(memberId).orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        if(!member.getIsActive()){
+            throw new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND);
+        }
 
         return new PetResponse(pet);
     }
@@ -108,7 +132,7 @@ public class PetService {
         Pet pet = petRepository.findById(petId).orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
         Member member = getMember(customMemberDetails);
 
-        //반려동물 수정시도시 예외 던짐
+        //타인의 반려동물 수정시도시 예외 던짐
         if (!pet.getMember().getMemberId().equals(member.getMemberId())) {
             throw new MallangsCustomException(ErrorCode.PET_NOT_OWNED);
         }
@@ -138,11 +162,12 @@ public class PetService {
     //반려동물 삭제 (비활성화)
     public PetResponse deletePet(Long petId, CustomMemberDetails customMemberDetails) {
         Member member = getMember(customMemberDetails);
-        try {
+
             Pet pet = petRepository.findById(petId).orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
             if (!pet.getMember().getMemberId().equals(member.getMemberId())) {
                 throw new MallangsCustomException(ErrorCode.PET_NOT_OWNED);
             }
+        try {
             pet.deactivate();
             petRepository.save(pet);
             return new PetResponse(pet);
@@ -155,11 +180,12 @@ public class PetService {
     //반려동물 복원 (활성화)
     public PetResponse restorePet(Long petId, CustomMemberDetails customMemberDetails) {
         Member member = getMember(customMemberDetails);
-        try {
+
             Pet pet = petRepository.findById(petId).orElseThrow(() -> new MallangsCustomException(ErrorCode.PET_NOT_FOUND));
             if (!pet.getMember().getMemberId().equals(member.getMemberId())) {
                 throw new MallangsCustomException(ErrorCode.PET_NOT_OWNED);
             }
+        try {
             pet.activate();
             petRepository.save(pet);
             return new PetResponse(pet);
@@ -172,9 +198,9 @@ public class PetService {
     //반경 내 반려동물 조회
     public Page<PetNearbyResponse> getNearbyPets(PetLocationRequest petLocationRequest,
                                            PageRequest pageRequest) {
-        try {
-            validateLocationSearch(petLocationRequest);
 
+            validateLocationSearch(petLocationRequest);
+        try {
             Sort sort = Sort.by("pet_Id").descending();
             Pageable pageable = pageRequest.getPageable(sort);
 
@@ -219,7 +245,7 @@ public class PetService {
 
         if (y < -90 || y > 90 || //북위는 양수로 남위는 음수로 표현
                 x < -180 || x > 180 || //동경은 양수로 서경은 음수로 표현
-                petLocationRequest.getRadius() <= 0 || petLocationRequest.getRadius() > 20) { // 최대 반경 20km
+                petLocationRequest.getRadius() <= 0 || petLocationRequest.getRadius() > 50) { // 최대 반경 50km
             throw new MallangsCustomException(ErrorCode.LOCATION_INVALIDE_RANGE);
         }
     }
@@ -246,6 +272,7 @@ public class PetService {
 
         return memberRepository.findByUserId(userId).orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
+
 
 
 }

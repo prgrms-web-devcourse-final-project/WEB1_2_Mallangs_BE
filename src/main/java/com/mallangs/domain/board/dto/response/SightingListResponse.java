@@ -1,35 +1,36 @@
 package com.mallangs.domain.board.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.mallangs.domain.board.entity.Board;
-import com.mallangs.domain.member.entity.embadded.Nickname;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
 public class SightingListResponse {
-
     private final Long boardId;
-    private final String categoryName;
     private final String title;
-    private final Nickname writerNickname;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime sightedAt;
+    private final String content;
+    private final String writer;
+    private final String categoryName;
     private final String address;
-    private final Long imageId;
-    private final int viewCount;
-    private final int commentCount;
+    private final int viewCnt;
+    private final int commentCnt;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    private final LocalDateTime sightedAt;
+    private final LocalDateTime createdAt;
 
     public SightingListResponse(Board board) {
         this.boardId = board.getBoardId();
-        this.categoryName = board.getCategory().getName();
         this.title = board.getTitle();
-        this.writerNickname = board.getMember().getNickname();
-        this.createdAt = board.getCreatedAt();
-        this.sightedAt = board.getSightedAt();
+        this.content = board.getContent();
+        this.writer = board.getMember().getNickname().getValue();
+        this.categoryName = board.getCategory().getName();
         this.address = board.getAddress();
-        this.imageId = board.getImageId();
-        this.viewCount = board.getViewCnt();
-        this.commentCount = board.getCommentCnt();
+        this.viewCnt = board.getViewCnt();
+        this.commentCnt = board.getCommentCnt();
+        this.sightedAt = board.getSightedAt();
+        this.createdAt = board.getCreatedAt();
     }
 }

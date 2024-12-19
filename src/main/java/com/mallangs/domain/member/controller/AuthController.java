@@ -19,7 +19,7 @@ import java.util.Map;
 @Log4j2
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @Tag(name = "소셜로그인 / 세션으로 토큰 받는 컨트롤러", description = "네이버 소셜로그인 인증 요청주소: `http://localhost:8080/oauth2/authorization/naver`\n" +
         "`구글 소셜로그인 인증 요청주소: http://localhost:8080/oauth2/authorization/google`\n"
         + "인증 완료 후 토큰 생성 API 엔드포인트 = `api/auth/get-access-token`\n"

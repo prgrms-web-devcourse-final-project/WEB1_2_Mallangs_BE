@@ -24,7 +24,7 @@
 //        Category category = Category.builder()
 //                .name(name)
 //                .categoryOrder(order)
-//                .categoryLevel(level)
+//                .categoryLevel(CategoryLevel.SUB_LEVEL)
 //                .build();
 //        category.changeStatus(status);
 //        return categoryRepository.save(category);

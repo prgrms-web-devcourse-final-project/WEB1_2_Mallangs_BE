@@ -5,18 +5,19 @@ import com.mallangs.domain.board.entity.CategoryStatus;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-
+@Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     // 사용자용 기능
     // 활성화된 모든 카테고리 조회
     @Query("""
-        SELECT c FROM Category c WHERE c.categoryStatus = 'ACTIVE' ORDER BY c.categoryOrder ASC
+        SELECT c FROM Category c ORDER BY c.categoryId ASC
         """)
-    List<Category> findAllActiveCategories();
+    List<Category> findAllCategories();
 
     // 활성화 된 카테고리 중 특정 카테고리 검색
     @Query("""

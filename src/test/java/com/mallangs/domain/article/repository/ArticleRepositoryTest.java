@@ -3,8 +3,9 @@ package com.mallangs.domain.article.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.mallangs.domain.article.entity.Article;
+import com.mallangs.domain.article.entity.ArticleType;
+import com.mallangs.domain.article.entity.CaseStatus;
 import com.mallangs.domain.article.entity.LostArticle;
-import com.mallangs.domain.article.entity.LostStatus;
 import com.mallangs.domain.article.entity.MapVisibility;
 import com.mallangs.domain.board.entity.BoardStatus;
 import com.mallangs.domain.member.entity.Member;
@@ -65,12 +66,11 @@ class ArticleRepositoryTest { // db 와의 crud 체크
         .petGender(PetGender.MALE)
         .isNeutering(true)
         .chipNumber("12345-67890")
-        .lostDate(LocalDate.of(2024, 11, 20))
-        .lastSeenLocation("공원")
-        .lostStatus(LostStatus.LOST)
+        .lostDate(LocalDate.of(2024, 11, 20).atStartOfDay())
+        .lostLocation("공원")
+        .lostStatus(CaseStatus.UNSOLVED)
         .mapVisibility(MapVisibility.VISIBLE)
-            .articleStatus(BoardStatus.DRAFT)
-        .type("lost")
+        .articleType(ArticleType.LOST)
         .title("강아지 찾아주세요")
         .geography(changeToPoint(-73.968285, 40.785091))
         .description("설명")
@@ -102,10 +102,10 @@ class ArticleRepositoryTest { // db 와의 crud 체크
         .petGender(PetGender.MALE)
         .isNeutering(true)
         .chipNumber("12321-67890")
-        .lostDate(LocalDate.of(2024, 10, 10))
-        .lastSeenLocation("산")
-        .lostStatus(LostStatus.LOST)
-        .type("lost")
+        .lostDate(LocalDate.of(2024, 10, 10).atStartOfDay())
+        .lostLocation("산")
+        .lostStatus(CaseStatus.UNSOLVED)
+        .articleType(ArticleType.LOST)
         .mapVisibility(MapVisibility.VISIBLE)
         .title("새 찾아주세요")
         .geography(changeToPoint(-73.968285, 40.785091))
@@ -143,10 +143,10 @@ class ArticleRepositoryTest { // db 와의 crud 체크
         .petGender(PetGender.MALE)
         .isNeutering(false)
         .chipNumber("12321-67890")
-        .lostDate(LocalDate.of(2024, 11, 10))
-        .lastSeenLocation("편의점")
-        .lostStatus(LostStatus.LOST)
-        .type("lost")
+        .lostDate(LocalDate.of(2024, 11, 10).atStartOfDay())
+        .lostLocation("편의점")
+        .lostStatus(CaseStatus.UNSOLVED)
+        .articleType(ArticleType.LOST)
         .mapVisibility(MapVisibility.VISIBLE)
         .title("고양이 찾아주세요")
         .geography(changeToPoint(-72.968285, 41.785091))

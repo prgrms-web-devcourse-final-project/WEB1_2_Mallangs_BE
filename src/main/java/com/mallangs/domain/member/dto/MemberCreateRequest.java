@@ -7,8 +7,11 @@ import com.mallangs.domain.member.entity.embadded.Nickname;
 import com.mallangs.domain.member.entity.embadded.Password;
 import com.mallangs.domain.member.entity.embadded.UserId;
 import com.mallangs.domain.member.util.GeometryUtil;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -36,37 +39,23 @@ public class MemberCreateRequest {
     private Boolean hasPet;
 
     // 주소
-    @NotNull(message = "주소 이름은 필수입니다.")
     private String addressName;
-    @NotNull(message = "주소 유형은 필수입니다.")
     private String addressType;
-    @NotNull(message = "시는 필수입니다.")
     private String region1depthName;
-    @NotNull(message = "군은 필수입니다.")
     private String region2depthName;
-    @NotNull(message = "읍/면/리는 필수입니다.")
     private String region3depthName;
-    @NotNull(message = "행정이름은 필수입니다.")
     private String region3depthHName;
-    @NotNull(message = "주소 번호는 필수입니다.")
     private String mainAddressNo;
-    @NotNull(message = "보조 주소 번호는 필수입니다.")
     private String subAddressNo;
-    @NotNull(message = "도로명은 필수입니다.")
     private String roadName;
-    @NotNull(message = "주 건물번호는 필수입니다.")
     private String mainBuildingNo;
-    @NotNull(message = "보조 건물번호는 필수입니다.")
     private String subBuildingNo;
-    @NotNull(message = "건물명은 필수입니다.")
     private String buildingName;
-    @NotNull(message = "우편번호는 필수입니다.")
     private String zoneNo;
-    @NotNull(message = "산악지역은 필수입력 값 입니다.")
     private String mountainYn;
-    @NotNull(message = "위도는 필수입니다.")
+    @Min(-90)@Max(90)
     private Double latitude;
-    @NotNull(message = "경도는 필수입니다.")
+    @Min(-90)@Max(90)
     private Double longitude;
 
 
@@ -96,5 +85,13 @@ public class MemberCreateRequest {
                 .mountainYn(mountainYn)
                 .point(point)
                 .build();
+    }
+    @Builder
+    public MemberCreateRequest(String userId, String password, String nickname, String email, Boolean hasPet) {
+        this.userId = userId;
+        this.password = password;
+        this.nickname = nickname;
+        this.email = email;
+        this.hasPet = hasPet;
     }
 }

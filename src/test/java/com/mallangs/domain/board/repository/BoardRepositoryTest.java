@@ -1,9 +1,6 @@
 //package com.mallangs.domain.board.repository;
 //
-//import com.mallangs.domain.board.entity.Board;
-//import com.mallangs.domain.board.entity.BoardStatus;
-//import com.mallangs.domain.board.entity.BoardType;
-//import com.mallangs.domain.board.entity.Category;
+//import com.mallangs.domain.board.entity.*;
 //import com.mallangs.domain.member.entity.Address;
 //import com.mallangs.domain.member.entity.Member;
 //import com.mallangs.domain.member.entity.embadded.Email;
@@ -84,7 +81,7 @@
 //        Category category = Category.builder()
 //                .name(name)
 //                .description("테스트 카테고리 설명")
-//                .categoryLevel(0)
+//                .categoryLevel(CategoryLevel.SUB_LEVEL)
 //                .categoryOrder(1)
 //                .build();
 //        return categoryRepository.save(category);
@@ -196,46 +193,47 @@
 //        assertThat(draftResult.getContent()).hasSize(1);
 //    }
 //
-//    @Test
-//    @DisplayName("관리자용 - 카테고리와 제목으로 게시글 검색")
-//    void searchForAdmin() {
-//        // given
-//        Board hiddenBoard = saveCommunity(testMember, testCategory, "테스트 숨김", "숨김 내용");
-//        hiddenBoard.changeStatus(BoardStatus.HIDDEN);
-//        boardRepository.save(hiddenBoard);
-//
-//        // when
-//        Page<Board> result = boardRepository.searchForAdmin(
-//                testCategory.getCategoryId(),
-//                "테스트",
-//                PageRequest.of(0, 10)
-//        );
-//
-//        // then
-//        assertThat(result.getContent()).hasSize(2);  // 모든 상태의 게시글이 검색됨
-//        assertThat(result.getContent()).extracting("title")
-//                .containsExactlyInAnyOrder("테스트 제목", "테스트 숨김");
-//    }
-//
-//    @Test
-//    @DisplayName("관리자용 - 카테고리, 상태, 제목으로 게시글 검색")
-//    void searchForAdminWithStatus() {
-//        // given
-//        Board hiddenBoard = saveCommunity(testMember, testCategory, "테스트 숨김", "숨김 내용");
-//        hiddenBoard.changeStatus(BoardStatus.HIDDEN);
-//        boardRepository.save(hiddenBoard);
-//
-//        // when
-//        Page<Board> result = boardRepository.searchForAdminWithStatus(
-//                testCategory.getCategoryId(),
-//                BoardStatus.HIDDEN,
-//                "테스트",
-//                PageRequest.of(0, 10)
-//        );
-//
-//        // then
-//        assertThat(result.getContent()).hasSize(1);
-//        assertThat(result.getContent().get(0).getTitle()).isEqualTo("테스트 숨김");
-//        assertThat(result.getContent().get(0).getBoardStatus()).isEqualTo(BoardStatus.HIDDEN);
-//    }
+
+////    @Test
+////    @DisplayName("관리자용 - 카테고리와 제목으로 게시글 검색")
+////    void searchForAdmin() {
+////        // given
+////        Board hiddenBoard = saveCommunity(testMember, testCategory, "테스트 숨김", "숨김 내용");
+////        hiddenBoard.changeStatus(BoardStatus.HIDDEN);
+////        boardRepository.save(hiddenBoard);
+////
+////        // when
+////        Page<Board> result = boardRepository.searchForAdmin(
+////                testCategory.getCategoryId(),
+////                "테스트",
+////                PageRequest.of(0, 10)
+////        );
+////
+////        // then
+////        assertThat(result.getContent()).hasSize(2);  // 모든 상태의 게시글이 검색됨
+////        assertThat(result.getContent()).extracting("title")
+////                .containsExactlyInAnyOrder("테스트 제목", "테스트 숨김");
+////    }
+////
+////    @Test
+////    @DisplayName("관리자용 - 카테고리, 상태, 제목으로 게시글 검색")
+////    void searchForAdminWithStatus() {
+////        // given
+////        Board hiddenBoard = saveCommunity(testMember, testCategory, "테스트 숨김", "숨김 내용");
+////        hiddenBoard.changeStatus(BoardStatus.HIDDEN);
+////        boardRepository.save(hiddenBoard);
+////
+////        // when
+////        Page<Board> result = boardRepository.searchForAdminWithStatus(
+////                testCategory.getCategoryId(),
+////                BoardStatus.HIDDEN,
+////                "테스트",
+////                PageRequest.of(0, 10)
+////        );
+////
+////        // then
+////        assertThat(result.getContent()).hasSize(1);
+////        assertThat(result.getContent().get(0).getTitle()).isEqualTo("테스트 숨김");
+////        assertThat(result.getContent().get(0).getBoardStatus()).isEqualTo(BoardStatus.HIDDEN);
+////    }
 //}

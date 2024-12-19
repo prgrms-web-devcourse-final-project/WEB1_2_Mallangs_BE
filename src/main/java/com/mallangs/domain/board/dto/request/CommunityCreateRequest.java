@@ -1,40 +1,19 @@
 package com.mallangs.domain.board.dto.request;
 
-import com.mallangs.domain.board.entity.Board;
-import com.mallangs.domain.board.entity.BoardType;
-import com.mallangs.domain.board.entity.Category;
-import com.mallangs.domain.member.entity.Member;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class CommunityCreateRequest {
-
-    @NotNull(message = "카테고리를 선택하세요.")
+    @NotNull
     private Long categoryId;
 
-    @NotBlank(message = "제목을 입력하세요.")
-    @Size(max = 200)
+    @NotBlank
     private String title;
 
-    @NotBlank(message = "내용을 입력하세요.")
+    @NotBlank
     private String content;
-
-    private Long imageId;
-
-    public Board toEntity(Member member, Category category) {
-        return Board.builder()
-                .member(member)
-                .category(category)
-                .title(this.title)
-                .content(this.content)
-                .imageId(this.imageId)
-                .boardType(BoardType.COMMUNITY)
-                .build();
-    }
 }

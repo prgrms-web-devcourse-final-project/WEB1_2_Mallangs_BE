@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 public class ChatMessageToDTOResponse {
 
     private Long chatMessageId;
-    private Long participatedRoomId;
     private Long senderId;
     private String senderName;
     private String message;
@@ -18,7 +17,6 @@ public class ChatMessageToDTOResponse {
 
     public ChatMessageToDTOResponse(ChatMessage chatMessage) {
         this.chatMessageId = chatMessage.getChatMessageId();
-        this.participatedRoomId = chatMessage.getParticipatedRoom().getParticipatedRoomId();
         this.senderId = chatMessage.getSender().getMemberId();
         this.senderName = chatMessage.getSender().getNickname().getValue();
         this.message = chatMessage.getMessage();

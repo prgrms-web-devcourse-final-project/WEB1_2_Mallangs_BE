@@ -35,9 +35,7 @@ public class Category extends BaseTimeEntity {
     @Column(length = 100)
     private String description;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private CategoryLevel categoryLevel;
+    private int categoryLevel;
 
     @Column(nullable = false)
     private int categoryOrder;
@@ -47,7 +45,7 @@ public class Category extends BaseTimeEntity {
     private CategoryStatus categoryStatus;
 
     @Builder
-    public Category(Category parentCategory, String name, String description, CategoryLevel categoryLevel,
+    public Category(Category parentCategory, String name, String description, int categoryLevel,
                     int categoryOrder) {
         this.parentCategory = parentCategory;
         this.name = name;
@@ -58,7 +56,7 @@ public class Category extends BaseTimeEntity {
     }
 
     // 카테고리 수정
-    public void changeCategory(Category parentCategory, String name, String description, CategoryLevel categoryLevel,
+    public void changeCategory(Category parentCategory, String name, String description, int categoryLevel,
                                int categoryOrder, CategoryStatus categoryStatus) {
         this.parentCategory = parentCategory;
         this.name = name;
