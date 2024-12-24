@@ -59,8 +59,7 @@ public class ArticleController {
             @Parameter(description = "현재 인증된 사용자 정보", required = true)
             @AuthenticationPrincipal CustomMemberDetails principal) {
         Long memberId = principal.getMemberId();
-        ArticleResponse articleResponse = articleService.createArticle(articleCreateRequest,
-                memberId);
+        ArticleResponse articleResponse = articleService.createArticle(articleCreateRequest,memberId);
 
         return ResponseEntity.ok(articleResponse);
     }
