@@ -99,10 +99,6 @@
 //    String closeDays = line[18];
 //    String webSite = line[17];
 //
-//    boolean exists = placeArticleRepository.existsByTitle(title);
-//    if (exists) {
-//      return null; // 이미 존재하면 null 반환
-//    }
 //
 //    return PlaceArticle.builder()
 //        .member(member)
