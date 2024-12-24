@@ -85,7 +85,7 @@ public class ChatRoomService {
                 ChatRoomResponse chatRoomResponse = ChatRoomResponse.builder()
                         .chatRoomName(partner.getNickname().getValue())
                         .memberNickname(me.getNickname().getValue())
-                        .memberProfileUrl(me.getProfileImage())
+                        .memberId(me.getMemberId())
                         .changedIsRead(0)
                         .build();
                 emitter.send(chatRoomResponse);

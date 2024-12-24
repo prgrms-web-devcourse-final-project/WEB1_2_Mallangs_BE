@@ -116,9 +116,7 @@ public class ChatMessageService {
                             .chatMessageId(chatMessage.getChatMessageId())
                             .chatRoomId(chatMessage.getChatRoom().getChatRoomId())
                             .message(chatMessage.getMessage())
-                            .chatMessageImage(chatMessage.getImageUrl())
                             .sender(chatMessage.getSender().getNickname().getValue())
-                            .profileImage(chatMessage.getSender().getProfileImage())
                             .type(chatMessage.getType())
                             .senderRead(chatMessage.getSenderRead())
                             .receiverRead(chatMessage.getSenderRead())
@@ -151,7 +149,7 @@ public class ChatMessageService {
         return ChatRoomResponse.builder()
                 .chatRoomName(foundPartRoom.getRoomName())
                 .memberNickname(foundPartRoom.getParticipant().getNickname().getValue())
-                .memberProfileUrl(foundPartRoom.getParticipant().getProfileImage())
+                .memberId(foundPartRoom.getParticipant().getMemberId())
                 .changedIsRead(numChanged)
                 .build();
     }

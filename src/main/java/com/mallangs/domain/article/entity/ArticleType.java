@@ -15,7 +15,10 @@ public enum ArticleType {
   RESCUE("rescue"),
 
   @JsonProperty("place")
-  PLACE("place");
+  PLACE("place"),
+
+  @JsonProperty("sight")
+  SIGHT("sight");
 
   private final String description;
 }
