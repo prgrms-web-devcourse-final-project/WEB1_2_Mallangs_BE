@@ -257,12 +257,12 @@ public class ArticleController {
 
     // 목격글타래 전체조회
     @Operation(summary = "목격글타래 전체조회", description = "실종글타래 ID로 관련 목격글타래를 전체 조회합니다.")
-    @GetMapping("/public/sighting/{articleId}")
+    @GetMapping("/public/sight/{lostArticleId}")
     public ResponseEntity<List<ArticleResponse>> getSightingArticleByLostArticleId(
-            @Parameter(description = "조회할 글타래 ID", required = true) @PathVariable Long articleId) {
+            @Parameter(description = "조회할 글타래 ID", required = true) @PathVariable Long lostArticleId) {
 
         //목격제보 글타래 전체조회
-        List<ArticleResponse> articleResponse = articleService.getSightArticleByLostId(articleId);
+        List<ArticleResponse> articleResponse = articleService.getSightArticleByLostId(lostArticleId);
 
         return ResponseEntity.ok(articleResponse);
     }
