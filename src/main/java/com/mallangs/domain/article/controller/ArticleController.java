@@ -91,6 +91,7 @@ public class ArticleController {
 
         ArticleResponse articleResponse = articleService.getArticleById(articleId, memberRole,
                 memberId);
+        log.info("articleResponse 결과: {}",articleResponse);
 
         return ResponseEntity.ok(articleResponse);
     }

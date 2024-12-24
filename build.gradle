@@ -108,6 +108,7 @@ dependencies {
 
     //AI prompt
     implementation 'org.springframework.ai:spring-ai-vertex-ai-gemini-spring-boot-starter:1.0.0-SNAPSHOT'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
 }
 jar {
