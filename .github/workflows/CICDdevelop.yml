@@ -21,7 +21,7 @@ jobs:
 
       # 3. application.properties 파일 생성 및 설정
       - run: touch ./src/main/resources/application.properties
-      - run: echo "${{secrets.APPLICATION}}" > ./src/main/resources/application.properties
+      - run: echo "${{secrets.APPLICATION2}}" > ./src/main/resources/application.properties
       - run: echo "spring.cloud.aws.credentials.access-key=${{secrets.AWS_ACTION_ACCESS_KEY}}" >> ./src/main/resources/application.properties
       - run: echo "spring.cloud.aws.credentials.secret-key=${{secrets.AWS_ACTION_SECRET_ACCESS_KEY}}" >> ./src/main/resources/application.properties
 
