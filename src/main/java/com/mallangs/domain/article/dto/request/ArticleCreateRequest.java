@@ -30,6 +30,7 @@ import lombok.experimental.SuperBuilder;
 @JsonSubTypes({
     @JsonSubTypes.Type(value = LostCreateRequest.class, name = "lost"),
     @JsonSubTypes.Type(value = RescueCreateRequest.class, name = "rescue"),
+    @JsonSubTypes.Type(value = SightingArticleCreateRequest.class, name = "sight"),
     @JsonSubTypes.Type(value = PlaceCreateRequest.class, name = "place")
 })
 public class ArticleCreateRequest {

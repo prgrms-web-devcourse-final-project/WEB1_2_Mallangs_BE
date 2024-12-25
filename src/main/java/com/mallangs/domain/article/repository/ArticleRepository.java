@@ -49,5 +49,10 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
       @Param("title") String title,
       @Param("description") String description);
 
+  // 모든 사용자
+  // 모든 목격글타래 조회
+  // article 에서 map visible // jpql 은 join 필요 없음
+  @Query("SELECT s FROM SightingArticle s WHERE s.lostArticleId = :lostSightId AND s.mapVisibility = 'VISIBLE'")
+  List<Article> findSightingArticles(@Param("lostSightId") Long lostSightId);
 
 }

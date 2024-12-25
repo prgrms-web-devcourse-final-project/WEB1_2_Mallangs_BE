@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -232,5 +233,10 @@ public class BoardService {
     public boolean isNotAdminRole() {
         return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
                 .noneMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    }
+
+    // 실종신고-목격제보 게시판 게시글 전체 조회 (실종글타래랑 비교위함 메서드)
+    public List<SightingListResponse> getAllSightingBoardToList() {
+        return boardRepository.findAllByBoardType(BoardType.SIGHTING).stream().map(SightingListResponse::new).collect(Collectors.toList());
     }
 }
