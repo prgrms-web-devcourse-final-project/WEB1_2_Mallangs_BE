@@ -3,7 +3,6 @@ package com.mallangs.domain.ai;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.mallangs.domain.ai.dto.AiResponseDTO;
 import com.mallangs.domain.ai.dto.SightAIResponse;
 import com.mallangs.domain.article.dto.response.ArticleResponse;
 import com.mallangs.domain.article.dto.response.LostResponse;

@@ -108,6 +108,8 @@ dependencies {
 
     //AI prompt
     implementation 'org.springframework.ai:spring-ai-vertex-ai-gemini-spring-boot-starter:1.0.0-SNAPSHOT'
+
+    //jackson 날짜변환 위한 의존성
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
 }
