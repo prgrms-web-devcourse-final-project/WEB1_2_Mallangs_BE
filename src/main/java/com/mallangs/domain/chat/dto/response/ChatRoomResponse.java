@@ -9,14 +9,14 @@ import lombok.ToString;
 public class ChatRoomResponse {
     private String chatRoomName;
     private String memberNickname;
-    private String memberProfileUrl;
+    private Long memberId;
     private Integer changedIsRead;
 
     @Builder
-    public ChatRoomResponse(String chatRoomName, String memberNickname, String memberProfileUrl, Integer changedIsRead) {
+    public ChatRoomResponse(String chatRoomName, String memberNickname, Long memberId, Integer changedIsRead) {
         this.chatRoomName = chatRoomName;
         this.memberNickname = memberNickname;
-        this.memberProfileUrl = memberProfileUrl;
+        this.memberId = memberId;
         this.changedIsRead = changedIsRead;
     }
 }

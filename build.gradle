@@ -21,6 +21,7 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven {url 'https://repo.spring.io/snapshot'} //스냅샷 저장소 추가
 }
 
 dependencies {
@@ -70,7 +71,6 @@ dependencies {
     implementation 'org.webjars:stomp-websocket:2.3.3-1'
 
     // 지리 데이터
-    implementation 'org.hibernate.orm:hibernate-spatial:6.5.3.Final'
     implementation 'com.querydsl:querydsl-spatial'
 
     //테스트
@@ -106,6 +106,11 @@ dependencies {
     implementation 'io.awspring.cloud:spring-cloud-aws-starter:3.1.1'
     implementation 'com.amazonaws:aws-java-sdk-s3:1.12.777'
 
+    //AI prompt
+    implementation 'org.springframework.ai:spring-ai-vertex-ai-gemini-spring-boot-starter:1.0.0-SNAPSHOT'
+
+    //jackson 날짜변환 위한 의존성
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
 }
 jar {
@@ -113,4 +118,8 @@ jar {
 }
 tasks.named('test') {
     useJUnitPlatform()
+}
+//긴 클래스 패스 길이 해결
+tasks.withType(JavaExec).configureEach {
+    classpath = files(sourceSets.main.runtimeClasspath.files)
 }

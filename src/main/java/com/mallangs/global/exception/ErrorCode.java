@@ -1,16 +1,10 @@
 package com.mallangs.global.exception;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.CONFLICT;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.NOT_ACCEPTABLE;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+
+import static org.springframework.http.HttpStatus.*;
 
 @Getter
 @RequiredArgsConstructor
@@ -53,6 +47,7 @@ public enum ErrorCode {
   RESOURCE_NOT_MODIFIABLE(FORBIDDEN, "이 리소스는 수정할 수 없습니다."),
   RESOURCE_NOT_DELETABLE(FORBIDDEN, "이 리소스는 삭제할 수 없습니다."),
   INVALID_TYPE_CHANGE(BAD_REQUEST, "글타래 타입은 생성 시에 설정된 타입을 유지해야 합니다."),
+  INVALID_REQUEST(BAD_REQUEST, "잘못된 입력값입니다. 입력값을 확인해주세요"),
 
   // Board
   CATEGORY_NOT_FOUND(NOT_FOUND, "카테고리 정보를 찾을 수 없습니다."),
@@ -115,8 +110,11 @@ public enum ErrorCode {
   REFRESH_TOKEN_EXPIRED(UNAUTHORIZED, "리프레시 토큰이 만료되었습니다."),
   TOKEN_EXPIRED(UNAUTHORIZED, "토큰이 만료되었습니다."),
   TOKEN_IS_BLOCKED(UNAUTHORIZED, "토큰이 차단되었습니다."),
-  REFRESH_TOKEN_MISSING(NOT_FOUND, "리프레시 토큰이 존재하지 않습니다.");
+  REFRESH_TOKEN_MISSING(NOT_FOUND, "리프레시 토큰이 존재하지 않습니다."),
 
+  //OpenAI API
+  FAILED_TO_REQUEST_OPENAI(BAD_REQUEST, "잘못된 입력입니다."),
+  INSUFFICIENT_OPENAI_QUOTA(TOO_MANY_REQUESTS, "OPENAI 사용량이 초과되었습니다.");
   private final HttpStatus httpStatus;
   private final String message;
 }

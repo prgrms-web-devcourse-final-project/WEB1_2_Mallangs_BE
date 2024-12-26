@@ -23,6 +23,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @Tag(name = "커뮤니티 & 실종신고-목격제보 API", description = "커뮤니티/실종신고-목격제보 관련 API")
 @RestController
@@ -215,4 +216,5 @@ public class BoardController {
         boardService.changeBoardStatus(request.getBoardIds(), request.getStatus());
         return ResponseEntity.noContent().build();
     }
+
 }

@@ -34,8 +34,7 @@ public class ChatRoomController {
     @Operation(summary = "채팅방 생성", description = "채팅방을 생성합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "채팅방 생성 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
-            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청")
     })
     public ResponseEntity<Long> create(@PathVariable("memberId") Long memberId,
                                        @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
@@ -84,10 +83,10 @@ public class ChatRoomController {
     }
 
 
-    //채팅방 조회
+    //참여 채팅방 조회
     @ResponseBody
     @GetMapping("/{participatedRoomId}")
-    @Operation(summary = "채팅방 조회", description = "채팅방을 조회합니다.")
+    @Operation(summary = "참여 채팅방 조회", description = "참여 채팅방을 조회합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "조회 성공"),
             @ApiResponse(responseCode = "400", description = "채팅방이 존재하지 않습니다.")
