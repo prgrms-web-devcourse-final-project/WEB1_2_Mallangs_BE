@@ -1,6 +1,8 @@
 package com.mallangs.domain.chat.service;
 
 import com.mallangs.domain.chat.dto.request.ChatRoomChangeNameRequest;
+import com.mallangs.domain.chat.dto.response.ChatRoomCreateResponse;
+import com.mallangs.domain.chat.dto.response.ChatRoomDeleteResponse;
 import com.mallangs.domain.chat.dto.response.ChatRoomResponse;
 import com.mallangs.domain.chat.dto.response.ParticipatedRoomListResponse;
 import com.mallangs.domain.chat.entity.ChatMessage;
@@ -41,7 +43,7 @@ public class ChatRoomService {
     private final SseEmitters sseEmitters;
 
     // 채팅방 생성
-    public Long create(Long myId, Long partnerId) {
+    public ChatRoomCreateResponse create(Long myId, Long partnerId) {
         //채팅방 생성
         ChatRoom chatRoom = ChatRoom.builder().build();
         ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
@@ -95,7 +97,7 @@ public class ChatRoomService {
             }
         }
 
-        return savedChatRoom.getChatRoomId();
+        return new ChatRoomCreateResponse(savedChatRoom.getChatRoomId());
     }
 
     //채팅방 리스트 조회
@@ -152,12 +154,13 @@ public class ChatRoomService {
     }
 
     //채팅방 삭제
-    public void delete(String userId, Long participatedRoomId) {
+    public ChatRoomDeleteResponse delete(String userId, Long participatedRoomId) {
         ParticipatedRoom partRoom = participatedRoomRepository.findByPRoomId(participatedRoomId)
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.PARTICIPATED_ROOM_NOT_FOUND));
 
         if (partRoom.getParticipant().getUserId().getValue().equals(userId)) {
             participatedRoomRepository.deleteById(participatedRoomId);
+            return new ChatRoomDeleteResponse(partRoom.getParticipatedRoomId());
         } else {
             throw new MallangsCustomException(ErrorCode.FAILED_DELETE_CHATROOM);
         }

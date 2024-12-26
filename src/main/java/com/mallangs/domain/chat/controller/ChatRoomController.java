@@ -1,5 +1,7 @@
 package com.mallangs.domain.chat.controller;
 
+import com.mallangs.domain.chat.dto.response.ChatRoomCreateResponse;
+import com.mallangs.domain.chat.dto.response.ChatRoomDeleteResponse;
 import com.mallangs.domain.chat.dto.response.ChatRoomResponse;
 import com.mallangs.domain.chat.dto.response.ParticipatedRoomListResponse;
 import com.mallangs.domain.chat.service.ChatMessageService;
@@ -11,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,14 +37,13 @@ public class ChatRoomController {
     @Operation(summary = "채팅방 생성", description = "채팅방을 생성합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "채팅방 생성 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청")
+            @ApiResponse(responseCode = "404", description = "회원정보를 찾을 수 없습니다.")
     })
-    public ResponseEntity<Long> create(@PathVariable("memberId") Long memberId,
-                                       @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
+    public ResponseEntity<ChatRoomCreateResponse> create(@PathVariable("memberId") Long memberId,
+                                                         @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
 
         Long myId = customMemberDetails.getMemberId();
-        Long roomId = chatRoomService.create(memberId, myId);
-        return ResponseEntity.created(URI.create("/api/chat-room/" + roomId)).body(roomId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(chatRoomService.create(memberId, myId));
     }
 
     //채팅방리스트 조회
@@ -54,7 +56,7 @@ public class ChatRoomController {
     public ResponseEntity<List<ParticipatedRoomListResponse>> getList(
             @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
         log.info("채팅방 조회 memberId 입력값: {}", customMemberDetails.getMemberId());
-        return ResponseEntity.ok(chatRoomService.get(customMemberDetails.getMemberId()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(chatRoomService.get(customMemberDetails.getMemberId()));
     }
 
 //    //채팅방 수정
@@ -74,28 +76,28 @@ public class ChatRoomController {
     @Operation(summary = "참여 채팅방 삭제", description = "참여 채팅방을 나갑니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "삭제 성공"),
-            @ApiResponse(responseCode = "400", description = "참여 채팅방이 존재하지 않습니다.")
+            @ApiResponse(responseCode = "401", description = "참여 채팅방 삭제 권한이 없는 사용자 입니다."),
+            @ApiResponse(responseCode = "404", description = "참여 채팅방이 존재하지 않습니다.")
     })
-    public ResponseEntity<?> delete(@PathVariable("participatedRoomId") Long participatedRoomId,
-                                    Authentication authentication) {
-        chatRoomService.delete(authentication.getName(), participatedRoomId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ChatRoomDeleteResponse> delete(@PathVariable("participatedRoomId") Long participatedRoomId,
+                                                         Authentication authentication) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(chatRoomService.delete(authentication.getName(), participatedRoomId));
     }
 
 
     //참여 채팅방 조회
     @ResponseBody
-    @GetMapping("/{participatedRoomId}")
-    @Operation(summary = "참여 채팅방 조회", description = "참여 채팅방을 조회합니다.")
+    @GetMapping("/{profileMemberId}")
+    @Operation(summary = "타인이 내 채팅방 조회", description = "타인이 내 채팅방을 조회합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "조회 성공"),
             @ApiResponse(responseCode = "400", description = "채팅방이 존재하지 않습니다.")
     })
-    public ResponseEntity<ChatRoomResponse> changeStatus(@PathVariable Long participatedRoomId,
+    public ResponseEntity<ChatRoomResponse> changeStatus(@PathVariable Long profileMemberId,
                                                          @AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
 
-        String nickname = customMemberDetails.getNickname();
-        return ResponseEntity.ok(chatMessageService.changeUnReadToRead(participatedRoomId, nickname));
+        Long memberId = customMemberDetails.getMemberId();
+        return ResponseEntity.status(HttpStatus.CREATED).body(chatMessageService.changeUnReadToRead(profileMemberId, memberId));
     }
 
 }
