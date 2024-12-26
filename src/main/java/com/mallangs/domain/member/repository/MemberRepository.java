@@ -69,7 +69,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "AND (:createAt IS NULL OR m.createdAt >= :createAt)")
     Page<MemberGetResponseOnlyMember> memberListByUserId(
             @Param("isActive") Boolean isActive,
-            @Param("userId") String userId,
+            @Param("userId") UserId userId,
             @Param("createAt") LocalDateTime createAt,
             Pageable pageable);
 
@@ -81,7 +81,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             " AND (:createAt IS NULL OR m.createdAt >= :createAt) ")
     Page<MemberGetResponseOnlyMember> memberListByEmail(
             @Param("isActive") Boolean isActive,
-            @Param("email") String email,
+            @Param("email") Email email,
             @Param("createAt") LocalDateTime createAt,
             Pageable pageable);
 

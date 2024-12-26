@@ -58,7 +58,7 @@ public class MemberAdminService {
             Boolean isActive = memberGetRequestByUserId.getIsActive();
             String userId = memberGetRequestByUserId.getUserId();
 
-            return memberRepository.memberListByUserId(isActive, userId, createAt, pageable);
+            return memberRepository.memberListByUserId(isActive, new UserId(userId), createAt, pageable);
         } catch (Exception e) {
             log.error("회원리스트 조회에 실패하였습니다. {}", e.getMessage());
             throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);
@@ -77,7 +77,7 @@ public class MemberAdminService {
             Boolean isActive = memberGetRequestByEmail.getIsActive();
             String email = memberGetRequestByEmail.getEmail();
 
-            return memberRepository.memberListByEmail(isActive, email, createAt, pageable);
+            return memberRepository.memberListByEmail(isActive, new Email(email), createAt, pageable);
         } catch (Exception e) {
             log.error("회원리스트 조회에 실패하였습니다. {}", e.getMessage());
             throw new MallangsCustomException(ErrorCode.FAILURE_REQUEST);

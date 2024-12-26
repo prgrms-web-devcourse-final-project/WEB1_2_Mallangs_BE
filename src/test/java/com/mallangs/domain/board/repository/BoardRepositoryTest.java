@@ -193,6 +193,7 @@
 //        assertThat(draftResult.getContent()).hasSize(1);
 //    }
 //
+
 ////    @Test
 ////    @DisplayName("관리자용 - 카테고리와 제목으로 게시글 검색")
 ////    void searchForAdmin() {
