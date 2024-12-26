@@ -7,6 +7,7 @@ import com.mallangs.domain.article.entity.ArticleType;
 import com.mallangs.domain.article.entity.CaseStatus;
 import com.mallangs.domain.article.entity.LostArticle;
 import com.mallangs.domain.article.entity.MapVisibility;
+import com.mallangs.domain.board.entity.BoardStatus;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.embadded.Email;
 import com.mallangs.domain.member.entity.embadded.Nickname;

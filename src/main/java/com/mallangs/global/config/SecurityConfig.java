@@ -82,6 +82,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable);
+
 //        // oauth2
 //        http
 //                .oauth2Login((oauth2) -> oauth2
