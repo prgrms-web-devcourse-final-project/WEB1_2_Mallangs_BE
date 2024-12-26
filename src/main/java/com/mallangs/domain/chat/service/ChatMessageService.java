@@ -10,6 +10,8 @@ import com.mallangs.domain.chat.redis.RedisSubscriber;
 import com.mallangs.domain.chat.repository.ChatMessageRepository;
 import com.mallangs.domain.chat.repository.ParticipatedRoomRepository;
 import com.mallangs.domain.member.dto.PageRequestDTO;
+import com.mallangs.domain.member.entity.Member;
+import com.mallangs.domain.member.repository.MemberRepository;
 import com.mallangs.global.exception.ErrorCode;
 import com.mallangs.global.exception.MallangsCustomException;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Log4j2
 @Service
 @Transactional
@@ -29,6 +33,7 @@ public class ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
     private final ParticipatedRoomRepository participatedRoomRepository;
     private final RedisSubscriber redisSubscriber;
+    private final MemberRepository memberRepository;
 
     //채팅 메세지 생성/송신
     public ChatMessageSuccessResponse sendMessage(ChatMessageRequest chatMessageRequest) {
@@ -132,10 +137,16 @@ public class ChatMessageService {
     }
 
     //가장 최근 읽음 처리된 메세지 부터, 찾아 읽음 처리하는 메서드
-    public ChatRoomResponse changeUnReadToRead(Long participatedRoomId, String nickname) {
+    public ChatRoomResponse changeUnReadToRead(Long profileMemberId, Long myId) {
+
+        Member proFileMember = memberRepository.findById(profileMemberId)
+                .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        Member myMember = memberRepository.findById(myId)
+                .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         //참여 채팅 정보 추출
-        ParticipatedRoom foundPartRoom = participatedRoomRepository.findByParticipatedRoomId(participatedRoomId)
+        ParticipatedRoom foundPartRoom = participatedRoomRepository.findByMyNicknameAndOtherId(myMember.getNickname().getValue(), profileMemberId)
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.PARTICIPATED_ROOM_NOT_FOUND));
 
         ChatRoom chatRoom = foundPartRoom.getChatRoom();
@@ -143,13 +154,14 @@ public class ChatMessageService {
             throw new MallangsCustomException(ErrorCode.CHATROOM_NOT_FOUND);
         }
 
-        int numChanged = chatMessageRepository.updateRead(chatRoom.getChatRoomId(), nickname);
+        int numChanged = chatMessageRepository.updateRead(chatRoom.getChatRoomId(), proFileMember.getNickname().getValue());
 
         //dto 로 변경
         return ChatRoomResponse.builder()
                 .chatRoomName(foundPartRoom.getRoomName())
                 .memberNickname(foundPartRoom.getParticipant().getNickname().getValue())
                 .memberId(foundPartRoom.getParticipant().getMemberId())
+                .chatRoomId(foundPartRoom.getChatRoom().getChatRoomId())
                 .changedIsRead(numChanged)
                 .build();
     }
