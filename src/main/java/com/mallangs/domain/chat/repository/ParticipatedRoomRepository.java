@@ -1,6 +1,7 @@
 package com.mallangs.domain.chat.repository;
 
 import com.mallangs.domain.chat.entity.ParticipatedRoom;
+import com.mallangs.domain.member.entity.embadded.Nickname;
 import com.mallangs.domain.member.entity.embadded.UserId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,5 +34,13 @@ public interface ParticipatedRoomRepository extends JpaRepository<ParticipatedRo
             " LEFT JOIN FETCH p.participant m" +
             "  WHERE p.participatedRoomId = :participatedRoomId")
     Optional<ParticipatedRoom> findByPRoomId(@Param("participatedRoomId") Long participatedRoomId);
+
+    // 참여채팅방 Id로 참여채팅방 불러오기- 회원, 채팅방 조인
+    @Query("SELECT DISTINCT p FROM ParticipatedRoom p" +
+            " LEFT JOIN FETCH p.participant m" +
+            " LEFT JOIN FETCH p.chatRoom c" +
+            " WHERE p.roomName = :myNickname" +
+            " AND p.participant.memberId = :otherId ")
+    Optional<ParticipatedRoom> findByMyNicknameAndOtherId(@Param("myNickname") String myNickname, @Param("otherId") Long otherId);
 
 }
