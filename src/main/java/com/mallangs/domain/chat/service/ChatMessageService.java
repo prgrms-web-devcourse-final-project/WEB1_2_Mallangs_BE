@@ -161,6 +161,7 @@ public class ChatMessageService {
                 .chatRoomName(foundPartRoom.getRoomName())
                 .memberNickname(foundPartRoom.getParticipant().getNickname().getValue())
                 .memberId(foundPartRoom.getParticipant().getMemberId())
+                .chatRoomId(foundPartRoom.getChatRoom().getChatRoomId())
                 .changedIsRead(numChanged)
                 .build();
     }
