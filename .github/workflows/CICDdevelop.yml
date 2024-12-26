@@ -26,7 +26,7 @@ jobs:
       - run: echo "spring.cloud.aws.credentials.secret-key=${{secrets.AWS_ACTION_SECRET_ACCESS_KEY}}" >> ./src/main/resources/application.properties
 
       # 4. 생성된 파일들을 아티팩트로 업로드
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: application.properties
           path: ./src/main/resources/application.properties
