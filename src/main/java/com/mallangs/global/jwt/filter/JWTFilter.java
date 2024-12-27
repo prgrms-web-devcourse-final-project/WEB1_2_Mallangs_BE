@@ -72,6 +72,7 @@ public class JWTFilter extends OncePerRequestFilter {
             patternVariableMap.put("/api/v1/comments/article/{articleId}", "articleId");
             patternVariableMap.put("/api/v1/place-articles/{placeArticleId}/reviews", "placeArticleId");
             patternVariableMap.put("/api/v1/place-articles/{placeArticleId}/reviews/average-score", "placeArticleId");
+            patternVariableMap.put("/api/v1/ai/{articleId}", "articleId");
 
             // PathVariable 포함 URI 매칭
             for (Map.Entry<String, String> entry : patternVariableMap.entrySet()) {
