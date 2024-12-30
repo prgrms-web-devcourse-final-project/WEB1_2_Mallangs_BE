@@ -113,6 +113,9 @@ dependencies {
     //jackson 날짜변환 위한 의존성
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
+    //로드밸런서 헬스체크
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+
 }
 jar {
     enabled = false
