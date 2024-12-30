@@ -21,6 +21,7 @@ public class MvcConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")  // 모든 경로에 대해 CORS 허용
                 .allowedOrigins("http://localhost:8080")
+                .allowedOrigins("https://mallangplace.site")
                 .allowedOrigins("http://localhost:5173")
                 .allowedOrigins("http://localhost:3000", "https://*.ngrok-free.app")  // 허용할 도메인
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")  // 허용할 HTTP 메서드
