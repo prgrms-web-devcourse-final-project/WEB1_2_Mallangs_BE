@@ -53,9 +53,9 @@ public class MemberCreateRequest {
     private String buildingName;
     private String zoneNo;
     private String mountainYn;
-    @Min(-90)@Max(90)
+    @Min(-180)@Max(180)
     private Double latitude;
-    @Min(-90)@Max(90)
+    @Min(-180)@Max(180)
     private Double longitude;
 
 
