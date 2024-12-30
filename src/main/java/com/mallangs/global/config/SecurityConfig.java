@@ -122,6 +122,7 @@ public class SecurityConfig {
                                 .requestMatchers("/ws-stomp/**").permitAll() //웹소켓
                                 .requestMatchers("/chat-rooms/**").permitAll() // 웹소켓
                                 .requestMatchers("/api/chat/websocket-test").permitAll() //웹소켓
+                                .requestMatchers("/api/v1/ai/**").permitAll() //AI
 
                                 // Swagger UI 관련 경로 허용
                                 .requestMatchers("/swagger-ui/**").permitAll()
