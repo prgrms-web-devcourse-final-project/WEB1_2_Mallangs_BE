@@ -64,7 +64,7 @@ public class SecurityConfig {
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(request -> {
                     CorsConfiguration configuration = new CorsConfiguration();
                     configuration.setAllowedOrigins(
-                            Arrays.asList("http://localhost:3000", "http://localhost:8080"
+                            Arrays.asList("http://localhost:3000", "http://localhost:8080", "https://mallang-place.vercel.app"
                                     ,"https://mallangplace.site","http://localhost:5173", "https://*.ngrok-free.app"));
                     configuration.setAllowedMethods(Collections.singletonList("*"));
                     configuration.setAllowCredentials(true);

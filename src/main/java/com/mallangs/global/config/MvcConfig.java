@@ -23,6 +23,7 @@ public class MvcConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:8080")
                 .allowedOrigins("https://mallangplace.site")
                 .allowedOrigins("http://localhost:5173")
+                .allowedOrigins("https://mallang-place.vercel.app")
                 .allowedOrigins("http://localhost:3000", "https://*.ngrok-free.app")  // 허용할 도메인
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")  // 허용할 HTTP 메서드
                 .allowedHeaders("*")  // 허용할 헤더
