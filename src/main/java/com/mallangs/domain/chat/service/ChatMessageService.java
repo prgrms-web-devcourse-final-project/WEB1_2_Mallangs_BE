@@ -1,5 +1,7 @@
 package com.mallangs.domain.chat.service;
 
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.mallangs.domain.chat.dto.request.ChatMessageRequest;
 import com.mallangs.domain.chat.dto.request.UpdateChatMessageRequest;
 import com.mallangs.domain.chat.dto.response.*;
@@ -19,10 +21,17 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Base64;
 import java.util.Optional;
+import java.util.UUID;
 
 @Log4j2
 @Service
@@ -52,8 +61,7 @@ public class ChatMessageService {
                     .message(chatMessageRequest.getMessage())
                     .sender(foundPartRoom.getParticipant())
                     .senderRead(true)
-                    .receiverRead(false)
-                    .imageUrl(chatMessageRequest.getImageUrl()).build();
+                    .receiverRead(false).build();
             ChatMessage savedChatMessage = chatMessageRepository.save(chatMessage);
             log.info("저장된 보낸 채팅 정보: {}", chatMessage.toString());
 
@@ -62,7 +70,7 @@ public class ChatMessageService {
                     .chatMessageId(savedChatMessage.getChatMessageId())
                     .chatRoomId(chatRoom.getChatRoomId())
                     .message(savedChatMessage.getMessage())
-                    .chatMessageImage(savedChatMessage.getImageUrl())
+                    .base64Image(chatMessageRequest.getBase64Image())
                     .sender(savedChatMessage.getSender().getNickname().getValue())
                     .type(savedChatMessage.getType())
                     .createTime(savedChatMessage.getCreatedAt())
@@ -70,7 +78,7 @@ public class ChatMessageService {
 
             log.info("마지막 메세지 보낼 채팅 정보: {}", chatMessageResponse.toString());
 
-            //채팅 보내기
+            //redis로 채팅 보내기
             redisSubscriber.sendMessage(chatMessageResponse);
             return new ChatMessageSuccessResponse(savedChatMessage.getSender().getUserId().getValue());
         } catch (Exception e) {
@@ -165,4 +173,5 @@ public class ChatMessageService {
                 .changedIsRead(numChanged)
                 .build();
     }
+
 }

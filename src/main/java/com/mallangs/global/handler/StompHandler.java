@@ -1,18 +1,12 @@
 package com.mallangs.global.handler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mallangs.domain.chat.entity.ParticipatedRoom;
-import com.mallangs.domain.chat.repository.ParticipatedRoomRepository;
-import com.mallangs.domain.chat.service.ChatMessageService;
 import com.mallangs.domain.member.entity.Member;
 import com.mallangs.domain.member.entity.embadded.UserId;
-import com.mallangs.global.jwt.entity.CustomMemberDetails;
-import com.mallangs.global.jwt.util.JWTUtil;
 import com.mallangs.domain.member.repository.MemberRepository;
 import com.mallangs.global.exception.ErrorCode;
 import com.mallangs.global.exception.MallangsCustomException;
+import com.mallangs.global.jwt.entity.CustomMemberDetails;
+import com.mallangs.global.jwt.util.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.messaging.Message;
