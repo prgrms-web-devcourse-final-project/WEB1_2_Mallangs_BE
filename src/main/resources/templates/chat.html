@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>WebSocket Image Transfer Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.2/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .chat-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .messages {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            height: 300px;
+            overflow-y: auto;
+            background: #f9f9f9;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-container input {
+            flex-grow: 1;
+            padding: 8px;
+        }
+
+        .input-container button {
+            padding: 8px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .input-container button:hover {
+            background-color: #218838;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 150px;
+        }
+    </style>
+</head>
+<body>
+<div class="chat-container">
+    <h2>WebSocket Image Transfer Test</h2>
+
+    <div class="messages" id="messages">
+        <!-- Messages will be appended here -->
+    </div>
+
+    <div class="input-container">
+        <input type="text" id="messageInput" placeholder="Enter your message...">
+        <input type="file" id="imageInput">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <div class="image-preview" id="imagePreview"></div>
+</div>
+
+<script>
+    let stompClient = null;
+
+    function connect() {
+        const socket = new SockJS('/ws-stomp'); // Your WebSocket endpoint
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function () {
+            console.log('Connected to WebSocket');
+
+            // Subscribe to the chat topic
+            stompClient.subscribe('/sub/chat/room/test', function (messageOutput) {
+                const message = JSON.parse(messageOutput.body);
+                displayMessage(message);
+            });
+        });
+    }
+
+    function sendMessage() {
+        const messageInput = document.getElementById('messageInput');
+        const imageInput = document.getElementById('imageInput');
+        const file = imageInput.files[0];
+
+        let message = {
+            message: messageInput.value,
+            imageUrl: null
+        };
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                message.imageUrl = e.target.result; // Base64 encoded image
+                stompClient.send('/pub/chat/send-message', {}, JSON.stringify(message));
+            };
+            reader.readAsDataURL(file);
+        } else {
+            stompClient.send('/pub/chat/send-message', {}, JSON.stringify(message));
+        }
+
+        messageInput.value = '';
+        imageInput.value = null;
+    }
+
+    function displayMessage(message) {
+        const messagesDiv = document.getElementById('messages');
+        const messageElement = document.createElement('div');
+
+        messageElement.innerHTML = `
+                <p><strong>Message:</strong> ${message.message}</p>
+                ${message.imageUrl ? `<img src="${message.imageUrl}" alt="Image">` : ''}
+                <hr>
+            `;
+
+        messagesDiv.appendChild(messageElement);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    // Connect on page load
+    connect();
+</script>
+</body>
+</html>

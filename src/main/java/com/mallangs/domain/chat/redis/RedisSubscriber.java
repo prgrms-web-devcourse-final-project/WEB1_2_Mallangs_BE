@@ -19,7 +19,7 @@ public class RedisSubscriber implements MessageListener {
     private final SimpMessageSendingOperations messagingTemplate;
     private final RedisTemplate redisTemplate;
 
-    //메세지를 구독자들에게 송신
+    //Stomp로 송신
     public void sendMessage(ChatMessageResponse publishMessage) {
         try {
             log.info("레디스 펍섭의 publishMessage: {}", publishMessage);
@@ -28,7 +28,7 @@ public class RedisSubscriber implements MessageListener {
             log.error("Exception {}", e.getMessage());
         }
     }
-    //stomp이용해서 구독자들에게 송신
+    //redis로 송수신
     @Override
     public void onMessage(Message message, byte[] pattern) {
         try {
