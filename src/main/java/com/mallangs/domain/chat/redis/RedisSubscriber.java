@@ -19,26 +19,26 @@ public class RedisSubscriber implements MessageListener {
     private final SimpMessageSendingOperations messagingTemplate;
     private final RedisTemplate redisTemplate;
 
-    //Stomp로 송신
+    //stomp (레디스 거치지 않고) 바로 메세지 전송
     public void sendMessage(ChatMessageResponse publishMessage) {
         try {
-            log.info("레디스 펍섭의 publishMessage: {}", publishMessage);
             messagingTemplate.convertAndSend("/sub/chat/room/" + publishMessage.getChatRoomId(), publishMessage);
         } catch (Exception e) {
             log.error("Exception {}", e.getMessage());
         }
     }
-    //redis로 송수신
+    //publish Redis 메세지 수신
     @Override
     public void onMessage(Message message, byte[] pattern) {
         try {
+            //레디스 역직렬화
             String publishMessage = (String) redisTemplate.getStringSerializer().deserialize(message.getBody());
-
             ChatMessageResponse chatMessage = objectMapper.readValue(publishMessage, ChatMessageResponse.class);
 
+            //stomp 이용해서 구독자들에게 메세지 송신
             messagingTemplate.convertAndSend("/sub/chat/room/" + chatMessage.getChatRoomId(), chatMessage);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("publish 레디스 메세지 -> stomp 메세지로 송신 실패 :{}", e.getMessage());
         }
     }
 }
