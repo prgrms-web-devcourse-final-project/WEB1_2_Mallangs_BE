@@ -11,9 +11,12 @@ import com.google.cloud.vertexai.generativeai.ResponseHandler;
 import com.mallangs.domain.ai.dto.SightAIResponse;
 import com.mallangs.domain.article.dto.response.ArticleResponse;
 import com.mallangs.domain.article.dto.response.LostResponse;
+import com.mallangs.domain.article.dto.response.PlaceResponse;
 import com.mallangs.domain.article.service.ArticleService;
 import com.mallangs.domain.board.dto.response.SightingListResponse;
 import com.mallangs.domain.board.service.BoardService;
+import com.mallangs.global.exception.ErrorCode;
+import com.mallangs.global.exception.MallangsCustomException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
@@ -59,6 +62,17 @@ public class AIPromptController {
 
         //단전조회, 실종글타래 조회
         ArticleResponse articleResponse = articleService.getLostArticleById(articleId);
+        log.info("articleResponse는 {}",articleResponse);
+
+        //lostArticle 확인
+        LostResponse lostArticle;
+        if(articleResponse instanceof LostResponse) {
+            // LostResponse 처리 로직
+            lostArticle = (LostResponse) articleResponse;
+        } else{
+            log.error("lostArticle이 아닙니다. {}", articleResponse);
+            throw new MallangsCustomException(ErrorCode.WRONG_ARTICLE);
+        }
 
         //질문제작
         StringBuilder question = new StringBuilder();
@@ -92,7 +106,6 @@ public class AIPromptController {
                 "그리고 50% 이상만 응답해 주세요.\n\n");
 
         // 실종 동물 정보
-        LostResponse lostArticle = (LostResponse) articleResponse;
         question.append("실종동물에 대한 설명 : lostArticle.getDescription()");
         question.append("실종 위치: 경도:" + lostArticle.getLongitude() + ", 위도:" + lostArticle.getLatitude());
         question.append("실종 동물 종: " + lostArticle.getBreed());
