@@ -80,6 +80,28 @@ public class MemberUserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(memberUserService.create(memberCreateRequest));
     }
 
+    @GetMapping("/member-id/{memberId}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @Operation(summary = "회원 프로필 조회", description = "회원 프로필 조회 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "회원 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "회원을 찾을 수 없습니다."),
+            @ApiResponse(responseCode = "406", description = "차단된 계정입니다.")
+    })
+    public ResponseEntity<MemberGetResponse> get(@PathVariable("memberId") Long memberId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(memberUserService.get(memberId));
+    }
+    @GetMapping("/other/member-id/{memberId}")
+    @Operation(summary = "(타인)회원 프로필 조회", description = "(타인)회원 프로필 조회 요청 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "회원 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "회원을 찾을 수 없습니다."),
+            @ApiResponse(responseCode = "406", description = "차단된 계정입니다.")
+    })
+    public ResponseEntity<MemberGetByOtherResponse> getByOther(@PathVariable("memberId") Long memberId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(memberUserService.getByOther(memberId));
+    }
+
     @GetMapping("")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Operation(summary = "회원 프로필 조회", description = "회원 프로필 조회 요청 API")

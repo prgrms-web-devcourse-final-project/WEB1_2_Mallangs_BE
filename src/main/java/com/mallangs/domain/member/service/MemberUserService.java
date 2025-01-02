@@ -68,7 +68,29 @@ public class MemberUserService {
         }
     }
 
-    //회원조회
+    //회원조회 -memberId
+    public MemberGetResponse get(Long memberId) {
+        Member foundMember = memberRepository.findByUserIdForProfile(memberId)
+                .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+        if (foundMember.getIsActive().equals(false)) {
+            throw new MallangsCustomException(ErrorCode.BANNED_MEMBER);
+        }
+        return new MemberGetResponse(foundMember);
+    }
+
+    //회원조회(타인) -memberId
+    public MemberGetByOtherResponse getByOther(Long memberId) {
+        Member foundMember = memberRepository.findByUserIdForProfile(memberId)
+                .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        if (foundMember.getIsActive().equals(false)) {
+            throw new MallangsCustomException(ErrorCode.BANNED_MEMBER);
+        }
+
+        return new MemberGetByOtherResponse(foundMember);
+    }
+
+    //회원조회 -userId
     public MemberGetResponse get(String userId) {
         Member foundMember = memberRepository.findByUserIdForProfile(new UserId(userId))
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
@@ -78,7 +100,7 @@ public class MemberUserService {
         return new MemberGetResponse(foundMember);
     }
 
-    //회원조회(타인)
+    //회원조회(타인) -userId
     public MemberGetByOtherResponse getByOther(String userId) {
         Member foundMember = memberRepository.findByUserIdForProfile(new UserId(userId))
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));

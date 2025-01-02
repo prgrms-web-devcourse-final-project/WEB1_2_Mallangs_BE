@@ -20,5 +20,12 @@ public class MapBoundsResponse {
   private double longitude;
 
   private String description;
-  
+
+  public MapBoundsResponse(Long articleId, String type, double latitude, double longitude, String description) {
+    this.articleId = articleId;
+    this.type = type;
+    this.latitude = latitude;
+    this.longitude = longitude;
+    this.description = description;
+  }
 }
