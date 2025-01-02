@@ -8,6 +8,7 @@ import com.mallangs.domain.chat.dto.response.*;
 import com.mallangs.domain.chat.entity.ChatMessage;
 import com.mallangs.domain.chat.entity.ChatRoom;
 import com.mallangs.domain.chat.entity.ParticipatedRoom;
+import com.mallangs.domain.chat.redis.RedisPublisher;
 import com.mallangs.domain.chat.redis.RedisSubscriber;
 import com.mallangs.domain.chat.repository.ChatMessageRepository;
 import com.mallangs.domain.chat.repository.ParticipatedRoomRepository;
@@ -41,6 +42,7 @@ public class ChatMessageService {
 
     private final ChatMessageRepository chatMessageRepository;
     private final ParticipatedRoomRepository participatedRoomRepository;
+    private final RedisPublisher redisPublisher;
     private final RedisSubscriber redisSubscriber;
     private final MemberRepository memberRepository;
 
@@ -79,7 +81,7 @@ public class ChatMessageService {
             log.info("마지막 메세지 보낼 채팅 정보: {}", chatMessageResponse.toString());
 
             //redis로 채팅 보내기
-            redisSubscriber.sendMessage(chatMessageResponse);
+            redisPublisher.publish(chatMessageResponse);
             return new ChatMessageSuccessResponse(savedChatMessage.getSender().getUserId().getValue());
         } catch (Exception e) {
             throw new MallangsCustomException(ErrorCode.FAILED_CREATE_CHAT_MESSAGE);
