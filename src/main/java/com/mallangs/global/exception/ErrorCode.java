@@ -46,6 +46,7 @@ public enum ErrorCode {
   UNAUTHORIZED_DELETE(FORBIDDEN, "이 리소스를 삭제할 권한이 없습니다."),
   RESOURCE_NOT_MODIFIABLE(FORBIDDEN, "이 리소스는 수정할 수 없습니다."),
   RESOURCE_NOT_DELETABLE(FORBIDDEN, "이 리소스는 삭제할 수 없습니다."),
+  WRONG_ARTICLE(BAD_REQUEST, "실종글타래가 아닌 다른 글타래를 조회하고 있습니다. 입력한 articleId를 확인해주세요."),
   INVALID_TYPE_CHANGE(BAD_REQUEST, "글타래 타입은 생성 시에 설정된 타입을 유지해야 합니다."),
   INVALID_REQUEST(BAD_REQUEST, "잘못된 입력값입니다. 입력값을 확인해주세요"),
   OUT_OF_BOUNDARY(BAD_REQUEST, "입력값을 확인해주세요. 위도의 값은 -90부터 90 사이, 경도의 값은 -180부터 180 사이여야 합니다."),
