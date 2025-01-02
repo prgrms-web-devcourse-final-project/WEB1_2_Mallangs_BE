@@ -109,7 +109,6 @@ dependencies {
     //AI prompt
 //    implementation 'org.springframework.ai:spring-ai-vertex-ai-gemini-spring-boot-starter:1.0.0-SNAPSHOT'
     implementation 'com.google.cloud:google-cloud-vertexai:1.15.0'
-    implementation 'org.springframework.ai:spring-ai-vertex-ai-gemini'
 
     //jackson 날짜변환 위한 의존성, json 의존성
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
