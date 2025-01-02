@@ -8,6 +8,8 @@ import java.util.Objects;
 
 import com.mallangs.domain.member.repository.AddressRepository;
 import com.mallangs.domain.member.repository.MemberRepository;
+import com.mallangs.global.exception.ErrorCode;
+import com.mallangs.global.exception.MallangsCustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -67,7 +69,7 @@ public class LocationService {
 
         } catch (Exception e) {
             log.error("대분류에서 실패하였습니다. {}", e.getMessage());
-            throw e;
+            throw new MallangsCustomException(ErrorCode.OUT_OF_BOUNDARY);
         }
     }
 

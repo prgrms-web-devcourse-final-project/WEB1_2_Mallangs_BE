@@ -136,47 +136,10 @@ public class JWTFilter extends OncePerRequestFilter {
                 String accessToken = authorizationHeader.substring(7);
                 Map<String, Object> claims = jwtUtil.validateToken(accessToken);
 
-//                //블랙리스트에 있는지 확인
-//                if (accessTokenBlackList.checkBlackList(accessToken)) {
-//                    handleException(response, new Exception("ACCESS TOKEN IS BLOCKED"));
-//                    return;
-//                }
                 //Access Token 만료 확인
                 if (jwtUtil.isExpired(accessToken)) {
                     throw new MallangsCustomException(ErrorCode.TOKEN_EXPIRED);
-//                    String refreshTokenFromCookies = getRefreshTokenFromCookies(request);
 
-//                    if (refreshTokenFromCookies != null) {
-//                        try {
-//                            Map<String, Object> RefreshPayloadMap = jwtUtil.validateRefreshToken(
-//                                    refreshTokenFromCookies);
-//                            String refreshTokenInRedis = refreshTokenService.readRefreshTokenInRedis(
-//                                    RefreshPayloadMap);
-//
-//                            if ((refreshTokenFromCookies.equals(refreshTokenInRedis)
-//                                    && (!jwtUtil.isExpired(refreshTokenFromCookies)))) {
-//
-//                                //userId로 맴버 찾기
-//                                Member foundMember = memberRepository.findByUserId(new UserId((String) RefreshPayloadMap.get("userId")))
-//                                        .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
-//
-//                                //SecurityContextHolder 에 회원 등록
-//                                CustomMemberDetails customUserDetails = new CustomMemberDetails(foundMember);
-//                                Authentication authToken = new UsernamePasswordAuthenticationToken(
-//                                        customUserDetails, null, customUserDetails.getAuthorities());
-//                                SecurityContextHolder.getContext().setAuthentication(authToken);
-//
-//                                filterChain.doFilter(request, response);
-//                            } else {
-//                                handleException(response, new Exception("INVALID REFRESH TOKEN"));
-//                            }
-//                        } catch (Exception e) {
-//                            handleException(response, new Exception("REFRESH TOKEN VALIDATION FAILED"));
-//                        }
-//                    } else {
-//                        handleException(response, new Exception("REFRESH TOKEN NOT FOUND"));
-//                    }
-//                    filterChain.doFilter(request, response);
                 } else {
                     log.info("Claims: {}", claims);
                     if (claims.get("category") == null || !(claims.get("category")).equals(
@@ -217,7 +180,7 @@ public class JWTFilter extends OncePerRequestFilter {
             }
         } catch (Exception e) {
             log.error("fail to check Tokens: {}", e.getMessage());
-            throw new MallangsCustomException(ErrorCode.FAILED_TO_CHECK_TOKENS);
+            handleException(response, e);
         }
     }
 
@@ -227,19 +190,6 @@ public class JWTFilter extends OncePerRequestFilter {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType("application/json");
         response.getWriter().println("{\"error\": \"" + e.getMessage() + "\"}");
-    }
-
-    //쿠키에서 Refresh Token 꺼내기
-    private String getRefreshTokenFromCookies(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("RefreshToken".equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
     }
 
     //숫자인지 아닌지 확인하는 코드
