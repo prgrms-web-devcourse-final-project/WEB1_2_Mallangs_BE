@@ -18,4 +18,7 @@ public interface LocationRepository {
       double southWestLon,
       double northEastLat, double northEastLon, String placeCategory, boolean isPublicData);
 
+  List<MapBoundsResponse> findUserInBoundsByCategory(double southWestLat,
+      double southWestLon, double northEastLat, double northEastLon);
+
 }
