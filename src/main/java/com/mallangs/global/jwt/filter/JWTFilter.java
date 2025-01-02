@@ -117,6 +117,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
                     //회원
                     uri.contains("/api/v1/member/other/") ||
+                    uri.contains("/api/v1/member/other/member-id") ||
 
                     //반려동물
                     ("GET".equals(method) && uri.startsWith("/api/v1/pets/nearby"))) {

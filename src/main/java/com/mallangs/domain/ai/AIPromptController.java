@@ -14,7 +14,6 @@ import com.mallangs.domain.article.dto.response.LostResponse;
 import com.mallangs.domain.article.service.ArticleService;
 import com.mallangs.domain.board.dto.response.SightingListResponse;
 import com.mallangs.domain.board.service.BoardService;
-import com.mallangs.domain.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,25 +57,10 @@ public class AIPromptController {
     public ResponseEntity<List<SightAIResponse>> getArticleByArticleIdByAI(
             @Parameter(description = "조회할 글타래 ID", required = true) @PathVariable Long articleId) {
 
-        String memberRole;
-        Long memberId;
-
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        if (principal instanceof Member member) {
-            memberRole = member.getMemberRole().name();
-            memberId = member.getMemberId();
-        } else {
-            memberRole = "ROLE_GUEST";
-            memberId = -1L;
-        }
-        log.info("role: {} memberId: {}", memberRole, memberId);
-
         //단전조회, 실종글타래 조회
-        ArticleResponse articleResponse = articleService.getArticleById(articleId, memberRole,
-                memberId);
+        ArticleResponse articleResponse = articleService.getLostArticleById(articleId);
 
-        //질문 제작
+        //질문제작
         StringBuilder question = new StringBuilder();
 
         // JSON 형식에 대한 예시 설명

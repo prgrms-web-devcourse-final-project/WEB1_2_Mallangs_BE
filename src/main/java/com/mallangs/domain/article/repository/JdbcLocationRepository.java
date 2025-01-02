@@ -76,7 +76,7 @@ public class JdbcLocationRepository implements LocationRepository {
     );
   }
 
-  // 장소 / 사용자 등록 위치
+  // 장소
   @Override
   public List<MapBoundsResponse> findPlaceArticlesInBoundsByType(double southWestLat,
       double southWestLon, double northEastLat, double northEastLon, boolean isPublicData) {
@@ -140,6 +140,36 @@ public class JdbcLocationRepository implements LocationRepository {
             rs.getDouble("longitude"),  // geography의 y 값
             rs.getString("description")
         )
+    );
+  }
+
+  //사용자 등록 위치
+  @Override
+  public List<MapBoundsResponse> findUserInBoundsByCategory(double southWestLat,
+         double southWestLon, double northEastLat, double northEastLon) {
+
+    String query = String.format(
+            "SELECT m.member_id, ST_X(a.point) AS longitude, " +
+                    "ST_Y(a.point) AS latitude, a.region_3depth_h_name " +
+                    "FROM address a "
+                    + "JOIN member m ON m.member_id = a.member_id "
+                    + "WHERE MBRContains(ST_GeomFromText('POLYGON((%f %f, %f %f, %f %f, %f %f, %f %f))', 4326), a.point) ",
+            southWestLat, southWestLon,
+            southWestLat, northEastLon,
+            northEastLat, northEastLon,
+            northEastLat, southWestLon,
+            southWestLat, southWestLon);
+
+    log.info(query);
+
+    return jdbcTemplate.query(query, (rs, rowNum) ->
+            new MapBoundsResponse(
+                    rs.getLong("member_id"),
+                    "user",
+                    rs.getDouble("latitude"), // geography의 x 값
+                    rs.getDouble("longitude"),  // geography의 y 값
+                    rs.getString("region_3depth_h_name")
+            )
     );
   }
 

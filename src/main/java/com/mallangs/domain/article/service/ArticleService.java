@@ -41,13 +41,13 @@ public class ArticleService {
                 .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         // 팩토리 매니저를 통해 적절한 팩토리 선택 -> 팩토리의 역할:
-        log.info("articleCreateRequest: {}",articleCreateRequest.toString());
-        log.info("articleCreateRequest 설명: {}",articleCreateRequest.getArticleType().getDescription());
+        log.info("articleCreateRequest: {}", articleCreateRequest.toString());
+        log.info("articleCreateRequest 설명: {}", articleCreateRequest.getArticleType().getDescription());
         ArticleFactory factory = factoryManager.getFactory(
                 articleCreateRequest.getArticleType().getDescription());
 
         // 팩토리에서 article 생성
-                Article article = factory.createArticle(foundMember, articleCreateRequest);
+        Article article = factory.createArticle(foundMember, articleCreateRequest);
         article.hideInMap(); // published 상태 아니면 map hidden
 
         Article savedArticle = articleRepository.save(article);
@@ -145,6 +145,24 @@ public class ArticleService {
 
         log.info("단건 조회 OTHER" + userRole);
         throw new MallangsCustomException(ErrorCode.ARTICLE_NOT_FOUND);
+    }
+
+    // 실종 글타래 단건 조회 (수정본)
+    // 사용자는 map visiblie 인 경우
+    public ArticleResponse getLostArticleById(Long articleId) {
+            Article foundArticle = articleRepository.findById(articleId)
+                    .orElseThrow(() -> new MallangsCustomException(ErrorCode.ARTICLE_NOT_FOUND));
+
+        try {
+            // ArticleResponse 로 반환 통일되게 팩토리메서드 작성 필요
+            ArticleFactory factory = factoryManager.getFactory(
+                    foundArticle.getArticleType().getDescription());
+            log.info("factory. : {}", factory);
+
+            return factory.createResponse(foundArticle);
+        } catch (Exception e) {
+            throw new MallangsCustomException(ErrorCode.ARTICLE_NOT_FOUND);
+        }
     }
 
     // 목격제보 글타래 전체조회
