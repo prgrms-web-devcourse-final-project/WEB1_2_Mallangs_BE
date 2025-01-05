@@ -70,6 +70,8 @@ public class OpenAiPromptController {
         question.append("실종 동물과 유사한 목격 정보를 여러 개 찾습니다. " +
                 "반드시 JSON 배열 형식으로 응답해주세요. 예시는 다음과 같습니다:\n");
 
+        question.append("다음은 단순히 JSON 응답 형식의 예제입니다. 반드시 실제 데이터를 사용하여 응답을 생성해 주세요:\n");
+        question.append("[예제 시작]\n");
         question.append("[\n");
         question.append("  {\n");
         question.append("    \"sightArticleId\": 12345,\n");
@@ -79,17 +81,9 @@ public class OpenAiPromptController {
         question.append("    \"breed\": \"Labrador\",\n");
         question.append("    \"color\": \"Yellow\",\n");
         question.append("    \"gender\": \"Male\"\n");
-        question.append("  },\n");
-        question.append("  {\n");
-        question.append("    \"sightArticleId\": 67890,\n");
-        question.append("    \"percentage\": 93.3,\n");
-        question.append("    \"findSpot\": \"서울특별시 서초구 서초동\",\n");
-        question.append("    \"sightedAt\": \"2024-12-22\",\n");
-        question.append("    \"breed\": \"Labrador\",\n");
-        question.append("    \"color\": \"Yellow\",\n");
-        question.append("    \"gender\": \"Male\"\n");
         question.append("  }\n");
-        question.append("]\n\n");
+        question.append("]\n");
+        question.append("[예제 끝]\n");
 
         question.append("목격 정보는 반드시 `percentage` 내림차순으로 정렬해주세요. " +
                 "그리고 50% 이상만 응답해 주세요.\n\n");
@@ -114,7 +108,7 @@ public class OpenAiPromptController {
             question.append(", 목격위치" + sightingListResponse.getAddress());
         }
 
-        question.append("\n위 정보를 바탕으로 JSON 배열을 만들어 주세요. " +
+        question.append("\n위 정보를 바탕으로 JSON 배열을 만들어 주세요. 그리고 50% 이상만 응답해 주세요 " +
                 "각 요소는 SightAIResponse 형식이며, 상위 5개만 찾아주세요. " +
                 "percentage 내림차순으로 정렬해 주세요. 완전히 동일한 내용의 목격제보가 있다면 percentage는 동일하게 해주세요.\n");
 
