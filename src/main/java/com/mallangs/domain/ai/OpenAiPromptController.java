@@ -2,7 +2,6 @@ package com.mallangs.domain.ai;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,7 +16,8 @@ public class OpenAiPromptController {
     }
 
     @GetMapping()
-    public String call (@RequestBody String message) {
+    public String call () {
+        String message = "너의이름은?";
         return chatClient.prompt()
                 .user(message)
                 .call()
