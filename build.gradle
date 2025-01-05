@@ -21,7 +21,8 @@ configurations {
 
 repositories {
     mavenCentral()
-    maven {url 'https://repo.spring.io/snapshot'} //스냅샷 저장소 추가
+    maven { url 'https://repo.spring.io/milestone' }
+    maven { url 'https://repo.spring.io/snapshot' }
 }
 
 dependencies {
@@ -99,7 +100,6 @@ dependencies {
 
     //CSV 데이터 저장
     implementation 'com.opencsv:opencsv:5.9'
-
     implementation 'mysql:mysql-connector-java:8.0.33'
 
     //Spring Cloud AWS, S3
@@ -107,12 +107,9 @@ dependencies {
     implementation 'com.amazonaws:aws-java-sdk-s3:1.12.777'
 
     //AI prompt
-//    implementation 'org.springframework.ai:spring-ai-vertex-ai-gemini-spring-boot-starter:1.0.0-SNAPSHOT'
-//    implementation 'com.google.cloud:google-cloud-vertexai:1.15.0'
-    implementation("com.openai:openai-java:0.9.0")
-    //openai, springai 연결의존성
     implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
-
+    implementation 'org.springframework.ai:spring-ai-openai'
+    implementation platform("org.springframework.ai:spring-ai-bom:1.0.0-SNAPSHOT")
 
     //jackson 날짜변환 위한 의존성, json 의존성
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
@@ -128,7 +125,4 @@ jar {
 tasks.named('test') {
     useJUnitPlatform()
 }
-//긴 클래스 패스 길이 해결
-tasks.withType(JavaExec).configureEach {
-    classpath = files(sourceSets.main.runtimeClasspath.files)
-}
+
