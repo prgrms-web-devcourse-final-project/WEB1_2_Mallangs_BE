@@ -187,8 +187,9 @@ public class JWTFilter extends OncePerRequestFilter {
     //오류시 조치처리
     public void handleException(HttpServletResponse response, Exception e)
             throws IOException {
+        response.setCharacterEncoding("UTF-8");
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        response.setContentType("application/json");
+        response.setContentType("application/json;charset=UTF-8");
         response.getWriter().println("{\"error\": \"" + e.getMessage() + "\"}");
     }
 
