@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Log4j2
@@ -32,7 +31,6 @@ import java.util.List;
 public class OpenAiPromptController {
 
     private final ChatClient chatClient;
-    ;
     private final ArticleService articleService;
     private final BoardService boardService;
 
@@ -40,16 +38,6 @@ public class OpenAiPromptController {
         this.chatClient = builder.build();
         this.articleService = articleService;
         this.boardService = boardService;
-    }
-
-    //테스트
-    @GetMapping()
-    public String call() {
-        String message = "너의이름은?";
-        return chatClient.prompt()
-                .user(message)
-                .call()
-                .content();
     }
 
     // AI로 비슷한 목격게시물 조회
@@ -127,8 +115,8 @@ public class OpenAiPromptController {
         }
 
         question.append("\n위 정보를 바탕으로 JSON 배열을 만들어 주세요. " +
-                "각 요소는 SightAIResponse 형식이며, 상위 5개만 찾아줘 " +
-                "percentage 내림차순으로 정렬해 주세요.\n");
+                "각 요소는 SightAIResponse 형식이며, 상위 5개만 찾아주세요. " +
+                "percentage 내림차순으로 정렬해 주세요. 완전히 동일한 내용의 목격제보가 있다면 percentage는 동일하게 해주세요.\n");
 
         //AI에게 질문하기
         try {
