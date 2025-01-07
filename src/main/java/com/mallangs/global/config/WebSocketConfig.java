@@ -40,7 +40,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(final MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/sub")
                 //heart beat 주기 (클라이언트_전송_간격, 서버_수신_간격) -> 서버에서 먼저 보내고, 클라가 응답하는 구조 0.1초, 0.2초
-                .setHeartbeatValue(new long[] {100, 200})
+                .setHeartbeatValue(new long[] {1000, 1000})
                 .setTaskScheduler(this.messageBrokerTaskScheduler);
         registry.setApplicationDestinationPrefixes("/pub");
     }
