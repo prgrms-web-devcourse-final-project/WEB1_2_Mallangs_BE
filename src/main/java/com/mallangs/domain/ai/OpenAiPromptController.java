@@ -127,7 +127,7 @@ public class OpenAiPromptController {
             // json 형식인지 확인
             if (!cleanedResponse.trim().startsWith("[")) {
                 log.error("Invalid response format: {}", cleanedResponse);
-                throw new IllegalArgumentException("AI 응답이 JSON 형식이 아닙니다.");
+                throw new MallangsCustomException(ErrorCode.WRONG_RESPONSE_TYPE);
             }
 
             // 2. JSON 데이터를 DTO로 매핑 <List>버전
@@ -139,14 +139,12 @@ public class OpenAiPromptController {
             List<SightAIResponse> answerList = objectMapper.readValue(cleanedResponse, listType);
 
             return ResponseEntity.ok(answerList);
-        } catch (
-                IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             log.error("AI answer failed {}", e.getMessage());
-            throw new RuntimeException("AI 응답이 유효하지 않습니다.");
-        } catch (
-                Exception e) {
+            throw new MallangsCustomException(ErrorCode.WRONG_RESPONSE_TYPE);
+        } catch (Exception e) {
             log.error("Error while processing AI response: {}", e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "AI 응답 처리 중 문제가 발생했습니다.", e);
+            throw new MallangsCustomException(ErrorCode.SERVER_ERROR);
         }
     }
 
