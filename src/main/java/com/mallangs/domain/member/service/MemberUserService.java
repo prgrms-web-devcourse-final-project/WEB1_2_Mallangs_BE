@@ -195,11 +195,26 @@ public class MemberUserService {
         }
     }
 
-    //이메일에 전송될 메세지 작성
+    //ip주소 검증 -> 경고메일 메세지 생성
+    public MemberSendMailResponse writeWarningMessage(String email) {
+
+        // 메시지 작성 (HTML 형식 권장)
+        String message = "안녕하세요. Mallang에 새로운 지역에서 접속이 발견되었습니다.\n"
+                + "본인이 아니라면 비밀번호를 변경해주세요.\n"
+                + "자세한 문의는 000-0000-0000으로 연락주세요.";
+
+        MemberSendMailResponse dto = new MemberSendMailResponse();
+        dto.setEmail(email);
+        dto.setTitle("Mallang 새로운 지역 로그인 안내 이메일입니다.");
+        dto.setMessage(message);
+        return dto;
+    }
+
+    //이메일에 전송될 비밀번호 변경 메세지 작성
     public MemberSendMailResponse writeMessage(String email, String tempPassword) {
         MemberSendMailResponse dto = new MemberSendMailResponse();
         dto.setEmail(email);
-        dto.setTitle("Mallang 임시비밀번호 안내 이메일 입니다.");
+        dto.setTitle("Mallang 임시비밀번호 안내 이메일입니다.");
         dto.setMessage("안녕하세요. Mallang 임시비밀번호 안내 관련 이메일 입니다.\n" + " 회원님의 임시 비밀번호는 "
                 + tempPassword + " 입니다.\n" + "로그인 후에는 비밀번호 변경 바랍니다.\n"
                 + "언제나 저희 서비스를 이용해 주셔서 감사합니다.");
@@ -229,4 +244,5 @@ public class MemberUserService {
             throw new MallangsCustomException(ErrorCode.FAILURE);
         }
     }
+
 }

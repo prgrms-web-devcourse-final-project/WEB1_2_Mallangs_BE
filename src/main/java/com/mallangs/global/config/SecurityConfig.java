@@ -5,13 +5,6 @@ import com.mallangs.global.jwt.filter.JWTFilter;
 import com.mallangs.global.jwt.service.AccessTokenBlackList;
 import com.mallangs.global.jwt.service.RefreshTokenService;
 import com.mallangs.global.jwt.util.JWTUtil;
-import com.mallangs.global.oauth2.handler.CustomFailureHandler;
-import com.mallangs.global.oauth2.handler.CustomSuccessHandler;
-import com.mallangs.global.oauth2.service.CustomOAuth2MemberService;
-
-import java.util.Arrays;
-import java.util.Collections;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +21,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 @Configuration
 @EnableWebSecurity
 @Log4j2
@@ -42,14 +38,10 @@ public class SecurityConfig {
     @Value("${spring.jwt.refresh-token-validity-in-minutes}")
     private Long accessRefreshTokenValidity;
 
-    private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
     private final AccessTokenBlackList accessTokenBlackList;
     private final MemberRepository memberRepository;
-    private final CustomOAuth2MemberService customOAuth2MemberService;
-    private final CustomSuccessHandler customSuccessHandler;
-    private final CustomFailureHandler customFailureHandler;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
@@ -82,16 +74,6 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable);
-
-//        // oauth2
-//        http
-//                .oauth2Login((oauth2) -> oauth2
-//                        .loginPage("/login")
-//                        .userInfoEndpoint((userInfo) -> userInfo
-//                                .userService(customOAuth2MemberService))
-//                        .successHandler(customSuccessHandler)
-//                        .failureHandler(customFailureHandler)
-//                );
 
         // 경로별 인가 작업
         http
