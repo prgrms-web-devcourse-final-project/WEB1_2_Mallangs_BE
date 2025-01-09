@@ -1,5 +1,6 @@
 package com.mallangs.domain.member.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mallangs.domain.member.dto.*;
 import com.mallangs.domain.member.dto.request.LoginRequest;
 import com.mallangs.domain.member.dto.response.MemberGetByOtherResponse;
@@ -28,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -56,16 +58,15 @@ import java.util.UUID;
 public class MemberUserController {
 
     private final MemberRepository memberRepository;
+    private final RedisTemplate<String,Object> redisTemplate;
+    private final ObjectMapper objectMapper;
+
     // 토큰 만료 시간
     @Value("${spring.jwt.access-token-validity-in-minutes}")
     private Long accessTokenValidity;
-    @Value("${spring.jwt.refresh-token-validity-in-minutes}")
-    private Long accessRefreshTokenValidity;
 
     private final AuthenticationManager authenticationManager;
     private final MemberUserService memberUserService;
-    private final RefreshTokenService refreshTokenService;
-    private final AccessTokenBlackList accessTokenBlackList;
     private final JWTUtil jwtUtil;
 
 
@@ -182,8 +183,8 @@ public class MemberUserController {
             @ApiResponse(responseCode = "201", description = "로그인 요청 성공"),
             @ApiResponse(responseCode = "401", description = "로그인에 실패했습니다.")
     })
-    public ResponseEntity<?> login(HttpServletResponse response,
-                                   @Validated @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> login(HttpServletResponse response, HttpServletRequest request,
+                                   @Validated @RequestBody LoginRequest loginRequest) throws MessagingException {
         try {
             // 인증 토큰 생성
             UsernamePasswordAuthenticationToken authToken =
@@ -213,19 +214,6 @@ public class MemberUserController {
             AccessPayloadMap.put("category", TokenCategory.ACCESS_TOKEN.name());
             String accessToken = jwtUtil.createAccessToken(AccessPayloadMap, accessTokenValidity);
 
-//            //리프레시 토큰 생성 ( 난수를 입력, 의미없는 토큰 생성 )
-//            Map<String, Object> refreshPayloadMap = new HashMap<>();
-//            refreshPayloadMap.put("userId", userId);
-//
-//            //식별 위한 UserID 입력
-//            String randomUUID = UUID.randomUUID().toString();
-//            refreshPayloadMap.put("randomUUID", randomUUID);
-//            String refreshToken = jwtUtil.createRefreshToken(refreshPayloadMap, accessRefreshTokenValidity);
-//            log.info("컨트롤러 로그인, 토큰만듬: {}, refresh: {}", accessToken, refreshToken);
-//
-//            //리프레시 토큰 레디스에 저장하기
-//            refreshTokenService.insertInRedis(refreshPayloadMap, refreshToken);
-
             //로그인 시간 저장
             Member foundMember = memberRepository.findByUserId(new UserId(userId))
                     .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
@@ -237,6 +225,19 @@ public class MemberUserController {
                 return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
                         .body(foundMember.getNickname().getValue() + "님은 " + foundMember.getReasonForBan() + " 이유로 "
                                 + (foundMember.getExpiryDate().getDayOfYear() - LocalDateTime.now().getDayOfYear()) + "일간 웹서비스 이용 제한됩니다.");
+            }
+
+            //ip주소 확인/저장
+            Object ipAddress = redisTemplate.opsForValue().get(userId);
+            if (ipAddress==null){
+                //ip주소 저장
+                ipAddress = request.getRemoteAddr();
+                redisTemplate.opsForValue().set(userId,ipAddress);
+            }else {
+                if (!(ipAddress).equals(request.getRemoteAddr())){
+                    //경고메세지 전송
+                    memberUserService.mailSend(memberUserService.writeWarningMessage(email));
+                };
             }
 
             //토큰 전송
@@ -266,93 +267,16 @@ public class MemberUserController {
     })
     public ResponseEntity<?> loginOut(HttpServletRequest request, HttpServletResponse response) {
         log.info("커스텀 로그아웃 실행");
-//
-//        // Refresh Token 없다면 오류
-//        String refreshTokenFromCookies = getRefreshTokenFromCookies(request);
-//        log.info("refreshTokenFromCookies : {}", refreshTokenFromCookies);
-//        if (refreshTokenFromCookies == null || refreshTokenFromCookies.trim().isEmpty()) {
-//            log.warn("No refresh token found");
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//                    .body(Map.of("error", "Refresh token is missing"));
-//        }
-//
-//        // Access Token 없다면 오류
-//        String authorizationHeader = request.getHeader("Authorization");
-//        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-//            log.warn("No access token found");
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//                    .body(Map.of("error", "Access token is missing"));
-//        }
-//
-//        String accessToken = authorizationHeader.substring(7);
-//        // 블랙리스트 등록
-//        try {
-//            if (!jwtUtil.isExpired(accessToken)) {
-//                if (!jwtUtil.isExpired(refreshTokenFromCookies)) {
-//                    accessTokenBlackList.registerBlackList(accessToken, refreshTokenFromCookies);
-//                    log.info("Tokens are registered to BlackList");
-//                } else {
-//                    log.info("RefreshToken is expired");
-//                }
-//            } else {
-//                log.info("AccessToken is expired");
-//
-//            }
-//            // 리프레시 토큰 삭제
-//            Map<String, Object> payloadMap = jwtUtil.validateRefreshToken(refreshTokenFromCookies);
-//            refreshTokenService.deleteRefreshTokenInRedis(payloadMap);
-//
-//        } catch (Exception e) {
-//            log.error("토큰 블랙리스트 처리에 실패하였습니다 : {}", e.getMessage());
-//            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(Map.of("error", "Token processing failed"));
-//        }
-//
-//        // 쿠키 비우기
-//        Cookie cookie = new Cookie("refreshToken", null);
-////        cookie.setSecure(true); // HTTPS 환경에서만 전송
-//        cookie.setPath("/");
-//        cookie.setHttpOnly(true);
-//        cookie.setMaxAge(0);
-//        response.addCookie(cookie);
-//
-//
-//        response.addHeader("accessToken",null);
-//        response.setStatus(HttpServletResponse.SC_OK);
-//        response.setContentType("application/json");
-
         response.setHeader("accessToken", null);
         return ResponseEntity.status(HttpStatus.CREATED).body("message : 로그아웃 성공");
     }
 
-    // 리프레시 토큰 꺼내기
-    private String getRefreshTokenFromCookies(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("RefreshToken".equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
-
-    }
-
-    @PutMapping("/member-role")
-    @Operation(summary = "관리자로 권한변환", description = "관리자로 권한 변환 API")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "관리자로 권한 병환 성공"),
-            @ApiResponse(responseCode = "400", description = "관리자로 권한 병환 실패.")
-    })
-    public ResponseEntity<?> changeMemberRole(@AuthenticationPrincipal CustomMemberDetails customMemberDetails) {
-        String userId = customMemberDetails.getUserId();
-        //맴버 찾기
-        Member foundMember = memberRepository.findByUserId(new UserId(userId))
-                .orElseThrow(() -> new MallangsCustomException(ErrorCode.MEMBER_NOT_FOUND));
-        //권한 변경
-        foundMember.changeRole(MemberRole.ROLE_ADMIN);
-        return ResponseEntity.status(HttpStatus.CREATED).body(memberRepository.save(foundMember));
+    //ip주소 변경
+    @GetMapping("/change/ip-address")
+    public String changeIpAddress(@RequestParam String userId, HttpServletRequest request) {
+        redisTemplate.opsForValue().set(userId, request.getRemoteAddr());
+        log.info("변경된 ip주소 : {}",request.getRemoteAddr());
+        return "ip주소가 변경되었습니다.";
     }
 
 }
